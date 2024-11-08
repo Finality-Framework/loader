@@ -1,0 +1,38 @@
+plugins {
+    id 'java'
+    id 'com.github.johnrengelman.shadow' version '8.1.1'
+}
+
+group = 'team.rainfall.finality'
+version = '1.0-SNAPSHOT'
+
+repositories {
+
+    maven {
+        url 'https://maven.aliyun.com/repository/public/'
+    }
+    maven {
+        url "https://jitpack.io/"
+    }
+    maven {
+        url "https://plugins.gradle.org/m2/"
+    }
+    mavenCentral()
+}
+
+
+
+dependencies {
+    implementation 'com.alibaba.fastjson2:fastjson2:2.0.53'
+    implementation group:'org.ow2.asm',name:'asm',version:'9.7'
+    implementation group:'org.ow2.asm',name:'asm-commons',version:'9.7'
+    implementation group:'org.ow2.asm',name:'asm-util',version:'9.7'
+    implementation group:'org.ow2.asm',name:'asm-tree',version:'9.7'
+    implementation group:'org.ow2.asm',name:'asm-analysis',version:'9.7'
+}
+
+shadowJar {
+    manifest {
+        attributes 'Main-Class': 'team.rainfall.finality.loader.Main'
+    }
+}

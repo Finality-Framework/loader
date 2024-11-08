@@ -1,2 +1,2 @@
-# loader
-load mods and plugins.
+# loader   
+This is the loader for Finality Framework.
