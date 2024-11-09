@@ -21,12 +21,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.jar.JarFile;
 
+import team.rainfall.finality.FinalityLogger;
 import team.rainfall.luminosity.TweakProcess;
 import team.rainfall.luminosity.TweakedClass;
 
 public class Main {
-
+    public static final String VERSION = "1.0.0";
     public static void main(String[] args) {
+        System.out.println("Finality Framework Loader "+VERSION);
         FinalityClassLoader classLoader = new FinalityClassLoader(new URL[0]);
         try {
             File overrideManifest = new File(args[1]);
@@ -36,7 +38,6 @@ public class Main {
             while ((line = reader.readLine()) != null) {
                 sb.append(line);
             }
-            PluginManager.INSTANCE.pluginFileList.add(new File("api.jar"));
             String[] var6 = sb.toString().split(";");
             int var7 = var6.length;
             int var8;
@@ -82,7 +83,7 @@ public class Main {
 
             switch (args[0]) {
                 case "launch":
-                    classLoader.loadClass("aoc.kingdoms.lukasz.jakowski.desktop.DesktopLauncher").getMethod("main", String[].class).invoke((Object) null, new String[0]);
+                    classLoader.loadClass("aoc.kingdoms.lukasz.jakowski.desktop.DesktopLauncher").getMethod("main", String[].class).invoke((Object) null, (Object) new String[0]);
                     break;
                 case "gen":
                     for (TweakedClass tweakedClass : process.tweakedClasses) {

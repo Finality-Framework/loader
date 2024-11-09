@@ -41,7 +41,7 @@ public class TweakProcess {
     }
 
     public void tweak() {
-
+        FinalityLogger.info("Start injecting code");
         DependenciesClassLoader dependenciesClassLoader = new DependenciesClassLoader(new URL[]{},Thread.currentThread().getContextClassLoader());
         try {
             dependenciesClassLoader.addUrl2(targetFile.toURI().toURL());
@@ -92,7 +92,6 @@ public class TweakProcess {
                     if (AsmUtil.annotationExists("Lteam/rainfall/luminosity/annotations/Tweak;", node)) {
                         FinalityLogger.debug("Found tweak annotation in class " + tweakClass);
                         ClassNode targetClassNode = getClassFromJar(targetJar,AsmUtil.getAnnotationValue("targetClass", AsmUtil.getAnnotation("Lteam/rainfall/luminosity/annotations/Tweak;", node)).toString());
-                        System.out.println("WTF C"+targetClassNode.methods.size());
                         String targetClassName = AsmUtil.getAnnotationValue("targetClass", AsmUtil.getAnnotation("Lteam/rainfall/luminosity/annotations/Tweak;", node)).toString();
                         if(plugin.manifest.publicizedClasses.contains(targetClassName)) {
                             AccessTransformer.transform(targetClassNode);
