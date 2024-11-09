@@ -5,46 +5,47 @@
 
 package team.rainfall.finality.loader;
 
-import java.io.File;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Iterator;
 
 public class FileManager {
     public static FileManager INSTANCE = new FileManager();
-    private ArrayList<File> fallbackFolderList = new ArrayList();
-
+    private ArrayList<File> fallbackFolderList = new ArrayList<>();
     public FileManager() {
     }
-
-    public void addFallbackFolder(File file) {
-        if (file.isDirectory()) {
-            this.fallbackFolderList.add(file);
+    public File getSteamWSFolder(){
+        //获得当前目录父目录的父目录
+        File file = new File("aoh3.exe").getAbsoluteFile();
+        file = file.getParentFile().getParentFile().getParentFile();
+        System.out.println(file.getAbsolutePath());
+        file = new File(file,"workshop");
+        file = new File(file,"content");
+        file = new File(file,"2772750");
+        if(file.exists()){
+            return file;
         }
-
-    }
-
-    public File getResource(String path) {
-        Iterator<File> var2 = this.fallbackFolderList.iterator();
-
-        File resource;
-        do {
-            if (!var2.hasNext()) {
-                resource = new File(getLocalPath(), path);
-                if (resource.exists()) {
-                    return resource;
-                }
-
-                return new File(getLocalPath(), path);
-            }
-
-            File file = (File)var2.next();
-            resource = new File(file, path);
-        } while(!resource.exists());
-
-        return resource;
+        throw new RuntimeException("Can not found SteamWSfolder");
     }
 
     private static String getLocalPath() {
         return (new File("")).getAbsolutePath() + File.separator;
+    }
+    public String[] getModsOffFile(){
+        File file = new File("settings/ModsOff.txt");
+        if(file.exists()){
+            //将文件内的数据读入String
+            try {
+                byte[] bytes = Files.readAllBytes(Paths.get(file.getAbsolutePath()));
+                String content = new String(bytes, StandardCharsets.UTF_8);
+                return content.split(";");
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return new String[0];
     }
 }

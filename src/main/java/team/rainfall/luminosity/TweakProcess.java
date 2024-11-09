@@ -56,9 +56,7 @@ public class TweakProcess {
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
         }
-        tweakedClasses.forEach(tweakedClass -> {
-            System.out.println(tweakedClass.className);
-        });
+        tweakedClasses.forEach(tweakedClass -> System.out.println(tweakedClass.className));
     }
     public void tweakAcc() throws FileNotFoundException {
         for(Plugin plugin : plugins){
