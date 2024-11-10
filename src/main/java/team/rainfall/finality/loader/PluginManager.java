@@ -26,8 +26,7 @@ public class PluginManager {
             File folder2 = new File(folder, "plugins");
             if (folder2.exists()) {
                 FinalityLogger.debug("folder2 exists");
-                File[] var3 = (File[])Objects.requireNonNull(folder2.listFiles());
-                int var4 = var3.length;
+                File[] var3 = Objects.requireNonNull(folder2.listFiles());
                 for (File pluginFile : var3) {
                     if (pluginFile.getName().endsWith(".jar")) {
                         System.out.println("add plugin " + pluginFile.getName());
@@ -50,8 +49,7 @@ public class PluginManager {
             try {
                 jarFiles.add(new JarFile(file));
             } catch (IOException var5) {
-                IOException e = var5;
-                throw new RuntimeException(e);
+                throw new RuntimeException(var5);
             }
         }
 

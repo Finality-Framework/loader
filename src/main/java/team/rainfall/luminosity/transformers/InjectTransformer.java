@@ -189,14 +189,12 @@ public class InjectTransformer {
 
     InsnList buildReturnOpcodes2(String desc) {
         InsnList insnList = new InsnList();
-        switch (desc.charAt(desc.length() - 1)) {
-            case 'V':
-                insnList.add(new InsnNode(ICONST_1));
-                insnList.add(new FieldInsnNode(PUTFIELD, "team/rainfall/luminosity/CallbackInfo", "isRetVoid", "Z"));
-                break;
-            default:
-                insnList.add(new InsnNode(ICONST_0));
-                insnList.add(new FieldInsnNode(PUTFIELD, "team/rainfall/luminosity/CallbackInfo", "isRetVoid", "Z"));
+        if (desc.charAt(desc.length() - 1) == 'V') {
+            insnList.add(new InsnNode(ICONST_1));
+            insnList.add(new FieldInsnNode(PUTFIELD, "team/rainfall/luminosity/CallbackInfo", "isRetVoid", "Z"));
+        } else {
+            insnList.add(new InsnNode(ICONST_0));
+            insnList.add(new FieldInsnNode(PUTFIELD, "team/rainfall/luminosity/CallbackInfo", "isRetVoid", "Z"));
         }
         return insnList;
     }

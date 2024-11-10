@@ -48,4 +48,13 @@ public class FileManager {
         }
         return new String[0];
     }
+    public String findGameFile(){
+        File file = new File("aoh3.exe");
+        if(file.exists()) return "aoh3.exe";
+        file = new File("aoh3.jar");
+        if(file.exists()) return "aoh3.jar";
+        file = new File("history2020.exe");
+        if(file.exists()) return "history2020.exe";
+        throw new RuntimeException("Can not found game file");
+    }
 }

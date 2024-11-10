@@ -1,7 +1,7 @@
 package team.rainfall.finality;
 
 public class FinalityLogger {
-    public static boolean isDebug = true;
+    public static final boolean isDebug = true;
     public static void info(String message) {
         System.out.println("[I] "+message);
     }
