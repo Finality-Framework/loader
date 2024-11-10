@@ -25,7 +25,7 @@ import team.rainfall.luminosity.TweakProcess;
 import team.rainfall.luminosity.TweakedClass;
 
 public class Main {
-    public static final String VERSION = "1.0.1";
+    public static final String VERSION = "1.0.2";
 
     public static void main(String[] args) {
         System.out.println("Finality Framework Loader " + VERSION);
