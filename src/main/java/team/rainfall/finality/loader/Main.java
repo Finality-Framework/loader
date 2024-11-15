@@ -26,7 +26,8 @@ import team.rainfall.luminosity.TweakedClass;
 
 public class Main {
     public static final String VERSION = "1.0.2";
-
+    public static final String STEAM_MANAGER_CLASS = "aoh.kingdoms.history.mainGame.Steam.SteamManager";
+    public static final String LAUNCHER_CLASS = "aoh.kingdoms.history.mainGame.desktop.DesktopLauncher";
     public static void main(String[] args) {
         System.out.println("Finality Framework Loader " + VERSION);
         FinalityClassLoader classLoader = new FinalityClassLoader(new URL[0]);
@@ -88,11 +89,11 @@ public class Main {
             if (manifest.disableSteamAPI) {
                 for (String str: manifest.localMods) {
                     System.out.println(str);
-                    Field foldersAllListField = classLoader.loadClass("aoc.kingdoms.lukasz.jakowski.Steam.SteamManager").getField("modsFoldersAll");
+                    Field foldersAllListField = classLoader.loadClass(STEAM_MANAGER_CLASS).getField("modsFoldersAll");
                     List<String> foldersAllList = (List) foldersAllListField.get(null);
-                    Field foldersListField = classLoader.loadClass("aoc.kingdoms.lukasz.jakowski.Steam.SteamManager").getField("modsFolders");
+                    Field foldersListField = classLoader.loadClass(STEAM_MANAGER_CLASS).getField("modsFolders");
                     List<String> foldersList = (List) foldersListField.get(null);
-                    Field foldersListSizeField = classLoader.loadClass("aoc.kingdoms.lukasz.jakowski.Steam.SteamManager").getField("modsFoldersSize");
+                    Field foldersListSizeField = classLoader.loadClass(STEAM_MANAGER_CLASS).getField("modsFoldersSize");
                     int folderListSize = foldersListSizeField.getInt(null);
                     foldersAllList.add(str);
                     foldersList.add(str);
@@ -101,7 +102,7 @@ public class Main {
             }
             switch (args[0]) {
                 case "launch":
-                    classLoader.loadClass("aoc.kingdoms.lukasz.jakowski.desktop.DesktopLauncher").getMethod("main", String[].class).invoke(null, (Object) new String[0]);
+                    classLoader.loadClass(LAUNCHER_CLASS).getMethod("main", String[].class).invoke(null, (Object) new String[0]);
                     break;
                 case "gen":
                     for (TweakedClass tweakedClass : process.tweakedClasses) {
@@ -148,6 +149,8 @@ public class Main {
     public static String getFallbackGameFilePath() {
         if (new File("aoh3.exe").exists()) {
             return "aoh3.exe";
+        } else if (new File("game.jar").exists()) {
+            return "game.jar";
         } else if (new File("aoh3.jar").exists()) {
             return "aoh3.jar";
         }

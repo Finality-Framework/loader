@@ -51,6 +51,8 @@ public class FileManager {
     public String findGameFile(){
         File file = new File("aoh3.exe");
         if(file.exists()) return "aoh3.exe";
+        file = new File("game.jar");
+        if(file.exists()) return "game.jar";
         file = new File("aoh3.jar");
         if(file.exists()) return "aoh3.jar";
         file = new File("history2020.exe");
