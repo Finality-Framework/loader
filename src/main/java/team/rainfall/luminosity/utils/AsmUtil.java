@@ -65,8 +65,18 @@ public class AsmUtil {
         return null;
     }
     public static MethodNode getMethodFromClass(String name,ClassNode node){
+        if(name.contains("(") && name.contains(")")){
+            return getMethodFromClass(name,node,true);
+        }else {
+            return getMethodFromClass(name,node,false);
+        }
+    }
+    public static MethodNode getMethodFromClass(String name,ClassNode node,boolean isFullName){
         for (MethodNode method : node.methods) {
-            if (method.name.equals(name)) {
+            if (method.name.equals(name) && !isFullName) {
+                return method;
+            }
+            if((method.name+method.desc).equals(name) && isFullName) {
                 return method;
             }
         }

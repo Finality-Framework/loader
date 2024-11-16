@@ -11,25 +11,26 @@ package team.rainfall.finality.loader;
 import java.io.*;
 import java.lang.reflect.Field;
 import java.net.URL;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 import java.util.jar.JarFile;
 
 import team.rainfall.finality.FinalityLogger;
+import team.rainfall.luminosity.Plugin;
 import team.rainfall.luminosity.TweakProcess;
 import team.rainfall.luminosity.TweakedClass;
 
 public class Main {
-    public static final String VERSION = "1.0.2";
+    public static final String VERSION = "1.0.3";
     public static final String STEAM_MANAGER_CLASS = "aoh.kingdoms.history.mainGame.Steam.SteamManager";
     public static final String LAUNCHER_CLASS = "aoh.kingdoms.history.mainGame.desktop.DesktopLauncher";
     public static void main(String[] args) {
         System.out.println("Finality Framework Loader " + VERSION);
+        long startTime = System.currentTimeMillis();
+        FinalityLogger.debug("START TIME "+startTime);
         FinalityClassLoader classLoader = new FinalityClassLoader(new URL[0]);
         try {
             Manifest manifest;
@@ -73,13 +74,12 @@ public class Main {
                     }
                 }
             }
-            TweakProcess process = new TweakProcess(PluginManager.INSTANCE.getPluginJarList(), new JarFile(new File(manifest.gameFile)));
+            TweakProcess process = new TweakProcess(PluginManager.INSTANCE.getPluginFileList(), new JarFile(new File(manifest.gameFile)));
             process.targetFile = new File(manifest.gameFile);
             process.tweak();
             classLoader.addUrl2((new File(manifest.gameFile)).toURI().toURL());
-            for (File file : PluginManager.INSTANCE.getPluginFileList()) {
-                System.out.println(file.getName());
-                classLoader.addUrl2(file.toURI().toURL());
+            for (Plugin plugin: process.plugins) {
+                classLoader.addUrl2(plugin.file.toURI().toURL());
             }
             if (args[0].equals("launch")) {
                 process.tweakedClasses.forEach((tweakedClass) -> classLoader.defineClass2(tweakedClass.className, tweakedClass.classBytes, 0, tweakedClass.classBytes.length));
@@ -88,7 +88,6 @@ public class Main {
             //But where is my Steam Workshop mods? To hell with those mods.
             if (manifest.disableSteamAPI) {
                 for (String str: manifest.localMods) {
-                    System.out.println(str);
                     Field foldersAllListField = classLoader.loadClass(STEAM_MANAGER_CLASS).getField("modsFoldersAll");
                     List<String> foldersAllList = (List) foldersAllListField.get(null);
                     Field foldersListField = classLoader.loadClass(STEAM_MANAGER_CLASS).getField("modsFolders");
@@ -102,6 +101,7 @@ public class Main {
             }
             switch (args[0]) {
                 case "launch":
+                    FinalityLogger.debug("END TIME "+System.currentTimeMillis()+",Time spending "+(System.currentTimeMillis()-startTime));
                     classLoader.loadClass(LAUNCHER_CLASS).getMethod("main", String[].class).invoke(null, (Object) new String[0]);
                     break;
                 case "gen":

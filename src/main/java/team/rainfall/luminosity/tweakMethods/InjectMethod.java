@@ -4,18 +4,18 @@ import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.MethodNode;
 
 public class InjectMethod {
-    public String sourceClass;
-    public ClassNode classNode;
-    public MethodNode methodNode;
+    public String sourceClassName;
+    public ClassNode sourceClassNode;
+    public MethodNode sourceMethodNode;
     public String position;
-    public String targetMethod;
-    public String targetClass;
-    public MethodNode targetNode;
+    public String targetMethodName;
+    public String targetClassName;
+    public MethodNode targetMethodNode;
     public ClassNode targetClassNode;
     public String getFullMethodName(){
-        return targetClass + "." + targetMethod;
+        return targetClassName + "." + targetMethodName;
     }
     public String getFullClassName(){
-        return targetClass;
+        return targetClassName;
     }
 }

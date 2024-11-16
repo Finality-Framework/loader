@@ -7,7 +7,6 @@ import team.rainfall.luminosity.utils.NumberUtil;
 import team.rainfall.luminosity.tweakMethods.InjectMethod;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 
 import static org.objectweb.asm.Opcodes.*;
 import static org.objectweb.asm.Opcodes.ARETURN;
@@ -52,9 +51,9 @@ public class InjectTransformer {
                         invokeNodes.add(node);
                     }
                 }
-                String locateMethodName = AsmUtil.getAnnotationValue("methodName", AsmUtil.getAnnotation("Lteam/rainfall/luminosity/annotations/MethodLocate;", method.methodNode)).toString();
+                String locateMethodName = AsmUtil.getAnnotationValue("methodName", AsmUtil.getAnnotation("Lteam/rainfall/luminosity/annotations/MethodLocate;", method.sourceMethodNode)).toString();
                 int foundCounter = -1;
-                int locateMethodOrder = (int) AsmUtil.getAnnotationValue("order", AsmUtil.getAnnotation("Lteam/rainfall/luminosity/annotations/MethodLocate;", method.methodNode));
+                int locateMethodOrder = (int) AsmUtil.getAnnotationValue("order", AsmUtil.getAnnotation("Lteam/rainfall/luminosity/annotations/MethodLocate;", method.sourceMethodNode));
                 for (AbstractInsnNode node : invokeNodes) {
                     if(node instanceof MethodInsnNode){
                         MethodInsnNode methodInsnNode = (MethodInsnNode) node;
@@ -75,9 +74,9 @@ public class InjectTransformer {
                         invokeNodes.add(node);
                     }
                 }
-                String locateMethodName = AsmUtil.getAnnotationValue("methodName", AsmUtil.getAnnotation("Lteam/rainfall/luminosity/annotations/MethodLocate;", method.methodNode)).toString();
+                String locateMethodName = AsmUtil.getAnnotationValue("methodName", AsmUtil.getAnnotation("Lteam/rainfall/luminosity/annotations/MethodLocate;", method.sourceMethodNode)).toString();
                 int foundCounter = -1;
-                int locateMethodOrder = (int) AsmUtil.getAnnotationValue("order", AsmUtil.getAnnotation("Lteam/rainfall/luminosity/annotations/MethodLocate;", method.methodNode));
+                int locateMethodOrder = (int) AsmUtil.getAnnotationValue("order", AsmUtil.getAnnotation("Lteam/rainfall/luminosity/annotations/MethodLocate;", method.sourceMethodNode));
                 for (AbstractInsnNode node : invokeNodes) {
                     if(node instanceof MethodInsnNode){
                         MethodInsnNode methodInsnNode = (MethodInsnNode) node;
@@ -96,7 +95,7 @@ public class InjectTransformer {
 
     InsnList buildInjectOpcodes(String sourceOwner, InjectMethod method, MethodNode targetNode) {
         InsnList insnList = new InsnList();
-        MethodNode sourceNode = method.methodNode;
+        MethodNode sourceNode = method.sourceMethodNode;
         insnList.add(new TypeInsnNode(NEW, "team/rainfall/luminosity/CallbackInfo"));
         insnList.add(new InsnNode(DUP));
         if (NumberUtil.isBitSet(targetNode.access, 3)) {

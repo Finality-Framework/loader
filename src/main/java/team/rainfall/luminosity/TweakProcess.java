@@ -1,7 +1,6 @@
 package team.rainfall.luminosity;
 
 import org.objectweb.asm.ClassWriter;
-import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.MethodNode;
 import team.rainfall.finality.FinalityLogger;
 import team.rainfall.luminosity.transformers.AccessTransformer;
@@ -19,6 +18,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.stream.Collectors;
@@ -29,14 +29,14 @@ public class TweakProcess {
     public final static int writeMode = ClassWriter.COMPUTE_FRAMES;
     //ASM needs dependencies to compute frames
     public static ClassLoader classLoader = new URLClassLoader(new URL[]{});
-    public ArrayList<JarFile> pluginJars = new ArrayList<>();
+    public ArrayList<File> pluginFiles = new ArrayList<>();
     public JarFile targetJar = null;
     public File targetFile = null;
     public ArrayList<Plugin> plugins = new ArrayList<>();
     public ArrayList<TweakedClass> tweakedClasses = new ArrayList<>();
     InjectTransformer injectTransformer = new InjectTransformer();
-    public TweakProcess(ArrayList<JarFile> pluginJars, JarFile targetJar) {
-        this.pluginJars = pluginJars;
+    public TweakProcess(ArrayList<File> pluginFiles, JarFile targetJar) {
+        this.pluginFiles = pluginFiles;
         this.targetJar = targetJar;
     }
 
@@ -86,7 +86,7 @@ public class TweakProcess {
         for (Plugin plugin : plugins) {
             plugin.manifest.tweakClasses.forEach((tweakClass) -> {
                 try {
-                    ClassNode node = getClassFromJar(plugin.file, tweakClass);
+                    ClassNode node = getClassFromJar(plugin.jarFile, tweakClass);
                     if (AsmUtil.annotationExists("Lteam/rainfall/luminosity/annotations/Tweak;", node)) {
                         FinalityLogger.debug("Found tweak annotation in class " + tweakClass);
                         ClassNode targetClassNode = getClassFromJar(targetJar,AsmUtil.getAnnotationValue("targetClass", AsmUtil.getAnnotation("Lteam/rainfall/luminosity/annotations/Tweak;", node)).toString());
@@ -102,13 +102,13 @@ public class TweakProcess {
                                 MethodNode targetMethodNode = AsmUtil.getMethodFromClass(targetMethodName, targetClassNode);
                                 InjectMethod injectMethod = new InjectMethod();
                                 injectMethod.position = AsmUtil.getAnnotationValue("position", AsmUtil.getAnnotation("Lteam/rainfall/luminosity/annotations/Inject;", methodNode)).toString();
-                                injectMethod.methodNode = methodNode;
-                                injectMethod.targetClass = targetClassName;
-                                injectMethod.targetMethod = targetMethodName;
+                                injectMethod.sourceMethodNode = methodNode;
+                                injectMethod.targetClassName = targetClassName;
+                                injectMethod.targetMethodName = targetMethodName;
                                 injectMethod.targetClassNode = targetClassNode;
-                                injectMethod.targetNode = targetMethodNode;
-                                injectMethod.classNode = node;
-                                injectMethod.sourceClass = tweakClass;
+                                injectMethod.targetMethodNode = targetMethodNode;
+                                injectMethod.sourceClassNode = node;
+                                injectMethod.sourceClassName = tweakClass;
                                 injectMethods.add(injectMethod);
                             }
                         }
@@ -121,8 +121,8 @@ public class TweakProcess {
         System.out.println(injectMethods.stream().collect(Collectors.groupingBy(InjectMethod::getFullMethodName)));
         injectMethods.stream().collect(Collectors.groupingBy(InjectMethod::getFullMethodName)).forEach((k,v)->{
             ClassNode targetClassNode = v.get(0).targetClassNode;
-            MethodNode targetMethodNode = v.get(0).targetNode;
-            injectTransformer.transform(v.get(0).sourceClass, v.toArray(new InjectMethod[0]), targetMethodNode);
+            MethodNode targetMethodNode = v.get(0).targetMethodNode;
+            injectTransformer.transform(v.get(0).sourceClassName, v.toArray(new InjectMethod[0]), targetMethodNode);
         });
         injectMethods.stream().collect(Collectors.groupingBy(InjectMethod::getFullClassName)).forEach((k,v)->{
             ClassWriter writer = new ClassWriter(writeMode);
@@ -131,34 +131,58 @@ public class TweakProcess {
             byte[] bytes = writer.toByteArray();
             TweakedClass tweakedClass = new TweakedClass();
             tweakedClass.classBytes = bytes;
-            tweakedClass.className = AsmUtil.getAnnotationValue("targetClass", AsmUtil.getAnnotation("Lteam/rainfall/luminosity/annotations/Tweak;", v.get(0).classNode)).toString();
+            tweakedClass.className = AsmUtil.getAnnotationValue("targetClass", AsmUtil.getAnnotation("Lteam/rainfall/luminosity/annotations/Tweak;", v.get(0).sourceClassNode)).toString();
             tweakedClasses.add(tweakedClass);
         });
 
     }
 
     public void readManifests() {
-        for (JarFile jarFile : pluginJars) {
-            Plugin plugin = new Plugin();
-            plugin.file = jarFile;
-            //Search for manifest
-            Enumeration<JarEntry> entries = jarFile.entries();
-            while (entries.hasMoreElements()) {
-                JarEntry entry = entries.nextElement();
-                if (entry.getName().equalsIgnoreCase("modify.json")) {
-                    try {
-                        plugin.manifest = new TweakManifest(jarFile.getInputStream(entry));
-                    } catch (IOException e) {
-                        System.out.println("Error while reading manifest: " + e.getMessage());
+        for (File file : pluginFiles) {
+            String absolutePath = file.getAbsoluteFile().getAbsolutePath();
+            try {
+                Plugin plugin = new Plugin();
+                JarFile jarFile = new JarFile(file);
+                plugin.file = file;
+                plugin.jarFile = jarFile;
+                //Search for manifest
+                Enumeration<JarEntry> entries = jarFile.entries();
+                while (entries.hasMoreElements()) {
+                    JarEntry entry = entries.nextElement();
+                    if (entry.getName().equalsIgnoreCase("modify.json")) {
+                        try {
+                            plugin.manifest = new TweakManifest(jarFile.getInputStream(entry));
+                        } catch (IOException e) {
+                            System.out.println("Error while reading manifest: " + e.getMessage());
+                            break;
+                        }
                         break;
                     }
-                    break;
                 }
+
+                if (plugin.manifest == null) {
+                    continue;
+                }
+                if (plugin.manifest.sdkVersion != 1) {
+                    FinalityLogger.warn("Found incompatible plugin " + absolutePath + " using SDK version " + plugin.manifest.sdkVersion);
+                    FinalityLogger.warn("This plugin won't be loaded!");
+                    continue;
+                }
+                AtomicBoolean shouldContinue = new AtomicBoolean(false);
+                plugins.forEach((v)->{
+                    if(plugin.manifest.packageName.equals(v.manifest.packageName)){
+                        FinalityLogger.warn("Found duplicate plugin " + absolutePath + " , package name is " + plugin.manifest.packageName);
+                        FinalityLogger.warn("This plugin won't be loaded!");
+                        shouldContinue.set(true);
+                    }
+                });
+                if(shouldContinue.get()){
+                    continue;
+                }
+                plugins.add(plugin);
+            } catch (Exception e) {
+                FinalityLogger.error("Error while reading the manifest of plugin "+absolutePath,e);
             }
-            if (plugin.manifest == null) {
-                continue;
-            }
-            plugins.add(plugin);
         }
     }
 }
