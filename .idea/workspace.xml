@@ -4,21 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b02e4973-3e3f-4f31-bf2a-882850525641" name="更改" comment="Urgent fix for package change">
-      <change afterPath="$PROJECT_DIR$/src/main/java/team/rainfall/luminosity/annotations/ImplementInterface.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/team/rainfall/luminosity/annotations/Overlay.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/team/rainfall/luminosity/transformers/ImplementTransformer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/team/rainfall/finality/FinalityLogger.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/team/rainfall/finality/FinalityLogger.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/team/rainfall/finality/loader/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/team/rainfall/finality/loader/Main.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/team/rainfall/luminosity/Plugin.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/team/rainfall/luminosity/Plugin.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/team/rainfall/luminosity/TweakManifest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/team/rainfall/luminosity/TweakManifest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/team/rainfall/luminosity/TweakProcess.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/team/rainfall/luminosity/TweakProcess.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/team/rainfall/luminosity/transformers/InjectTransformer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/team/rainfall/luminosity/transformers/InjectTransformer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/team/rainfall/luminosity/tweakMethods/InjectMethod.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/team/rainfall/luminosity/tweakMethods/InjectMethod.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/team/rainfall/luminosity/utils/AsmUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/team/rainfall/luminosity/utils/AsmUtil.java" afterDir="false" />
-    </list>
+    <list default="true" id="b02e4973-3e3f-4f31-bf2a-882850525641" name="更改" comment="1.0.3 released" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -290,7 +276,15 @@
       <option name="project" value="LOCAL" />
       <updated>1731685039016</updated>
     </task>
-    <option name="localTasksCounter" value="9" />
+    <task id="LOCAL-00009" summary="1.0.3 released">
+      <option name="closed" value="true" />
+      <created>1731751257796</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1731751257796</updated>
+    </task>
+    <option name="localTasksCounter" value="10" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -312,6 +306,7 @@
     <MESSAGE value="1.0.2 released" />
     <MESSAGE value="readme change" />
     <MESSAGE value="Urgent fix for package change" />
-    <option name="LAST_COMMIT_MESSAGE" value="Urgent fix for package change" />
+    <MESSAGE value="1.0.3 released" />
+    <option name="LAST_COMMIT_MESSAGE" value="1.0.3 released" />
   </component>
 </project>
