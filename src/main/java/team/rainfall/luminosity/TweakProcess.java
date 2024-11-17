@@ -18,6 +18,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.Iterator;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
@@ -50,6 +51,7 @@ public class TweakProcess {
         }
         classLoader = dependenciesClassLoader;
         readManifests();
+        tweakOverlay();
         inject();
         try {
             tweakAcc();
@@ -58,6 +60,31 @@ public class TweakProcess {
         }
         tweakedClasses.forEach(tweakedClass -> System.out.println(tweakedClass.className));
     }
+
+    public void tweakOverlay(){
+        for (Plugin plugin : plugins) {
+            Iterator<String> iterator =plugin.manifest.tweakClasses.iterator();
+            while (iterator.hasNext()){
+                String tweakClass = iterator.next();
+                try {
+                    ClassNode node = getClassFromJar(plugin.jarFile, tweakClass);
+                    if (AsmUtil.annotationExists("Lteam/rainfall/luminosity/annotations/Overlay;", node)) {
+                        ClassWriter writer = new ClassWriter(writeMode);
+                        node.accept(writer);
+                        byte[] bytes = writer.toByteArray();
+                        TweakedClass tweakedClass = new TweakedClass();
+                        tweakedClass.classBytes = bytes;
+                        tweakedClass.className = tweakClass;
+                        tweakedClasses.add(tweakedClass);
+                        iterator.remove();
+                    }
+                } catch (Exception e) {
+                    FinalityLogger.error("Error while tweaking overlay class " + tweakClass,e);
+                }
+            }
+        }
+    }
+
     public void tweakAcc() throws FileNotFoundException {
         for(Plugin plugin : plugins){
             for(String clzPath : plugin.manifest.publicizedClasses){
@@ -84,7 +111,7 @@ public class TweakProcess {
     public void inject() {
         ArrayList<InjectMethod> injectMethods = new ArrayList<>();
         for (Plugin plugin : plugins) {
-            plugin.manifest.tweakClasses.forEach((tweakClass) -> {
+            for(String tweakClass:plugin.manifest.tweakClasses){
                 try {
                     ClassNode node = getClassFromJar(plugin.jarFile, tweakClass);
                     if (AsmUtil.annotationExists("Lteam/rainfall/luminosity/annotations/Tweak;", node)) {
@@ -116,7 +143,7 @@ public class TweakProcess {
                 } catch (FileNotFoundException e) {
                     System.out.println("Error while getting class: " + e.getMessage());
                 }
-            });
+            }
         }
         System.out.println(injectMethods.stream().collect(Collectors.groupingBy(InjectMethod::getFullMethodName)));
         injectMethods.stream().collect(Collectors.groupingBy(InjectMethod::getFullMethodName)).forEach((k,v)->{

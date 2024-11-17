@@ -82,7 +82,11 @@ public class Main {
                 classLoader.addUrl2(plugin.file.toURI().toURL());
             }
             if (args[0].equals("launch")) {
-                process.tweakedClasses.forEach((tweakedClass) -> classLoader.defineClass2(tweakedClass.className, tweakedClass.classBytes, 0, tweakedClass.classBytes.length));
+                process.tweakedClasses.forEach((tweakedClass) ->
+                        {
+                            FinalityLogger.debug("TWEAKED CLAZZ "+tweakedClass.className);
+                            classLoader.defineClass2(tweakedClass.className, tweakedClass.classBytes, 0, tweakedClass.classBytes.length);
+                        });
             }
             //Hijack SteamManager to load mods only when Steam API is disabled.
             //But where is my Steam Workshop mods? To hell with those mods.
