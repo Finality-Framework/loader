@@ -20,11 +20,11 @@ public class AsmUtil {
         return false;
     }
     public static boolean annotationExists (String name, ClassNode node) {
-        FinalityLogger.info("START");
+        //FinalityLogger.info("START");
         if(node.visibleAnnotations == null) return false;
-        FinalityLogger.info("START2");
+        //FinalityLogger.info("START2");
         for (AnnotationNode annotation : node.visibleAnnotations) {
-            FinalityLogger.info("START3 "+annotation.desc);
+            //FinalityLogger.info("START3 "+annotation.desc);
             if (annotation.desc.equals(name)) {
                 return true;
             }

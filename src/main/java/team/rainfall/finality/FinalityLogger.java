@@ -1,7 +1,7 @@
 package team.rainfall.finality;
 
 public class FinalityLogger {
-    public static final boolean isDebug = true;
+    public static boolean isDebug = false;
     public static final String RED_BACKGROUND = "\033[41m";
     public static final String WHITE_BACKGROUND = "\033[47m";
     public static final String YELLOW_BACKGROUND = "\033[43m";

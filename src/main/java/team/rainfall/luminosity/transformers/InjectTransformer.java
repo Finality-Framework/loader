@@ -16,22 +16,16 @@ public class InjectTransformer {
     LabelNode beforeReturnLabel = new LabelNode();
     InsnNode returnNode;
     public void transform(String sourceOwner, InjectMethod[] injectMethods, MethodNode targetNode) {
-        System.out.println("DEBUG444:" + sourceOwner);
         afterReturnLabel = new LabelNode();
         beforeReturnLabel = new LabelNode();
         targetNode.instructions.insert(buildReturnOpcodes(targetNode.desc, targetNode));
         for (InjectMethod method : injectMethods) {
-            System.out.println("DEBUG555:"+method.getFullMethodName());
             if (method.position.equals("HEAD")) {
                 targetNode.instructions.insert(afterReturnLabel, buildInjectOpcodes(sourceOwner, method, targetNode));
             }
             if (method.position.equals("RETURN")) {
                 ArrayList<AbstractInsnNode> returnNodes = new ArrayList<>();
                 for (AbstractInsnNode node : targetNode.instructions) {
-                    if(node instanceof MethodInsnNode){
-                        MethodInsnNode methodInsnNode = (MethodInsnNode) node;
-                        System.out.println("DEBUG C:"+AsmUtil.getFullInvokeName(methodInsnNode));
-                    }
                     if(node.equals(returnNode)){
                         continue;
                     }
@@ -40,7 +34,7 @@ public class InjectTransformer {
                     }
                 }
                 for (AbstractInsnNode node : returnNodes) {
-                    System.out.println(node);
+                    //System.out.println(node);
                     targetNode.instructions.insertBefore(node, buildInjectOpcodes(sourceOwner, method, targetNode));
                 }
             }
@@ -99,7 +93,6 @@ public class InjectTransformer {
         insnList.add(new TypeInsnNode(NEW, "team/rainfall/luminosity/CallbackInfo"));
         insnList.add(new InsnNode(DUP));
         if (NumberUtil.isBitSet(targetNode.access, 3)) {
-            System.out.println("It's static!");
             insnList.add(new MethodInsnNode(INVOKESPECIAL, "team/rainfall/luminosity/CallbackInfo", "<init>", "()V", false));
         } else {
             insnList.add(new VarInsnNode(ALOAD, 0));
@@ -199,32 +192,36 @@ public class InjectTransformer {
     }
 
     InsnList getLocalVarIndexOfParams(MethodNode node) {
+        int flag = 1;
+        if (NumberUtil.isBitSet(node.access, 3)) {
+            flag = 0;
+        }
         ArrayList<Integer> indexes = new ArrayList<>();
         InsnList insnList = new InsnList();
         Type[] types = Type.getMethodType(node.desc).getArgumentTypes();
-        System.out.println(types.length);
+        //System.out.println(types.length);
         for (int i = 0; i < types.length; i++) {
-            System.out.println(types[i].getDescriptor());
+            //System.out.println(types[i].getDescriptor());
             indexes.add(i);
         }
         for (Integer integer : indexes) {
             switch (types[integer].getDescriptor()) {
                 case "I":
                 case "Z":
-                    insnList.add(new VarInsnNode(ILOAD, integer+1));
+                    insnList.add(new VarInsnNode(ILOAD, integer+flag));
                     break;
                 case "J":
-                    insnList.add(new VarInsnNode(LLOAD, integer+1));
+                    insnList.add(new VarInsnNode(LLOAD, integer+flag));
                     break;
                 case "F":
-                    insnList.add(new VarInsnNode(FLOAD, integer+1));
+                    insnList.add(new VarInsnNode(FLOAD, integer+flag));
                     break;
                 case "D":
-                    insnList.add(new VarInsnNode(DLOAD, integer+1));
+                    insnList.add(new VarInsnNode(DLOAD, integer+flag));
                     break;
                 case "L":
                 default:
-                    insnList.add(new VarInsnNode(ALOAD, integer+1));
+                    insnList.add(new VarInsnNode(ALOAD, integer+flag));
                     break;
 
             }

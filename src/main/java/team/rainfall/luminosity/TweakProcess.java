@@ -40,9 +40,8 @@ public class TweakProcess {
         this.pluginFiles = pluginFiles;
         this.targetJar = targetJar;
     }
-
     public void tweak() {
-        FinalityLogger.info("Start injecting code");
+        FinalityLogger.info("Code injection started");
         DependenciesClassLoader dependenciesClassLoader = new DependenciesClassLoader(new URL[]{},Thread.currentThread().getContextClassLoader());
         try {
             dependenciesClassLoader.addUrl2(targetFile.toURI().toURL());
@@ -58,7 +57,9 @@ public class TweakProcess {
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
         }
-        tweakedClasses.forEach(tweakedClass -> System.out.println(tweakedClass.className));
+        computeBytes();
+        FinalityLogger.info("Code injection finished");
+        //tweakedClasses.forEach(tweakedClass -> System.out.println(tweakedClass.className));
     }
 
     public void tweakOverlay(){
@@ -69,11 +70,8 @@ public class TweakProcess {
                 try {
                     ClassNode node = getClassFromJar(plugin.jarFile, tweakClass);
                     if (AsmUtil.annotationExists("Lteam/rainfall/luminosity/annotations/Overlay;", node)) {
-                        ClassWriter writer = new ClassWriter(writeMode);
-                        node.accept(writer);
-                        byte[] bytes = writer.toByteArray();
                         TweakedClass tweakedClass = new TweakedClass();
-                        tweakedClass.classBytes = bytes;
+                        tweakedClass.classNode = node;
                         tweakedClass.className = tweakClass;
                         tweakedClasses.add(tweakedClass);
                         iterator.remove();
@@ -88,13 +86,17 @@ public class TweakProcess {
     public void tweakAcc() throws FileNotFoundException {
         for(Plugin plugin : plugins){
             for(String clzPath : plugin.manifest.publicizedClasses){
-                ClassNode classNode = getClassFromJar(targetJar,clzPath);
+                ClassNode classNode = null;
+                for(TweakedClass tweakedClass : tweakedClasses){
+                    if(tweakedClass.className.equals(clzPath)){
+                        classNode = tweakedClass.classNode;
+                    }
+                }
+                if(classNode == null) classNode = getClassFromJar(targetJar,clzPath);
                 AccessTransformer.transform(classNode);
                 TweakedClass tweakedClass = new TweakedClass();
-                ClassWriter writer = new ClassWriter(writeMode);
-                classNode.accept(writer);
                 tweakedClass.className = clzPath;
-                tweakedClass.classBytes = writer.toByteArray();
+                tweakedClass.classNode = classNode;
                 boolean dontAdd = false;
                 for (TweakedClass tweakedClass1 : tweakedClasses){
                     if (tweakedClass1.className.equals(tweakedClass.className)) {
@@ -116,8 +118,14 @@ public class TweakProcess {
                     ClassNode node = getClassFromJar(plugin.jarFile, tweakClass);
                     if (AsmUtil.annotationExists("Lteam/rainfall/luminosity/annotations/Tweak;", node)) {
                         FinalityLogger.debug("Found tweak annotation in class " + tweakClass);
-                        ClassNode targetClassNode = getClassFromJar(targetJar,AsmUtil.getAnnotationValue("targetClass", AsmUtil.getAnnotation("Lteam/rainfall/luminosity/annotations/Tweak;", node)).toString());
                         String targetClassName = AsmUtil.getAnnotationValue("targetClass", AsmUtil.getAnnotation("Lteam/rainfall/luminosity/annotations/Tweak;", node)).toString();
+                        ClassNode targetClassNode = null;
+                        for(TweakedClass tweakedClass : tweakedClasses){
+                            if(tweakedClass.className.equals(targetClassName)){
+                                targetClassNode = tweakedClass.classNode;
+                            }
+                        }
+                        if(targetClassNode == null) targetClassNode = getClassFromJar(targetJar,targetClassName);
                         if(plugin.manifest.publicizedClasses.contains(targetClassName)) {
                             AccessTransformer.transform(targetClassNode);
                             plugin.manifest.publicizedClasses.remove(targetClassName);
@@ -141,23 +149,18 @@ public class TweakProcess {
                         }
                     }
                 } catch (FileNotFoundException e) {
-                    System.out.println("Error while getting class: " + e.getMessage());
+                    FinalityLogger.error("Error while getting class: " + e.getMessage());
                 }
             }
         }
-        System.out.println(injectMethods.stream().collect(Collectors.groupingBy(InjectMethod::getFullMethodName)));
         injectMethods.stream().collect(Collectors.groupingBy(InjectMethod::getFullMethodName)).forEach((k,v)->{
-            ClassNode targetClassNode = v.get(0).targetClassNode;
             MethodNode targetMethodNode = v.get(0).targetMethodNode;
             injectTransformer.transform(v.get(0).sourceClassName, v.toArray(new InjectMethod[0]), targetMethodNode);
         });
         injectMethods.stream().collect(Collectors.groupingBy(InjectMethod::getFullClassName)).forEach((k,v)->{
-            ClassWriter writer = new ClassWriter(writeMode);
             ClassNode targetClassNode = v.get(0).targetClassNode;
-            targetClassNode.accept(writer);
-            byte[] bytes = writer.toByteArray();
             TweakedClass tweakedClass = new TweakedClass();
-            tweakedClass.classBytes = bytes;
+            tweakedClass.classNode = targetClassNode;
             tweakedClass.className = AsmUtil.getAnnotationValue("targetClass", AsmUtil.getAnnotation("Lteam/rainfall/luminosity/annotations/Tweak;", v.get(0).sourceClassNode)).toString();
             tweakedClasses.add(tweakedClass);
         });
@@ -180,7 +183,7 @@ public class TweakProcess {
                         try {
                             plugin.manifest = new TweakManifest(jarFile.getInputStream(entry));
                         } catch (IOException e) {
-                            System.out.println("Error while reading manifest: " + e.getMessage());
+                            FinalityLogger.error("Error while reading manifest: " + e.getMessage());
                             break;
                         }
                         break;
@@ -209,6 +212,15 @@ public class TweakProcess {
                 plugins.add(plugin);
             } catch (Exception e) {
                 FinalityLogger.error("Error while reading the manifest of plugin "+absolutePath,e);
+            }
+        }
+    }
+    public void computeBytes(){
+        for(TweakedClass tweakedClass : tweakedClasses){
+            if(tweakedClass.classBytes == null){
+                ClassWriter writer = new ClassWriter(writeMode);
+                tweakedClass.classNode.accept(writer);
+                tweakedClass.classBytes = writer.toByteArray();
             }
         }
     }

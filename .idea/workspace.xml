@@ -5,10 +5,20 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b02e4973-3e3f-4f31-bf2a-882850525641" name="更改" comment="Better log">
-      <change afterPath="$PROJECT_DIR$/src/main/java/team/rainfall/luminosity/annotations/Overlay.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/team/rainfall/finality/loader/LaunchOption.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/team/rainfall/finality/loader/ParamParser.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/team/rainfall/finality/loader/launchMode.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/team/rainfall/finality/FinalityLogger.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/team/rainfall/finality/FinalityLogger.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/team/rainfall/finality/loader/FileManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/team/rainfall/finality/loader/FileManager.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/team/rainfall/finality/loader/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/team/rainfall/finality/loader/Main.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/team/rainfall/finality/loader/Manifest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/team/rainfall/finality/loader/Manifest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/team/rainfall/finality/loader/PluginManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/team/rainfall/finality/loader/PluginManager.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/team/rainfall/luminosity/TweakProcess.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/team/rainfall/luminosity/TweakProcess.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/team/rainfall/luminosity/TweakedClass.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/team/rainfall/luminosity/TweakedClass.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/team/rainfall/luminosity/transformers/InjectTransformer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/team/rainfall/luminosity/transformers/InjectTransformer.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/team/rainfall/luminosity/utils/AsmUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/team/rainfall/luminosity/utils/AsmUtil.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/team/rainfall/luminosity/utils/JarUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/team/rainfall/luminosity/utils/JarUtil.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -55,8 +65,8 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="Interface" />
-        <option value="Class" />
         <option value="AnnotationType" />
+        <option value="Class" />
       </list>
     </option>
   </component>
@@ -199,8 +209,8 @@
     <list>
       <item itemvalue="Gradle.loader [clean build]" />
       <item itemvalue="Gradle.loader [clean shadowJar]" />
-      <item itemvalue="Gradle.loader [dependencies]" />
       <item itemvalue="Gradle.loader [shadowJar]" />
+      <item itemvalue="Gradle.loader [dependencies]" />
     </list>
     <recent_temporary>
       <list>

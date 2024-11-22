@@ -21,7 +21,7 @@ public class FileManager {
         //获得当前目录父目录的父目录
         File file = new File("aoh3.exe").getAbsoluteFile();
         file = file.getParentFile().getParentFile().getParentFile();
-        System.out.println(file.getAbsolutePath());
+        //System.out.println(file.getAbsolutePath());
         file = new File(file,"workshop");
         file = new File(file,"content");
         file = new File(file,"2772750");

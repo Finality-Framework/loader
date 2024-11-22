@@ -29,7 +29,7 @@ public class PluginManager {
                 File[] var3 = Objects.requireNonNull(folder2.listFiles());
                 for (File pluginFile : var3) {
                     if (pluginFile.getName().endsWith(".jar")) {
-                        System.out.println("add plugin " + pluginFile.getName());
+                        FinalityLogger.info("Found plugin " + pluginFile.getName());
                         this.pluginFileList.add(pluginFile);
                     }
                 }

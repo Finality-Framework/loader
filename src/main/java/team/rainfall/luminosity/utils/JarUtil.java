@@ -14,7 +14,7 @@ public class JarUtil {
     public static ClassNode getClassFromJar(JarFile file, String path) throws FileNotFoundException {
         path = path.replace(".", "/");
         path = path + ".class";
-        FinalityLogger.info(path);
+        //FinalityLogger.info(path);
         Enumeration<JarEntry> entries = file.entries();
         while (entries.hasMoreElements()) {
             JarEntry entry = entries.nextElement();
