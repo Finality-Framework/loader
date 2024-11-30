@@ -8,19 +8,24 @@ import java.nio.file.Paths;
 
 public class ParamParser {
     public Manifest manifest = new Manifest();
-    public launchMode mode = launchMode.ONLY_LAUNCH;
-
+    public LaunchMode mode = LaunchMode.ONLY_LAUNCH;
+    public String gameFilePath = FileManager.INSTANCE.findGameFile();
+    public boolean disableSteamAPI = false;
     public void parse(String[] args) {
         for (int i = 0; i < args.length; i++) {
             if (args[i].equals("-debug")) {
                 FinalityLogger.isDebug = true;
             }
-            if (args[i].equals("-manifest")) {
-                try {
-                    manifest = new Manifest(Files.newInputStream(Paths.get(args[i + 1])));
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
+            if(args[i].equals("-disableSteamAPI")){
+                disableSteamAPI = true;
+            }
+            if (args[i].equals("-gamePath")) {
+                if(args.length <= i + 1){
+                    FinalityLogger.warn("Invalid game path");
+                    gameFilePath = FileManager.INSTANCE.findGameFile();
+                    break;
                 }
+                gameFilePath = args[i+1];
             }
             if (args[i].equals("-launchMode")) {
                 if(args.length <= i + 1){
@@ -29,13 +34,13 @@ public class ParamParser {
                 }
                 switch (args[i + 1]) {
                     case "only-launch":
-                        mode = launchMode.ONLY_LAUNCH;
+                        mode = LaunchMode.ONLY_LAUNCH;
                         break;
                     case "only-gen":
-                        mode = launchMode.ONLY_GEN;
+                        mode = LaunchMode.ONLY_GEN;
                         break;
                     case "launch-and-gen":
-                        mode = launchMode.LAUNCH_AND_GEN;
+                        mode = LaunchMode.LAUNCH_AND_GEN;
                         break;
                     default:
                         FinalityLogger.warn("Invalid launch mode, defaulting to only-launch");

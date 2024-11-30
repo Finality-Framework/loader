@@ -1,4 +1,4 @@
-package team.rainfall.luminosity;
+package team.rainfall.finality.loader.plugin;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;

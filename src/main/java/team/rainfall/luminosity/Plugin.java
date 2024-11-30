@@ -1,6 +1,8 @@
 package team.rainfall.luminosity;
 
 
+import team.rainfall.finality.loader.plugin.TweakManifest;
+
 import java.io.File;
 import java.util.jar.JarFile;
 

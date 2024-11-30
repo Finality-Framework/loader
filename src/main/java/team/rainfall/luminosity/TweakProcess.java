@@ -3,6 +3,8 @@ package team.rainfall.luminosity;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.tree.MethodNode;
 import team.rainfall.finality.FinalityLogger;
+import team.rainfall.finality.loader.plugin.PluginData;
+import team.rainfall.finality.loader.plugin.TweakManifest;
 import team.rainfall.luminosity.transformers.AccessTransformer;
 import team.rainfall.luminosity.transformers.InjectTransformer;
 import team.rainfall.luminosity.utils.AsmUtil;
@@ -31,13 +33,17 @@ public class TweakProcess {
     //ASM needs dependencies to compute frames
     public static ClassLoader classLoader = new URLClassLoader(new URL[]{});
     public ArrayList<File> pluginFiles = new ArrayList<>();
-    public JarFile targetJar = null;
+    public JarFile targetJar;
     public File targetFile = null;
     public ArrayList<Plugin> plugins = new ArrayList<>();
     public ArrayList<TweakedClass> tweakedClasses = new ArrayList<>();
     InjectTransformer injectTransformer = new InjectTransformer();
-    public TweakProcess(ArrayList<File> pluginFiles, JarFile targetJar) {
-        this.pluginFiles = pluginFiles;
+    public TweakProcess(ArrayList<PluginData> pluginDatas, JarFile targetJar) {
+        pluginDatas.forEach((v) -> {
+            if(v.manifest.useLuminosity) {
+                this.pluginFiles.add(v.file);
+            }
+        });
         this.targetJar = targetJar;
     }
     public void tweak() {
@@ -64,12 +70,18 @@ public class TweakProcess {
 
     public void tweakOverlay(){
         for (Plugin plugin : plugins) {
-            Iterator<String> iterator =plugin.manifest.tweakClasses.iterator();
+
+            Iterator<String> iterator = plugin.manifest.tweakClasses.iterator();
             while (iterator.hasNext()){
                 String tweakClass = iterator.next();
                 try {
                     ClassNode node = getClassFromJar(plugin.jarFile, tweakClass);
                     if (AsmUtil.annotationExists("Lteam/rainfall/luminosity/annotations/Overlay;", node)) {
+                        if(plugin.manifest.sdkVersion <= 1){
+                            FinalityLogger.warn("Plugin "+plugin.manifest.packageName+" tried to use overlay feature,but SDK version is too low("+plugin.manifest.sdkVersion+")");
+                            FinalityLogger.warn("Overlay tweak won't be applied!");
+                            break;
+                        }
                         TweakedClass tweakedClass = new TweakedClass();
                         tweakedClass.classNode = node;
                         tweakedClass.className = tweakClass;
@@ -193,7 +205,7 @@ public class TweakProcess {
                 if (plugin.manifest == null) {
                     continue;
                 }
-                if (plugin.manifest.sdkVersion != 1) {
+                if (plugin.manifest.sdkVersion <= 0) {
                     FinalityLogger.warn("Found incompatible plugin " + absolutePath + " using SDK version " + plugin.manifest.sdkVersion);
                     FinalityLogger.warn("This plugin won't be loaded!");
                     continue;

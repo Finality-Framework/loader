@@ -11,24 +11,24 @@ package team.rainfall.finality.loader;
 import java.io.*;
 import java.lang.reflect.Field;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.jar.JarFile;
-
 import team.rainfall.finality.FinalityLogger;
+import team.rainfall.finality.loader.plugin.PluginData;
+import team.rainfall.finality.loader.plugin.PluginManager;
+import team.rainfall.finality.loader.util.FinalityClassLoader;
 import team.rainfall.luminosity.Plugin;
 import team.rainfall.luminosity.TweakProcess;
 import team.rainfall.luminosity.TweakedClass;
 
 public class Main {
-    public static final String VERSION = "1.0.4";
+    public static final String VERSION = "1.1.0";
     public static final String STEAM_MANAGER_CLASS = "aoh.kingdoms.history.mainGame.Steam.SteamManager";
     public static final String LAUNCHER_CLASS = "aoh.kingdoms.history.mainGame.desktop.DesktopLauncher";
-
     public static void main(String[] args) {
+        FinalityLogger.init();
         System.out.println("Finality Framework Loader " + VERSION);
         ParamParser paramParser = new ParamParser();
         paramParser.parse(args);
@@ -51,7 +51,7 @@ public class Main {
                 PluginManager.INSTANCE.findPlugins(file);
             }
 
-            if (!manifest.disableSteamAPI) {
+            if (!paramParser.disableSteamAPI) {
                 for (File file : Objects.requireNonNull(FileManager.INSTANCE.getSteamWSFolder().listFiles())) {
                     boolean shouldBreak = false;
                     for (String s : FileManager.INSTANCE.getModsOffFile()) {
@@ -70,23 +70,26 @@ public class Main {
                     }
                 }
             }
-            TweakProcess process = new TweakProcess(PluginManager.INSTANCE.getPluginFileList(), new JarFile(new File(manifest.gameFile)));
-            process.targetFile = new File(manifest.gameFile);
+            //Luminosity Tweak
+            TweakProcess process = new TweakProcess(PluginManager.INSTANCE.pluginDataList, new JarFile(new File(paramParser.gameFilePath)));
+            process.targetFile = new File(paramParser.gameFilePath);
             process.tweak();
-            classLoader.addUrl2((new File(manifest.gameFile)).toURI().toURL());
-            for (Plugin plugin : process.plugins) {
-                classLoader.addUrl2(plugin.file.toURI().toURL());
+            for (PluginData data:PluginManager.INSTANCE.pluginDataList) {
+                classLoader.addUrl2(data.file.toURI().toURL());
             }
-            if (paramParser.mode != launchMode.ONLY_GEN) {
+            classLoader.addUrl2((new File(paramParser.gameFilePath)).toURI().toURL());
+            if (paramParser.mode != LaunchMode.ONLY_GEN) {
                 process.tweakedClasses.forEach((tweakedClass) ->
                 {
                     FinalityLogger.debug("TWEAKED CLAZZ " + tweakedClass.className);
                     classLoader.defineClass2(tweakedClass.className, tweakedClass.classBytes, 0, tweakedClass.classBytes.length);
                 });
             }
+            //Luminosity Tweak end
+
             //Hijack SteamManager to load mods only when Steam API is disabled.
             //But where is my Steam Workshop mods? To hell with those mods.
-            if (manifest.disableSteamAPI) {
+            if (paramParser.disableSteamAPI) {
                 for (String str : manifest.localMods) {
                     Field foldersAllListField = classLoader.loadClass(STEAM_MANAGER_CLASS).getField("modsFoldersAll");
                     List<String> foldersAllList = (List) foldersAllListField.get(null);
@@ -99,7 +102,7 @@ public class Main {
                     foldersListSizeField.setInt(null, folderListSize + 1);
                 }
             }
-            if (paramParser.mode == launchMode.ONLY_GEN || paramParser.mode == launchMode.LAUNCH_AND_GEN) {
+            if (paramParser.mode == LaunchMode.ONLY_GEN || paramParser.mode == LaunchMode.LAUNCH_AND_GEN) {
                 for (TweakedClass tweakedClass : process.tweakedClasses) {
                     try {
                         deleteDir(new File("gen/"));
@@ -112,7 +115,7 @@ public class Main {
                     }
                 }
             }
-            if (paramParser.mode == launchMode.ONLY_LAUNCH || paramParser.mode == launchMode.LAUNCH_AND_GEN) {
+            if (paramParser.mode == LaunchMode.ONLY_LAUNCH || paramParser.mode == LaunchMode.LAUNCH_AND_GEN) {
                 FinalityLogger.info("Ready to launch game,time spending " + (System.currentTimeMillis() - startTime) + "ms");
                 classLoader.loadClass(LAUNCHER_CLASS).getMethod("main", String[].class).invoke(null, (Object) new String[0]);
             }
