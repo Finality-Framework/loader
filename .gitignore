@@ -3,6 +3,13 @@ build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
+.idea/dictionaries/
+.idea/workspace.xml
+.xcodemap/
+.idea/gradle.xml
+.idea/misc.xml
+.idea/inspectionProfiles/Project_Default.xml
+test/plugins/
 
 ### IntelliJ IDEA ###
 .idea/modules.xml
