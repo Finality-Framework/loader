@@ -9,6 +9,7 @@ build/
 .idea/gradle.xml
 .idea/misc.xml
 .idea/inspectionProfiles/Project_Default.xml
+plugins/
 
 ### IntelliJ IDEA ###
 .idea/modules.xml
