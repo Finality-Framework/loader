@@ -60,10 +60,25 @@ public class FinalityLogger {
     public static void error(String message, Throwable throwable) {
         System.err.println("[Error] " + message + "\n" + throwable.getMessage());
         if (isDebug) {
-            throwable.printStackTrace();
+            for (StackTraceElement element : throwable.getStackTrace()) {
+                System.err.println(element.toString());
+            }
         }
         output("[Error] " + message + "\n" + throwable.getMessage());
+        if (isDebug) {
+            output(getStackTraceAsString(throwable));
+        }
     }
+
+    //将异常堆栈转换为字符串
+    private static String getStackTraceAsString(Throwable throwable) {
+        StringBuilder sb = new StringBuilder();
+        for (StackTraceElement element : throwable.getStackTrace()) {
+            sb.append(element.toString()).append("\n");
+        }
+        return sb.toString();
+    }
+
 
     public static void debug(String message) {
         if (isDebug) {

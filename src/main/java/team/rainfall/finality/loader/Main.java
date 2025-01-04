@@ -127,7 +127,10 @@ public class Main {
     public static boolean deleteDir(File dir) {
         if (dir.isDirectory()) {
             String[] children = dir.list();
-            int var3 = children.length;
+            int var3 = 0;
+            if (children != null) {
+                var3 = children.length;
+            }
 
             for (int var4 = 0; var4 < var3; ++var4) {
                 String child = children[var4];
