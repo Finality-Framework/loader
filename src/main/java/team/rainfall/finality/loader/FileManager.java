@@ -46,6 +46,7 @@ public class FileManager {
                 throw new RuntimeException(e);
             }
         }
+
         return new String[0];
     }
     public String findGameFile(){

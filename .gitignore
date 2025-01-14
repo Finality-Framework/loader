@@ -10,6 +10,9 @@ build/
 .idea/misc.xml
 .idea/inspectionProfiles/Project_Default.xml
 test/plugin
+loader.log
+game.jar
+bin
 
 ### IntelliJ IDEA ###
 .idea/modules.xml
