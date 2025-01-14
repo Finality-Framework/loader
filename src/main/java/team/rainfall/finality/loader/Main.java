@@ -24,9 +24,11 @@ import team.rainfall.luminosity.TweakProcess;
 import team.rainfall.luminosity.TweakedClass;
 
 public class Main {
-    public static final String VERSION = "1.1.0";
-    public static final String STEAM_MANAGER_CLASS = "aoh.kingdoms.history.mainGame.Steam.SteamManager";
-    public static final String LAUNCHER_CLASS = "aoh.kingdoms.history.mainGame.desktop.DesktopLauncher";
+
+    public static final String VERSION = "1.1.1";
+    public static final String STEAM_MANAGER_CLASS = "aoc.kingdoms.lukasz.jakowski.Steam.SteamManager";
+    public static final String LAUNCHER_CLASS = "aoc.kingdoms.lukasz.jakowski.desktop.DesktopLauncher";
+
     public static void main(String[] args) {
         FinalityLogger.init();
         System.out.println("Finality Framework Loader " + VERSION);
@@ -127,7 +129,10 @@ public class Main {
     public static boolean deleteDir(File dir) {
         if (dir.isDirectory()) {
             String[] children = dir.list();
-            int var3 = children.length;
+            int var3 = 0;
+            if (children != null) {
+                var3 = children.length;
+            }
 
             for (int var4 = 0; var4 < var3; ++var4) {
                 String child = children[var4];
