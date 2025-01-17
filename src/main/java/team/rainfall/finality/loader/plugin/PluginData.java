@@ -23,6 +23,9 @@ public class PluginData {
         if (file.getName().endsWith(".jar")) {
             try{
                 this.isOldPlugin = jarFile.getJarEntry("modify.json") != null;
+                if(jarFile.getJarEntry("plugin.json") != null && isOldPlugin){
+                    isOldPlugin = false;
+                }
                 if(isOldPlugin){
                     tweakManifest = new TweakManifest(jarFile.getInputStream(jarFile.getEntry("modify.json")));
                     this.manifest = buildDefaultManifestForOldPlugin(tweakManifest);

@@ -11,44 +11,42 @@ package team.rainfall.finality.loader;
 import java.io.*;
 import java.lang.reflect.Field;
 import java.net.URL;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import team.rainfall.finality.FinalityLogger;
 import team.rainfall.finality.loader.plugin.PluginData;
 import team.rainfall.finality.loader.plugin.PluginManager;
 import team.rainfall.finality.loader.util.FinalityClassLoader;
-import team.rainfall.luminosity.Plugin;
+import team.rainfall.finality.luminosity2.LuminosityEnvironment;
 import team.rainfall.luminosity.TweakProcess;
 import team.rainfall.luminosity.TweakedClass;
 
 public class Main {
-
-    public static final String VERSION = "1.1.1";
-    public static final String STEAM_MANAGER_CLASS = "aoc.kingdoms.lukasz.jakowski.Steam.SteamManager";
-    public static final String LAUNCHER_CLASS = "aoc.kingdoms.lukasz.jakowski.desktop.DesktopLauncher";
-
+    public static final String VERSION = "1.2.0";
+    public static final String STEAM_MANAGER_CLASS = "aoh.kingdoms.history.mainGame.Steam.SteamManager";
+    public static String LAUNCHER_CLASS = "aoh.kingdoms.history.mainGame.desktop.DesktopLauncher";
+    public static ArrayList<String> localMods = new ArrayList<>();
     public static void main(String[] args) {
         FinalityLogger.init();
-        System.out.println("Finality Framework Loader " + VERSION);
+        FinalityLogger.info("Finality Framework Loader " + VERSION);
         ParamParser paramParser = new ParamParser();
         paramParser.parse(args);
         long startTime = System.currentTimeMillis();
         FinalityClassLoader classLoader = new FinalityClassLoader(new URL[0]);
         try {
-            Manifest manifest = paramParser.manifest;
+            JarFile gameJar = new JarFile(new File(paramParser.gameFilePath));
+            LAUNCHER_CLASS = gameJar.getManifest().getMainAttributes().getValue(Attributes.Name.MAIN_CLASS);
             //Search local mods
             for (File file : Objects.requireNonNull(new File("mods").listFiles())) {
                 String[] strings = FileManager.INSTANCE.getModsOffFile();
                 List<String> list = Arrays.asList(strings);
                 if (file.isDirectory() && !list.contains("mods/" + file.getName() + "/")) {
-                    manifest.localMods.add("mods/" + file.getName() + "/");
+                    localMods.add("mods/" + file.getName() + "/");
                 }
             }
-            for (String str : manifest.localMods) {
+            for (String str : localMods) {
                 //遍历str文件夹
-                FinalityLogger.debug("DEBUG 2" + str);
                 File file = new File(str);
                 PluginManager.INSTANCE.findPlugins(file);
             }
@@ -57,9 +55,7 @@ public class Main {
                 for (File file : Objects.requireNonNull(FileManager.INSTANCE.getSteamWSFolder().listFiles())) {
                     boolean shouldBreak = false;
                     for (String s : FileManager.INSTANCE.getModsOffFile()) {
-                        FinalityLogger.debug("111 " + s + " 222 " + file.getAbsolutePath());
                         if (s.equals(file.getAbsolutePath())) {
-                            FinalityLogger.debug("Found off mod " + s);
                             shouldBreak = true;
                             break;
                         }
@@ -76,9 +72,15 @@ public class Main {
             TweakProcess process = new TweakProcess(PluginManager.INSTANCE.pluginDataList, new JarFile(new File(paramParser.gameFilePath)));
             process.targetFile = new File(paramParser.gameFilePath);
             process.tweak();
+
+            //Luminosity2
+            LuminosityEnvironment environment = new LuminosityEnvironment(PluginManager.INSTANCE.pluginDataList,new File(paramParser.gameFilePath));
+            environment.run();
+
             for (PluginData data:PluginManager.INSTANCE.pluginDataList) {
                 classLoader.addUrl2(data.file.toURI().toURL());
             }
+
             classLoader.addUrl2((new File(paramParser.gameFilePath)).toURI().toURL());
             if (paramParser.mode != LaunchMode.ONLY_GEN) {
                 process.tweakedClasses.forEach((tweakedClass) ->
@@ -86,23 +88,28 @@ public class Main {
                     FinalityLogger.debug("TWEAKED CLAZZ " + tweakedClass.className);
                     classLoader.defineClass2(tweakedClass.className, tweakedClass.classBytes, 0, tweakedClass.classBytes.length);
                 });
+
+                environment.load(classLoader);
             }
             //Luminosity Tweak end
 
             //Hijack SteamManager to load mods only when Steam API is disabled.
             //But where is my Steam Workshop mods? To hell with those mods.
-            if (paramParser.disableSteamAPI) {
-                for (String str : manifest.localMods) {
-                    Field foldersAllListField = classLoader.loadClass(STEAM_MANAGER_CLASS).getField("modsFoldersAll");
-                    List<String> foldersAllList = (List) foldersAllListField.get(null);
-                    Field foldersListField = classLoader.loadClass(STEAM_MANAGER_CLASS).getField("modsFolders");
-                    List<String> foldersList = (List) foldersListField.get(null);
-                    Field foldersListSizeField = classLoader.loadClass(STEAM_MANAGER_CLASS).getField("modsFoldersSize");
-                    int folderListSize = foldersListSizeField.getInt(null);
-                    foldersAllList.add(str);
-                    foldersList.add(str);
-                    foldersListSizeField.setInt(null, folderListSize + 1);
+            try {
+                if (paramParser.disableSteamAPI) {
+                    for (String str : localMods) {
+                        Field foldersAllListField = classLoader.loadClass(STEAM_MANAGER_CLASS).getField("modsFoldersAll");
+                        List<String> foldersAllList = (List) foldersAllListField.get(null);
+                        Field foldersListField = classLoader.loadClass(STEAM_MANAGER_CLASS).getField("modsFolders");
+                        List<String> foldersList = (List) foldersListField.get(null);
+                        Field foldersListSizeField = classLoader.loadClass(STEAM_MANAGER_CLASS).getField("modsFoldersSize");
+                        int folderListSize = foldersListSizeField.getInt(null);
+                        foldersAllList.add(str);
+                        foldersList.add(str);
+                        foldersListSizeField.setInt(null, folderListSize + 1);
+                    }
                 }
+            } catch (Exception ignored) {
             }
             if (paramParser.mode == LaunchMode.ONLY_GEN || paramParser.mode == LaunchMode.LAUNCH_AND_GEN) {
                 for (TweakedClass tweakedClass : process.tweakedClasses) {
@@ -113,7 +120,7 @@ public class Main {
                         FileOutputStream fos = new FileOutputStream(file);
                         fos.write(tweakedClass.classBytes);
                     } catch (IOException var17) {
-                        var17.printStackTrace();
+                        FinalityLogger.error("Gen err",var17);
                     }
                 }
             }
@@ -129,16 +136,12 @@ public class Main {
     public static boolean deleteDir(File dir) {
         if (dir.isDirectory()) {
             String[] children = dir.list();
-            int var3 = 0;
             if (children != null) {
-                var3 = children.length;
-            }
-
-            for (int var4 = 0; var4 < var3; ++var4) {
-                String child = children[var4];
-                boolean success = deleteDir(new File(dir, child));
-                if (!success) {
-                    return false;
+                for (String child : children) {
+                    boolean success = deleteDir(new File(dir, child));
+                    if (!success) {
+                        return false;
+                    }
                 }
             }
         }

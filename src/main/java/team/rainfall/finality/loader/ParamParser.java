@@ -5,9 +5,10 @@ import team.rainfall.finality.FinalityLogger;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 
 public class ParamParser {
-    public Manifest manifest = new Manifest();
+    public ArrayList<String> modPaths = new ArrayList<>();
     public LaunchMode mode = LaunchMode.ONLY_LAUNCH;
     public String gameFilePath = FileManager.INSTANCE.findGameFile();
     public boolean disableSteamAPI = false;
