@@ -3,11 +3,13 @@ package team.rainfall.finality.luminosity2.utils;
 import org.objectweb.asm.tree.AnnotationNode;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.MethodNode;
+import team.rainfall.finality.FinalityLogger;
 
 public class AnnotationUtil {
     public static boolean annotationExists (String name, MethodNode node) {
         if(node.visibleAnnotations == null) return false;
         for (AnnotationNode annotation : node.visibleAnnotations) {
+            FinalityLogger.debug("DBG2 "+annotation.desc);
             if (annotation.desc.equals(name)) {
                 return true;
             }

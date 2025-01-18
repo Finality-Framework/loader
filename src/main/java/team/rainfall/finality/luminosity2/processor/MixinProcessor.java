@@ -11,6 +11,7 @@ import team.rainfall.finality.luminosity2.utils.AnnotationUtil;
 import team.rainfall.finality.luminosity2.utils.MethodUtil;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 public class MixinProcessor implements Processor {
     ClassNode sourceNode;
@@ -18,16 +19,25 @@ public class MixinProcessor implements Processor {
     ArrayList<String> methodNameList = new ArrayList<>();
     public void process(){
         FinalityLogger.debug("Mixin Process S "+sourceNode.name+" T "+targetNode.name);
+        removeShadows();
         Remapper remapper = new SimpleRemapper(sourceNode.name,targetNode.name);
         sourceNode.accept(new ClassRemapper(sourceNode,remapper));
         findMethods();
         mixinMethods();
     }
+    public void removeShadows(){
+        Iterator<MethodNode> nodeIterator = sourceNode.methods.iterator();
+        while (nodeIterator.hasNext()){
+            MethodNode methodNode = nodeIterator.next();
+            FinalityLogger.debug("DBG1 " + methodNode.name);
+            if (AnnotationUtil.annotationExists("Lteam/rainfall/finality/luminosity2/annotations/Shadow;", methodNode)) {
+                FinalityLogger.debug("ShadowMethod " + methodNode.name);
+                nodeIterator.remove();
+            }
+        }
+    }
     public void findMethods(){
         for (MethodNode methodNode:targetNode.methods){
-            if (AnnotationUtil.annotationExists("Lteam/rainfall/finality/luminosity2/annotations/Shadow;",methodNode)){
-                continue;
-            }
             methodNameList.add(methodNode.name+methodNode.desc);
         }
     }
