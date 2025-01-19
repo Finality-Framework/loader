@@ -24,17 +24,17 @@ import java.util.Map;
 import java.util.jar.JarFile;
 
 public class LuminosityEnvironment {
-    ArrayList<ClassInfo> classInfos = new ArrayList<>();
+    public ArrayList<ClassInfo> classInfos = new ArrayList<>();
     ArrayList<PluginData> pluginData = null;
     JarFile coreJar = null;
     FinalityClassLoader classLoader = new FinalityClassLoader(new URL[]{},Thread.currentThread().getContextClassLoader());
     HashMap<String, List<ClassNode>> classNodeMap = new HashMap<>();
-    public LuminosityEnvironment(ArrayList<PluginData> pluginDatas, File coreJar){
+    public LuminosityEnvironment(ArrayList<PluginData> pluginData, File coreJar){
         try {
             this.coreJar = new JarFile(coreJar);
             classLoader.addUrl2(coreJar.toURI().toURL());
-            this.pluginData = pluginDatas;
-            for(PluginData data : pluginDatas){
+            this.pluginData = pluginData;
+            for(PluginData data : pluginData){
                 FinalityLogger.debug("L2 "+data.manifest.id);
                 classLoader.addUrl2(data.file.toURI().toURL());
             }

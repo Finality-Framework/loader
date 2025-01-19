@@ -19,6 +19,7 @@ import team.rainfall.finality.loader.plugin.PluginData;
 import team.rainfall.finality.loader.plugin.PluginManager;
 import team.rainfall.finality.loader.util.FinalityClassLoader;
 import team.rainfall.finality.luminosity2.LuminosityEnvironment;
+import team.rainfall.finality.luminosity2.utils.ClassInfo;
 import team.rainfall.luminosity.TweakProcess;
 import team.rainfall.luminosity.TweakedClass;
 
@@ -112,6 +113,17 @@ public class Main {
             } catch (Exception ignored) {
             }
             if (paramParser.mode == LaunchMode.ONLY_GEN || paramParser.mode == LaunchMode.LAUNCH_AND_GEN) {
+                for(ClassInfo classInfo : environment.classInfos){
+                    try {
+                        deleteDir(new File("gen/"));
+                        File file = new File("gen/" + classInfo.name.replace(".", "/") + ".class");
+                        boolean ignored = file.getParentFile().mkdirs();
+                        FileOutputStream fos = new FileOutputStream(file);
+                        fos.write(classInfo.bytes);
+                    } catch (IOException var17) {
+                        FinalityLogger.error("Gen err",var17);
+                    }
+                }
                 for (TweakedClass tweakedClass : process.tweakedClasses) {
                     try {
                         deleteDir(new File("gen/"));

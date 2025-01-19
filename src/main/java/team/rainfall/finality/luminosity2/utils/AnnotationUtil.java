@@ -5,6 +5,7 @@ import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.MethodNode;
 import team.rainfall.finality.FinalityLogger;
 
+@SuppressWarnings("unused")
 public class AnnotationUtil {
     public static boolean annotationExists (String name, MethodNode node) {
         if(node.visibleAnnotations == null) return false;
