@@ -50,3 +50,4 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+/loader.log

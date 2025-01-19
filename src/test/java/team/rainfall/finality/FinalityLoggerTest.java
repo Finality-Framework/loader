@@ -59,7 +59,7 @@ public class FinalityLoggerTest {
     public void testWarn() throws IOException {
         FinalityLogger.warn("Test warning message");
         String content = new String(Files.readAllBytes(Paths.get("./loader.log")));
-        assertTrue(content.contains("[Warning] Test warning message"));
+        assertTrue(content.contains("[Warning]Test warning message"));
     }
 
 }

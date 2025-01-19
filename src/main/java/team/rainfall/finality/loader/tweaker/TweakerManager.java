@@ -8,7 +8,7 @@ import team.rainfall.luminosity.annotations.Tweak;
 import java.util.ArrayList;
 
 public class TweakerManager {
-    private ArrayList<Tweaker> tweakers = new ArrayList<>();
+    private final ArrayList<Tweaker> tweakers = new ArrayList<>();
     public FinalityClassLoader classLoader;
     public volatile static TweakerManager INSTANCE = new TweakerManager();
     public ArrayList<Tweaker> getTweakers() {

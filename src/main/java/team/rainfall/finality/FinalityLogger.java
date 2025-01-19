@@ -42,6 +42,7 @@ public class FinalityLogger {
             LocalDateTime dateTime = LocalDateTime.now();
             DateTimeFormatter formatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM).withLocale(Locale.getDefault());
             logStream.write("Logger initiated at "+ dateTime.format(formatter) + "\n");
+            logStream.flush();
         } catch (IOException ignored) {
 
         }
@@ -90,7 +91,7 @@ public class FinalityLogger {
 
     public static void warn(String message) {
         System.out.println(YELLOW_BACKGROUND + BLACK_COLOR + "[Warning] " + message + RESET);
-        output("[Warning]"+message);
+        output("[Warning] "+message);
     }
     public static void output(String message){
         try{
