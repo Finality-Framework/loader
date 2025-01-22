@@ -16,8 +16,10 @@ import java.util.Date;
 import java.util.Locale;
 
 public class FinalityLogger {
+    public static final int STACKTRACE_LIMIT = 10;
     public static OutputStreamWriter logStream = null;
     public static boolean isDebug = false;
+    public static final String RED_COLOR = "\033[31m";
     public static final String RED_BACKGROUND = "\033[41m";
     public static final String WHITE_BACKGROUND = "\033[47m";
     public static final String YELLOW_BACKGROUND = "\033[43m";
@@ -59,23 +61,31 @@ public class FinalityLogger {
     }
 
     public static void error(String message, Throwable throwable) {
-        System.err.println("[Error] " + message + "\n" + throwable.getMessage());
+        System.err.println(RED_BACKGROUND+"[Error] " + message + RESET);
         if (isDebug) {
-            for (StackTraceElement element : throwable.getStackTrace()) {
-                System.err.println(element.toString());
-            }
+            System.err.println(RED_COLOR+getStackTraceAsString(throwable,true)+RESET);
         }
-        output("[Error] " + message + "\n" + throwable.getMessage());
+        output("[Error] " + message);
         if (isDebug) {
-            output(getStackTraceAsString(throwable));
+            output(getStackTraceAsString(throwable,false));
         }
     }
 
     //将异常堆栈转换为字符串
-    private static String getStackTraceAsString(Throwable throwable) {
+    private static String getStackTraceAsString(Throwable throwable,boolean stacktraceLimit) {
         StringBuilder sb = new StringBuilder();
+        sb.append(throwable.toString());
+        if(throwable.getMessage() != null){
+            sb.append(":").append(throwable.getMessage());
+        }
+        int i = 1;
         for (StackTraceElement element : throwable.getStackTrace()) {
-            sb.append(element.toString()).append("\n");
+            if(i >= STACKTRACE_LIMIT && stacktraceLimit){
+                sb.append("\n").append("... ").append(throwable.getStackTrace().length - i).append(" more");
+                break;
+            }
+            i++;
+            sb.append("\n").append("at ").append(element.toString());
         }
         return sb.toString();
     }
