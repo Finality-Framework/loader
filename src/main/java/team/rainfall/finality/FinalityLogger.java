@@ -1,21 +1,14 @@
 package team.rainfall.finality;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.nio.charset.Charset;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.text.DateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
-import java.util.Date;
 import java.util.Locale;
 
 public class FinalityLogger {
+    public static AlternativeOutputStream alternativeOutputStream = new AlternativeOutputStream(System.out);
     public static final int STACKTRACE_LIMIT = 10;
     public static OutputStreamWriter logStream = null;
     public static boolean isDebug = false;
@@ -45,22 +38,29 @@ public class FinalityLogger {
             DateTimeFormatter formatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM).withLocale(Locale.getDefault());
             logStream.write("Logger initiated at "+ dateTime.format(formatter) + "\n");
             logStream.flush();
+            System.setErr(alternativeOutputStream);
+            System.setOut(alternativeOutputStream);
         } catch (IOException ignored) {
 
         }
     }
 
     public static void info(String message) {
+        alternativeOutputStream.bypassing = true;
         System.out.println(WHITE_BACKGROUND + BLACK_COLOR + "[Info] " + message + RESET);
         output("[Info] " + message);
+        alternativeOutputStream.bypassing = false;
     }
 
     public static void error(String message) {
+        alternativeOutputStream.bypassing = true;
         System.err.println(RED_BACKGROUND + "[Error] " + message + RESET);
         output("[Error] " + message);
+        alternativeOutputStream.bypassing = false;
     }
 
     public static void error(String message, Throwable throwable) {
+        alternativeOutputStream.bypassing = true;
         System.err.println(RED_BACKGROUND+"[Error] " + message + RESET);
         if (isDebug) {
             System.err.println(RED_COLOR+getStackTraceAsString(throwable,true)+RESET);
@@ -69,6 +69,7 @@ public class FinalityLogger {
         if (isDebug) {
             output(getStackTraceAsString(throwable,false));
         }
+        alternativeOutputStream.bypassing = false;
     }
 
     //将异常堆栈转换为字符串
@@ -92,17 +93,21 @@ public class FinalityLogger {
 
 
     public static void debug(String message) {
+        alternativeOutputStream.bypassing = true;
         if (isDebug) {
             System.out.println(GRAY_BACKGROUND + "[Debug] " + message + RESET);
             output("[Debug] " + message);
         }
-
+        alternativeOutputStream.bypassing = false;
     }
 
     public static void warn(String message) {
+        alternativeOutputStream.bypassing = true;
         System.out.println(YELLOW_BACKGROUND + BLACK_COLOR + "[Warning] " + message + RESET);
         output("[Warning] "+message);
+        alternativeOutputStream.bypassing = false;
     }
+
     public static void output(String message){
         try{
             logStream.write(message+'\n');

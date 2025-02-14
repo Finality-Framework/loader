@@ -17,14 +17,16 @@ import java.util.jar.JarFile;
 import team.rainfall.finality.FinalityLogger;
 import team.rainfall.finality.loader.plugin.PluginData;
 import team.rainfall.finality.loader.plugin.PluginManager;
-import team.rainfall.finality.loader.util.FinalityClassLoader;
+import team.rainfall.finality.loader.util.*;
 import team.rainfall.finality.luminosity2.LuminosityEnvironment;
 import team.rainfall.finality.luminosity2.utils.ClassInfo;
 import team.rainfall.luminosity.TweakProcess;
 import team.rainfall.luminosity.TweakedClass;
 
+import javax.swing.*;
+
 public class Main {
-    public static final String VERSION = "1.2.1";
+    public static final String VERSION = "1.2.2";
     public static final String STEAM_MANAGER_CLASS = "aoh.kingdoms.history.mainGame.Steam.SteamManager";
     public static String LAUNCHER_CLASS = "aoh.kingdoms.history.mainGame.desktop.DesktopLauncher";
     public static ArrayList<String> localMods = new ArrayList<>();
@@ -33,10 +35,19 @@ public class Main {
         FinalityLogger.info("Finality Framework Loader " + VERSION);
         ParamParser paramParser = new ParamParser();
         paramParser.parse(args);
+        FileUtil.createPrivateDir();
+        if(GithubUtil.checkUpdate()){
+            String [] options = {"前往更新","取消"};
+            int i = JOptionPane.showOptionDialog(null, String.format(Localization.bundle.getString("new_version"), GithubUtil.latestVersion),Localization.bundle.getString("update"),JOptionPane.YES_NO_OPTION,JOptionPane.QUESTION_MESSAGE,null,options,options[0]);
+            if(i == 0){
+                BrowserUtil.openUrl("https://github.com/Finality-Framework/loader/releases");
+            }
+        }
         long startTime = System.currentTimeMillis();
         FinalityClassLoader classLoader = new FinalityClassLoader(new URL[0]);
+        JarFile gameJar;
         try {
-            JarFile gameJar = new JarFile(new File(paramParser.gameFilePath));
+            gameJar = new JarFile(new File(paramParser.gameFilePath));
             LAUNCHER_CLASS = gameJar.getManifest().getMainAttributes().getValue(Attributes.Name.MAIN_CLASS);
             //Search local mods
             for (File file : Objects.requireNonNull(new File("mods").listFiles())) {
@@ -138,10 +149,16 @@ public class Main {
             }
             if (paramParser.mode == LaunchMode.ONLY_LAUNCH || paramParser.mode == LaunchMode.LAUNCH_AND_GEN) {
                 FinalityLogger.info("Ready to launch game,time spending " + (System.currentTimeMillis() - startTime) + "ms");
-                classLoader.loadClass(LAUNCHER_CLASS).getMethod("main", String[].class).invoke(null, (Object) new String[0]);
+                try {
+                    classLoader.loadClass(LAUNCHER_CLASS).getMethod("main", String[].class).invoke(null, (Object) new String[0]);
+                }catch (Exception e){
+                    JOptionPane.showMessageDialog(null,Localization.bundle.getString("game_crashed"),Localization.bundle.getString("error"),JOptionPane.ERROR_MESSAGE);
+                }
             }
         } catch (Exception var18) {
-            throw new RuntimeException(var18);
+            FinalityLogger.error("Unknown err",var18);
+            ErrorCode.showInternalError("Etude - 01");
+            System.exit(1);
         }
     }
 

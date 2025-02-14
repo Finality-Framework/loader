@@ -5,6 +5,7 @@ import org.objectweb.asm.tree.AnnotationNode;
 import org.objectweb.asm.tree.ClassNode;
 import team.rainfall.finality.FinalityLogger;
 import team.rainfall.finality.loader.plugin.PluginData;
+import team.rainfall.finality.loader.util.ErrorCode;
 import team.rainfall.finality.loader.util.FinalityClassLoader;
 import team.rainfall.finality.loader.util.FinalityException;
 import team.rainfall.finality.luminosity2.processor.MixinProcessor;
@@ -13,6 +14,7 @@ import team.rainfall.finality.luminosity2.utils.ClassInfo;
 import team.rainfall.finality.luminosity2.utils.JarUtil;
 import team.rainfall.finality.luminosity2.utils.Luminosity_ClassWriter;
 
+import javax.swing.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -30,6 +32,7 @@ public class LuminosityEnvironment {
     FinalityClassLoader classLoader = new FinalityClassLoader(new URL[]{},Thread.currentThread().getContextClassLoader());
     HashMap<String, List<ClassNode>> classNodeMap = new HashMap<>();
     public LuminosityEnvironment(ArrayList<PluginData> pluginData, File coreJar){
+        Luminosity_ClassWriter.classLoader = classLoader;
         try {
             this.coreJar = new JarFile(coreJar);
             classLoader.addUrl2(coreJar.toURI().toURL());
@@ -38,8 +41,7 @@ public class LuminosityEnvironment {
                 FinalityLogger.debug("L2 "+data.manifest.id);
                 classLoader.addUrl2(data.file.toURI().toURL());
             }
-        } catch (IOException e) {
-            throw new FinalityException("Core Jar File is not a valid jar,loader will exit now!");
+        } catch (IOException ignored) {
         }
     }
     public void run(){
@@ -91,10 +93,16 @@ public class LuminosityEnvironment {
     }
     // 写出字节
     public void writeBytes(){
-        for (ClassInfo classInfo : classInfos) {
-            Luminosity_ClassWriter classWriter = new Luminosity_ClassWriter(ClassWriter.COMPUTE_FRAMES);
-            classInfo.node.accept(classWriter);
-            classInfo.bytes = classWriter.toByteArray();
+        try {
+            for (ClassInfo classInfo : classInfos) {
+                Luminosity_ClassWriter classWriter = new Luminosity_ClassWriter(ClassWriter.COMPUTE_FRAMES);
+                classInfo.node.accept(classWriter);
+                classInfo.bytes = classWriter.toByteArray();
+            }
+        }catch (Exception e){
+            ErrorCode.showInternalError("Sonata - 02");
+            FinalityLogger.error("Exception while writing bytes",e);
+            System.exit(1);
         }
     }
     public void load(FinalityClassLoader classLoader){
