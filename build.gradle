@@ -22,7 +22,8 @@ repositories {
 
 
 dependencies {
-    implementation 'com.mashape.unirest:unirest-java:1.4.9'
+    implementation 'com.formdev:flatlaf:3.5'
+    implementation 'com.konghq:unirest-java:3.14.5'
     implementation 'com.alibaba.fastjson2:fastjson2:2.0.53'
     implementation group:'org.ow2.asm',name:'asm',version:'9.7'
     implementation group:'org.ow2.asm',name:'asm-commons',version:'9.7'

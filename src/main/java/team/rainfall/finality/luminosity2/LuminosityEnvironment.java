@@ -5,16 +5,14 @@ import org.objectweb.asm.tree.AnnotationNode;
 import org.objectweb.asm.tree.ClassNode;
 import team.rainfall.finality.FinalityLogger;
 import team.rainfall.finality.loader.plugin.PluginData;
-import team.rainfall.finality.loader.util.ErrorCode;
+import team.rainfall.finality.loader.gui.ErrorCode;
 import team.rainfall.finality.loader.util.FinalityClassLoader;
-import team.rainfall.finality.loader.util.FinalityException;
 import team.rainfall.finality.luminosity2.processor.MixinProcessor;
 import team.rainfall.finality.luminosity2.utils.AnnotationUtil;
 import team.rainfall.finality.luminosity2.utils.ClassInfo;
 import team.rainfall.finality.luminosity2.utils.JarUtil;
 import team.rainfall.finality.luminosity2.utils.Luminosity_ClassWriter;
 
-import javax.swing.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;

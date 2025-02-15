@@ -1,4 +1,6 @@
-package team.rainfall.finality.loader.util;
+package team.rainfall.finality.loader.gui;
+
+import team.rainfall.finality.loader.util.Localization;
 
 import javax.swing.*;
 
