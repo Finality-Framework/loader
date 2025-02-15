@@ -1,0 +1,47 @@
+package team.rainfall.finality.loader.util;
+import team.rainfall.finality.FinalityLogger;
+
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
+public class FileUtil {
+    public static void createPrivateDir(){
+        File file = new File("./.finality");
+        if(!file.exists()){
+            boolean ignored = file.mkdir();
+        }
+    }
+    public static void deleteFileIfThreeDaysPast(File file) {
+        try {
+            if (file.exists()) {
+                // 获取文件的基本属性
+                BasicFileAttributes attrs = Files.readAttributes(file.toPath(), BasicFileAttributes.class);
+                // 获取文件的创建时间
+                Instant creationTime = attrs.creationTime().toInstant();
+                // 获取当前时间
+                Instant now = Instant.now();
+                // 计算创建时间与当前时间的差异
+                long daysBetween = ChronoUnit.DAYS.between(creationTime, now);
+
+                // 如果差异大于或等于1天，删除文件
+                if (daysBetween >= 1) {
+                    boolean ignored = file.delete();
+                }
+            }
+        }catch (Exception ignored){}
+    }
+
+    public static String readString(File file){
+        try {
+            return new String(Files.readAllBytes(file.toPath()));
+        } catch (IOException e) {
+            FinalityLogger.error("Failed while readString(File)",e);
+            return null;
+        }
+    }
+}
