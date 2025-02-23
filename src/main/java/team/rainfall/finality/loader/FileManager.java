@@ -5,14 +5,11 @@
 
 package team.rainfall.finality.loader;
 
-<<<<<<< Updated upstream
-=======
 import team.rainfall.finality.loader.gui.ErrorCode;
 import team.rainfall.finality.loader.util.FinalityException;
 import com.sun.jna.platform.win32.Advapi32Util;
 import com.sun.jna.platform.win32.WinReg;
 
->>>>>>> Stashed changes
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
