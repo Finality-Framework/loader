@@ -30,13 +30,13 @@ public class FinalityLogger {
                 file.createNewFile();
             }
             FileOutputStream fos = new FileOutputStream("./loader.log");
-            fos.write(new byte[]{(byte)0xEF, (byte)0xBB, (byte)0xBF});
+            fos.write(new byte[]{(byte) 0xEF, (byte) 0xBB, (byte) 0xBF});
             fos.flush();
             logStream = new OutputStreamWriter(fos, StandardCharsets.UTF_8);
             //输出系统的日期
             LocalDateTime dateTime = LocalDateTime.now();
             DateTimeFormatter formatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM).withLocale(Locale.getDefault());
-            logStream.write("Logger initiated at "+ dateTime.format(formatter) + "\n");
+            logStream.write("Logger initiated at " + dateTime.format(formatter) + "\n");
             logStream.flush();
             System.setErr(alternativeOutputStream);
             System.setOut(alternativeOutputStream);
@@ -61,27 +61,23 @@ public class FinalityLogger {
 
     public static void error(String message, Throwable throwable) {
         alternativeOutputStream.bypassing = true;
-        System.err.println(RED_BACKGROUND+"[Error] " + message + RESET);
-        if (isDebug) {
-            System.err.println(RED_COLOR+getStackTraceAsString(throwable,true)+RESET);
-        }
+        System.err.println(RED_BACKGROUND + "[Error] " + message + RESET);
+        System.err.println(RED_COLOR + getStackTraceAsString(throwable, true) + RESET);
         output("[Error] " + message);
-        if (isDebug) {
-            output(getStackTraceAsString(throwable,false));
-        }
+        output(getStackTraceAsString(throwable, false));
         alternativeOutputStream.bypassing = false;
     }
 
     //将异常堆栈转换为字符串
-    private static String getStackTraceAsString(Throwable throwable,boolean stacktraceLimit) {
+    private static String getStackTraceAsString(Throwable throwable, boolean stacktraceLimit) {
         StringBuilder sb = new StringBuilder();
         sb.append(throwable.toString());
-        if(throwable.getMessage() != null){
+        if (throwable.getMessage() != null) {
             sb.append(":").append(throwable.getMessage());
         }
         int i = 1;
         for (StackTraceElement element : throwable.getStackTrace()) {
-            if(i >= STACKTRACE_LIMIT && stacktraceLimit){
+            if (i >= STACKTRACE_LIMIT && stacktraceLimit) {
                 sb.append("\n").append("... ").append(throwable.getStackTrace().length - i).append(" more");
                 break;
             }
@@ -104,15 +100,15 @@ public class FinalityLogger {
     public static void warn(String message) {
         alternativeOutputStream.bypassing = true;
         System.out.println(YELLOW_BACKGROUND + BLACK_COLOR + "[Warning] " + message + RESET);
-        output("[Warning] "+message);
+        output("[Warning] " + message);
         alternativeOutputStream.bypassing = false;
     }
 
-    public static void output(String message){
-        try{
-            logStream.write(message+'\n');
+    public static void output(String message) {
+        try {
+            logStream.write(message + '\n');
             logStream.flush();
-        }catch (IOException ignored){
+        } catch (IOException ignored) {
 
         }
     }

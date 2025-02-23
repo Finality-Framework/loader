@@ -5,8 +5,11 @@ import team.rainfall.finality.loader.util.Localization;
 import javax.swing.*;
 
 public class ErrorCode {
+    public static boolean showed = false;
     public static void showInternalError(String code){
+        if(showed) return;
         String msg = String.format(Localization.bundle.getString("internal_error"), code);
         JOptionPane.showMessageDialog(null,msg,Localization.bundle.getString("error"),JOptionPane.ERROR_MESSAGE);
+        showed = true;
     }
 }

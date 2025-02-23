@@ -34,8 +34,8 @@ public class Loader {
         ParamParser paramParser = new ParamParser();
         paramParser.parse(args);
         FileUtil.createPrivateDir();
-        FlatIntelliJLaf.install();
         SplashScreen.create();
+
         if(GithubUtil.checkUpdate()){
             String [] options = {Localization.bundle.getString("update_now"),Localization.bundle.getString("later")};
             int i = JOptionPane.showOptionDialog(null, String.format(Localization.bundle.getString("new_version"), GithubUtil.latestVersion),Localization.bundle.getString("update"),JOptionPane.YES_NO_OPTION,JOptionPane.QUESTION_MESSAGE,null,options,options[0]);
@@ -43,6 +43,7 @@ public class Loader {
                 BrowserUtil.openUrl(GithubUtil.getLocaleRepoLink()+"/releases/");
             }
         }
+
         long startTime = System.currentTimeMillis();
         FinalityClassLoader classLoader = new FinalityClassLoader(new URL[0]);
         JarFile gameJar;
@@ -80,6 +81,7 @@ public class Loader {
                     }
                 }
             }
+
             //Luminosity Tweak
             TweakProcess process = new TweakProcess(PluginManager.INSTANCE.pluginDataList, new JarFile(new File(paramParser.gameFilePath)));
             process.targetFile = new File(paramParser.gameFilePath);

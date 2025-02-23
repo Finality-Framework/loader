@@ -5,6 +5,9 @@
 
 package team.rainfall.finality.loader;
 
+import team.rainfall.finality.loader.gui.ErrorCode;
+import team.rainfall.finality.loader.util.FinalityException;
+
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -28,7 +31,8 @@ public class FileManager {
         if(file.exists()){
             return file;
         }
-        throw new RuntimeException("Can not found SteamWSfolder");
+        ErrorCode.showInternalError("Etude - 04");
+        throw new FinalityException("SteamWSFolder is missing");
     }
 
     private static String getLocalPath() {
@@ -58,6 +62,7 @@ public class FileManager {
         if(file.exists()) return "aoh3.jar";
         file = new File("history2020.exe");
         if(file.exists()) return "history2020.exe";
+        ErrorCode.showInternalError("Etude - 03");
         throw new RuntimeException("Can not found game file");
     }
 }
