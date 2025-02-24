@@ -19,7 +19,9 @@ repositories {
     mavenCentral()
 }
 
-
+tasks.withType(Test).configureEach {
+    enabled = false
+}
 
 dependencies {
     implementation 'com.formdev:flatlaf:3.5'

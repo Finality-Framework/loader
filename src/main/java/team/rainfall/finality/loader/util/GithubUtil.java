@@ -21,9 +21,18 @@ public class GithubUtil {
     public static final String GITHUB_LATEST_RELEASE_LINK = "https://api.github.com/repos/finality-framework/loader/releases/latest";
     public static final String GITEE_LATEST_RELEASE_LINK = "https://gitee.com/api/v5/repos/finality-framework/loader/releases/latest";
     public static String latestVersion = Main.VERSION;
+
+//    @SuppressWarnings("ConstantConditions")
     public static boolean checkUpdate() {
+        // test版本不检测
+//        if (Main.VERSION.contains("test")) {
+//            FinalityLogger.debug(" using test version.");
+//            return false;
+//        }
+
         FileUtil.deleteFileIfThreeDaysPast(new File("./.finality/update"));
         if(CacheCheck()) return false;
+
         try {
             Unirest.config().verifySsl(false);
             String response = Unirest.get(getLocaleAPILink()).asJson().getBody().toString();

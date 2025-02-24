@@ -6,7 +6,6 @@
 package team.rainfall.finality.loader;
 
 import team.rainfall.finality.loader.gui.ErrorCode;
-import team.rainfall.finality.loader.util.FinalityException;
 import com.sun.jna.platform.win32.Advapi32Util;
 import com.sun.jna.platform.win32.WinReg;
 
@@ -15,17 +14,25 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class FileManager {
+
     public static FileManager INSTANCE = new FileManager();
     private ArrayList<File> fallbackFolderList = new ArrayList<>();
     public FileManager() {
     }
+
+    public File getSteamWSFolder() {
+        try {
+            return getSteamWSFolderDirect();
+        } catch (RuntimeException e) {
+            return getSteamWSFolderGlobal();
+        }
+    }
     
-    public File getSteamWSFolder(){
+    public File getSteamWSFolderDirect(){
         //获得当前目录父目录的父目录
         File file = new File("aoh3.exe").getAbsoluteFile();
         file = file.getParentFile().getParentFile().getParentFile();
@@ -51,7 +58,7 @@ public class FileManager {
             File vdfFile = new File(steamPath, "config/libraryfolders.vdf");
             if (!vdfFile.exists()) {
                 ErrorCode.showInternalError("Etude - 04");
-                throw new FinalityException("Steam library config not found");
+                throw new RuntimeException("Steam library config not found");
             }
 
             String vdfContent = new String(Files.readAllBytes(vdfFile.toPath()), StandardCharsets.UTF_8);
@@ -74,11 +81,11 @@ public class FileManager {
             }
             // 如果都没找到，抛出异常
             ErrorCode.showInternalError("Etude - 04");
-            throw new FinalityException("SteamWSFolder is missing");
+            throw new RuntimeException("SteamWSFolder is missing");
             
         } catch (Exception e) {
             ErrorCode.showInternalError("Etude - 04");
-            throw new FinalityException("Failed to locate Steam Workshop folder: " + e.getMessage());
+            throw new RuntimeException("Failed to locate Steam Workshop folder: " + e.getMessage());
         }
     }
 
@@ -113,4 +120,6 @@ public class FileManager {
         if(file.exists()) return "history2020.exe";
         throw new RuntimeException("Can not found game file");
     }
+
+
 }
