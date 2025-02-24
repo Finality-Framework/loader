@@ -5,19 +5,34 @@
 
 package team.rainfall.finality.loader;
 
+import team.rainfall.finality.loader.gui.ErrorCode;
+import com.sun.jna.platform.win32.Advapi32Util;
+import com.sun.jna.platform.win32.WinReg;
+
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class FileManager {
+
     public static FileManager INSTANCE = new FileManager();
     private ArrayList<File> fallbackFolderList = new ArrayList<>();
     public FileManager() {
     }
-    public File getSteamWSFolder(){
+
+    public File getSteamWSFolder() {
+        try {
+            return getSteamWSFolderDirect();
+        } catch (RuntimeException e) {
+            return getSteamWSFolderGlobal();
+        }
+    }
+    
+    public File getSteamWSFolderDirect(){
         //获得当前目录父目录的父目录
         File file = new File("aoh3.exe").getAbsoluteFile();
         file = file.getParentFile().getParentFile().getParentFile();
@@ -31,9 +46,53 @@ public class FileManager {
         throw new RuntimeException("Can not found SteamWSfolder");
     }
 
+    public File getSteamWSFolderGlobal() {
+        try {
+            // 从注册表获取Steam安装路径
+            String steamPath = Advapi32Util.registryGetStringValue(
+                WinReg.HKEY_LOCAL_MACHINE,
+                "Software\\Wow6432Node\\Valve\\Steam",
+                "InstallPath"
+            );
+            // 读取libraryfolders.vdf文件
+            File vdfFile = new File(steamPath, "config/libraryfolders.vdf");
+            if (!vdfFile.exists()) {
+                ErrorCode.showInternalError("Etude - 04");
+                throw new RuntimeException("Steam library config not found");
+            }
+
+            String vdfContent = new String(Files.readAllBytes(vdfFile.toPath()), StandardCharsets.UTF_8);
+            
+            // 解析VDF文件查找所有库路径
+            Pattern pathPattern = Pattern.compile("\"path\"\\s+\"([^\"]+)\"");
+            Matcher matcher = pathPattern.matcher(vdfContent);
+            ArrayList<String> libraryPaths = new ArrayList<>();
+            while (matcher.find()) {
+                libraryPaths.add(matcher.group(1).replace("\\\\", "\\"));
+            }
+            // 添加默认Steam安装路径
+            libraryPaths.add(steamPath);
+            // 在每个库路径中查找Workshop文件夹
+            for (String libraryPath : libraryPaths) {
+                File workshopPath = new File(libraryPath, "steamapps/workshop/content/2772750");
+                if (workshopPath.exists() && workshopPath.isDirectory()) {
+                    return workshopPath;
+                }
+            }
+            // 如果都没找到，抛出异常
+            ErrorCode.showInternalError("Etude - 04");
+            throw new RuntimeException("SteamWSFolder is missing");
+            
+        } catch (Exception e) {
+            ErrorCode.showInternalError("Etude - 04");
+            throw new RuntimeException("Failed to locate Steam Workshop folder: " + e.getMessage());
+        }
+    }
+
     private static String getLocalPath() {
         return (new File("")).getAbsolutePath() + File.separator;
     }
+    
     public String[] getModsOffFile(){
         File file = new File("settings/ModsOff.txt");
         if(file.exists()){
@@ -49,6 +108,7 @@ public class FileManager {
 
         return new String[0];
     }
+    
     public String findGameFile(){
         File file = new File("aoh3.exe");
         if(file.exists()) return "aoh3.exe";
@@ -60,4 +120,6 @@ public class FileManager {
         if(file.exists()) return "history2020.exe";
         throw new RuntimeException("Can not found game file");
     }
+
+
 }

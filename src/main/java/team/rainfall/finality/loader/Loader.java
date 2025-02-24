@@ -34,7 +34,7 @@ public class Loader {
         ParamParser paramParser = new ParamParser();
         paramParser.parse(args);
         FileUtil.createPrivateDir();
-        FlatIntelliJLaf.install();
+        FlatIntelliJLaf.setup();
         SplashScreen.create();
         if(GithubUtil.checkUpdate()){
             String [] options = {Localization.bundle.getString("update_now"),Localization.bundle.getString("later")};
