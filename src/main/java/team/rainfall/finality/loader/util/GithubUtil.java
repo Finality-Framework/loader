@@ -2,11 +2,10 @@ package team.rainfall.finality.loader.util;
 
 import com.alibaba.fastjson2.JSONObject;
 import kong.unirest.Unirest;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
 import team.rainfall.finality.FinalityLogger;
 import team.rainfall.finality.loader.Main;
+import team.rainfall.finality.loader.VersionType;
+
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
@@ -22,13 +21,11 @@ public class GithubUtil {
     public static final String GITEE_LATEST_RELEASE_LINK = "https://gitee.com/api/v5/repos/finality-framework/loader/releases/latest";
     public static String latestVersion = Main.VERSION;
 
-//    @SuppressWarnings("ConstantConditions")
     public static boolean checkUpdate() {
-        // test版本不检测
-//        if (Main.VERSION.contains("test")) {
-//            FinalityLogger.debug(" using test version.");
-//            return false;
-//        }
+       if(Main.VERSION_TYPE == VersionType.DEV){
+           //Bypass update
+           return false;
+       }
 
         FileUtil.deleteFileIfThreeDaysPast(new File("./.finality/update"));
         if(CacheCheck()) return false;

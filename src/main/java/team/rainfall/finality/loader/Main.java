@@ -17,8 +17,8 @@ import team.rainfall.finality.loader.gui.ErrorCode;
 
 public class Main {
 
-    public static final String VERSION = "1.2.4_test";
-
+    public static final String VERSION = "1.2.4";
+    public static final VersionType VERSION_TYPE = VersionType.DEV;
     public static final String STEAM_MANAGER_CLASS = "aoh.kingdoms.history.mainGame.Steam.SteamManager";
     public static String LAUNCHER_CLASS = "aoh.kingdoms.history.mainGame.desktop.DesktopLauncher";
     public static ArrayList<String> localMods = new ArrayList<>();
@@ -51,3 +51,4 @@ public class Main {
     }
 
 }
+

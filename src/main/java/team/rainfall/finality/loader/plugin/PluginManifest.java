@@ -17,11 +17,13 @@ public class PluginManifest {
     public ArrayList<String> tweakClasses = new ArrayList<>();
     public PluginManifest(InputStream is){
         JSONObject jsonObject = JSON.parseObject(is, Charset.defaultCharset());
-        jsonObject.getJSONArray("tweakClasses").forEach(item -> tweakClasses.add((String) item));
+        useLuminosity = jsonObject.getBoolean("useLuminosity");
+        if(useLuminosity) {
+            jsonObject.getJSONArray("tweakClasses").forEach(item -> tweakClasses.add((String) item));
+        }
         sdkVersion = jsonObject.getInteger("sdkVersion");
         version = jsonObject.getInteger("version");
         id = jsonObject.getString("id");
-        useLuminosity = jsonObject.getBoolean("useLuminosity");
         hasTweaker = jsonObject.getBoolean("hasTweaker");
         tweaker = jsonObject.getString("tweaker");
         if(useLuminosity == null){

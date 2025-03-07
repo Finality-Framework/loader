@@ -16,6 +16,7 @@ import team.rainfall.finality.luminosity2.utils.Luminosity_ClassWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -97,16 +98,20 @@ public class LuminosityEnvironment {
                 classInfo.node.accept(classWriter);
                 classInfo.bytes = classWriter.toByteArray();
             }
+
+            //Write and load classes from jar to avoid init problem
+            CachePacker.packClassesIntoJar(classInfos,"./.finality/luminosity2.jar");
         }catch (Exception e){
             ErrorCode.showInternalError("Sonata - 02");
             FinalityLogger.error("Exception while writing bytes",e);
             System.exit(1);
         }
     }
-    public void load(FinalityClassLoader classLoader){
-        for(ClassInfo classInfo:classInfos){
-            classLoader.defineClass2(classInfo.name,classInfo.bytes,0,classInfo.bytes.length);
-        }
+
+
+
+    public void load(FinalityClassLoader classLoader) throws MalformedURLException {
+       classLoader.addUrl2(new File("./.finality/luminosity2.jar").toURI().toURL());
     }
 
 }

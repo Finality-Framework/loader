@@ -31,6 +31,9 @@ public class Loader {
     public static void loaderMain(String[] args) {
         FinalityLogger.init();
         FinalityLogger.info("Finality Framework Loader " + VERSION);
+
+        unstableWarn();
+
         ParamParser paramParser = new ParamParser();
         paramParser.parse(args);
         FileUtil.createPrivateDir();
@@ -89,11 +92,7 @@ public class Loader {
             LuminosityEnvironment environment = new LuminosityEnvironment(PluginManager.INSTANCE.pluginDataList,new File(paramParser.gameFilePath));
             environment.run();
 
-            for (PluginData data:PluginManager.INSTANCE.pluginDataList) {
-                classLoader.addUrl2(data.file.toURI().toURL());
-            }
-
-            classLoader.addUrl2((new File(paramParser.gameFilePath)).toURI().toURL());
+            //Luminosity should run earlier than other classloader load
             if (paramParser.mode != LaunchMode.ONLY_GEN) {
                 process.tweakedClasses.forEach((tweakedClass) ->
                 {
@@ -103,6 +102,13 @@ public class Loader {
 
                 environment.load(classLoader);
             }
+
+            for (PluginData data:PluginManager.INSTANCE.pluginDataList) {
+                classLoader.addUrl2(data.file.toURI().toURL());
+            }
+
+            classLoader.addUrl2((new File(paramParser.gameFilePath)).toURI().toURL());
+
             //Luminosity Tweak end
 
             //Hijack SteamManager to load mods only when Steam API is disabled.
@@ -153,6 +159,7 @@ public class Loader {
                     SplashScreen.destroy();
                     classLoader.loadClass(LAUNCHER_CLASS).getMethod("main", String[].class).invoke(null, (Object) new String[0]);
                 }catch (Exception e){
+                    FinalityLogger.error("Game err",e);
                     JOptionPane.showMessageDialog(null,Localization.bundle.getString("game_crashed"),Localization.bundle.getString("error"),JOptionPane.ERROR_MESSAGE);
                 }
             }
@@ -162,5 +169,12 @@ public class Loader {
             System.exit(1);
         }
         SplashScreen.destroy();
+    }
+
+    static void unstableWarn(){
+        if(VERSION_TYPE != VersionType.RELEASE) {
+            FinalityLogger.warn("This is a unstable version of Finality Loader!");
+            FinalityLogger.warn("You know what are you doing.");
+        }
     }
 }
