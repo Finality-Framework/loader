@@ -20,16 +20,15 @@ import java.util.regex.Pattern;
 public class FileManager {
 
     public static FileManager INSTANCE = new FileManager();
-    private ArrayList<File> fallbackFolderList = new ArrayList<>();
     public FileManager() {
     }
 
     public File getSteamWSFolder() {
-        try {
-            return getSteamWSFolderDirect();
-        } catch (RuntimeException e) {
-            return getSteamWSFolderGlobal();
+        File WSfolder = getSteamWSFolderDirect();
+        if(WSfolder == null){
+            WSfolder = getSteamWSFolderGlobal();
         }
+        return WSfolder;
     }
     
     public File getSteamWSFolderDirect(){
@@ -42,7 +41,7 @@ public class FileManager {
         if(file.exists()){
             return file;
         }
-        throw new RuntimeException("Can not found SteamWSfolder");
+        return null;
     }
 
     public File getSteamWSFolderGlobal() {

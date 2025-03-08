@@ -98,7 +98,6 @@ public class LuminosityEnvironment {
                 classInfo.node.accept(classWriter);
                 classInfo.bytes = classWriter.toByteArray();
             }
-
             //Write and load classes from jar to avoid init problem
             CachePacker.packClassesIntoJar(classInfos,"./.finality/luminosity2.jar");
         }catch (Exception e){

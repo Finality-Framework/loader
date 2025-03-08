@@ -1,6 +1,7 @@
 package team.rainfall.finality.loader;
 
 import team.rainfall.finality.FinalityLogger;
+import team.rainfall.finality.loader.util.Localization;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -30,7 +31,7 @@ public class ParamParser {
             }
             if (args[i].equals("-launchMode")) {
                 if(args.length <= i + 1){
-                    FinalityLogger.warn("Invalid launch mode, defaulting to only-launch");
+                    FinalityLogger.warn(Localization.bundle.getString("invalid_launch_mode"));
                     break;
                 }
                 switch (args[i + 1]) {
@@ -44,7 +45,7 @@ public class ParamParser {
                         mode = LaunchMode.LAUNCH_AND_GEN;
                         break;
                     default:
-                        FinalityLogger.warn("Invalid launch mode, defaulting to only-launch");
+                        FinalityLogger.warn(Localization.bundle.getString("invalid_launch_mode"));
                         break;
 
                 }

@@ -154,7 +154,7 @@ public class Loader {
                 }
             }
             if (paramParser.mode == LaunchMode.ONLY_LAUNCH || paramParser.mode == LaunchMode.LAUNCH_AND_GEN) {
-                FinalityLogger.info("Ready to launch game,time spending " + (System.currentTimeMillis() - startTime) + "ms");
+                FinalityLogger.info(String.format(Localization.bundle.getString("ready_to_launch"),(System.currentTimeMillis() - startTime)));
                 try {
                     SplashScreen.destroy();
                     classLoader.loadClass(LAUNCHER_CLASS).getMethod("main", String[].class).invoke(null, (Object) new String[0]);
@@ -173,8 +173,8 @@ public class Loader {
 
     static void unstableWarn(){
         if(VERSION_TYPE != VersionType.RELEASE) {
-            FinalityLogger.warn("This is a unstable version of Finality Loader!");
-            FinalityLogger.warn("You know what are you doing.");
+            FinalityLogger.warn(Localization.bundle.getString("unstable_tips_1"));
+            FinalityLogger.warn(Localization.bundle.getString("unstable_tips_2"));
         }
     }
 }

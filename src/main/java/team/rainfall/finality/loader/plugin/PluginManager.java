@@ -6,6 +6,7 @@
 package team.rainfall.finality.loader.plugin;
 
 import team.rainfall.finality.FinalityLogger;
+import team.rainfall.finality.loader.util.Localization;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -24,7 +25,7 @@ public class PluginManager {
                 File[] var3 = Objects.requireNonNull(folder2.listFiles());
                 for (File pluginFile : var3) {
                     if (pluginFile.getName().endsWith(".jar")) {
-                        FinalityLogger.info("Found plugin " + pluginFile.getName());
+                        FinalityLogger.info(String.format(Localization.bundle.getString("found_plugin"),pluginFile.getName()));
                         try{
                             PluginData data = new PluginData(pluginFile);
                             pluginDataList.add(data);

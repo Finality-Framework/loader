@@ -2,7 +2,6 @@ package team.rainfall.finality.luminosity2;
 
 import team.rainfall.finality.luminosity2.utils.ClassInfo;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -16,6 +15,7 @@ public class CachePacker {
     public static void packClassesIntoJar(List<ClassInfo> classInfoList, String jarFilePath) throws IOException {
         Manifest manifest = new Manifest();
         manifest.getMainAttributes().putValue("Manifest-Version", "1.0");
+        manifest.getMainAttributes().put("Created-By", "Finality Loader Luminosity2");
         try (JarOutputStream jos = new JarOutputStream(Files.newOutputStream(Paths.get(jarFilePath)), manifest)) {
             for (ClassInfo classInfo : classInfoList) {
                 String path = classInfo.name.replace('.', '/') + ".class";
