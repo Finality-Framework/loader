@@ -5,7 +5,9 @@
 
 package team.rainfall.finality.loader.plugin;
 
+import org.semver4j.Semver;
 import team.rainfall.finality.FinalityLogger;
+import team.rainfall.finality.loader.Main;
 import team.rainfall.finality.loader.util.Localization;
 
 import java.io.File;
@@ -28,7 +30,13 @@ public class PluginManager {
                         FinalityLogger.info(String.format(Localization.bundle.getString("found_plugin"),pluginFile.getName()));
                         try{
                             PluginData data = new PluginData(pluginFile);
-                            pluginDataList.add(data);
+                            if(!Objects.requireNonNull(Semver.parse(Main.VERSION)).satisfies(data.manifest.sdkVersion)){
+                                FinalityLogger.warn(String.format(Localization.bundle.getString("incompatible_plugin"), data.manifest.name,data.manifest.sdkVersion));
+                                FinalityLogger.warn(Localization.bundle.getString("it_wont_be_loaded"));
+                            }else {
+                                pluginDataList.add(data);
+                                FinalityLogger.info(String.format(Localization.bundle.getString("loaded_plugin"), data.manifest.name));
+                            }
                         } catch (Exception e) {
                             FinalityLogger.error("Error loading plugin " + pluginFile.getName(), e);
                         }

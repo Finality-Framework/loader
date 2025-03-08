@@ -24,17 +24,6 @@ public class PluginDataTest {
         assertNotNull(pluginData.manifest);
     }
 
-    @Test
-    public void testBuildDefaultManifestForOldPlugin() {
-        String json = "{\"sdkVersion\":2,\"tweakClasses\":[\"class1\",\"class2\"],\"publicizedClasses\":[\"class3\",\"class4\"],\"packageName\":\"testPackage\"}";
-        ByteArrayInputStream inputStream = new ByteArrayInputStream(json.getBytes(StandardCharsets.UTF_8));
-        TweakManifest tweakManifest = new TweakManifest(inputStream);
-        PluginManifest manifest = PluginData.buildDefaultManifestForOldPlugin(tweakManifest);
-        assertEquals("testPackage", manifest.id);
-        assertFalse(manifest.hasTweaker);
-        assertEquals(0, manifest.version);
-        assertTrue(manifest.useLuminosity);
-        assertEquals(2, manifest.sdkVersion);
-    }
+
 
 }

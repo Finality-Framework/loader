@@ -17,7 +17,7 @@ import team.rainfall.finality.loader.gui.ErrorCode;
 
 public class Main {
 
-    public static final String VERSION = "1.2.4";
+    public static final String VERSION = "1.3.0";
     public static final VersionType VERSION_TYPE = VersionType.DEV;
     public static final String STEAM_MANAGER_CLASS = "aoh.kingdoms.history.mainGame.Steam.SteamManager";
     public static String LAUNCHER_CLASS = "aoh.kingdoms.history.mainGame.desktop.DesktopLauncher";
@@ -25,7 +25,6 @@ public class Main {
     public static void main(String[] args) {
         try {
             FlatIntelliJLaf.setup();
-
             Loader.loaderMain(args);
         }catch (Throwable e){
             FinalityLogger.error("Unknown err",e);
