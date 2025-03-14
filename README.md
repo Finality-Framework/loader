@@ -1,6 +1,3 @@
-# IMPORTANT NOTICE  
-Starting from v1.2.1, this project will enter LTSC status. The project will only receive updates for stability and security, and no new features will be added.
-
 # loader   
 This is the loader for Finality Framework.
 
