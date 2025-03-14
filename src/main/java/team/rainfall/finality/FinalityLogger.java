@@ -18,6 +18,7 @@ public class FinalityLogger {
     public static final String YELLOW_BACKGROUND = "\033[43m";
     public static final String GRAY_BACKGROUND = "\033[100m";
     public static final String BLACK_COLOR = "\033[30m";
+    public static final String PURPLE_BACKGROUND = "\033[45m";
     public static final String RESET = "\033[0m";
 
     public static void init() {
@@ -44,7 +45,12 @@ public class FinalityLogger {
 
         }
     }
-
+    public static void important(String message){
+        alternativeOutputStream.bypassing = true;
+        System.out.println(PURPLE_BACKGROUND + "[Important] " + message + RESET);
+        output("[Important] " + message);
+        alternativeOutputStream.bypassing = false;
+    }
     public static void info(String message) {
         alternativeOutputStream.bypassing = true;
         System.out.println(WHITE_BACKGROUND + BLACK_COLOR + "[Info] " + message + RESET);
@@ -62,13 +68,9 @@ public class FinalityLogger {
     public static void error(String message, Throwable throwable) {
         alternativeOutputStream.bypassing = true;
         System.err.println(RED_BACKGROUND+"[Error] " + message + RESET);
-        if (isDebug) {
-            System.err.println(RED_COLOR+getStackTraceAsString(throwable,true)+RESET);
-        }
+        System.err.println(RED_COLOR+getStackTraceAsString(throwable,true)+RESET);
         output("[Error] " + message);
-        if (isDebug) {
-            output(getStackTraceAsString(throwable,false));
-        }
+        output(getStackTraceAsString(throwable,false));
         alternativeOutputStream.bypassing = false;
     }
 
@@ -88,6 +90,10 @@ public class FinalityLogger {
             i++;
             sb.append("\n").append("at ").append(element.toString());
         }
+        if(throwable.getCause() != null) {
+            sb.append("\nCaused by: ").append(getStackTraceAsString(throwable.getCause(),stacktraceLimit));
+        }
+
         return sb.toString();
     }
 

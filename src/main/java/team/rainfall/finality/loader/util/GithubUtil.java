@@ -3,6 +3,7 @@ package team.rainfall.finality.loader.util;
 import com.alibaba.fastjson2.JSONObject;
 import kong.unirest.Unirest;
 import team.rainfall.finality.FinalityLogger;
+import team.rainfall.finality.loader.FileManager;
 import team.rainfall.finality.loader.Main;
 import team.rainfall.finality.loader.VersionType;
 
@@ -27,7 +28,7 @@ public class GithubUtil {
            return false;
        }
 
-        FileUtil.deleteFileIfThreeDaysPast(new File("./.finality/update"));
+        FileUtil.deleteFileIfThreeDaysPast(FileManager.INSTANCE.getFile("./.finality/update"));
         if(CacheCheck()) return false;
 
         try {
@@ -35,7 +36,7 @@ public class GithubUtil {
             String response = Unirest.get(getLocaleAPILink()).asJson().getBody().toString();
             JSONObject jsonObject = JSONObject.parseObject(response);
             String tag = jsonObject.getString("tag_name");
-            File file = new File("./.finality/update");
+            File file = FileManager.INSTANCE.getFile("./.finality/update");
             boolean ignored = file.createNewFile();
             if(tag.equals(Main.VERSION)){
                 return false;
@@ -49,7 +50,7 @@ public class GithubUtil {
         }
     }
     public static boolean CacheCheck() {
-        File file = new File("./.finality/update");
+        File file = FileManager.INSTANCE.getFile("./.finality/update");
         return file.exists();
     }
     //Bypass SSL Cert

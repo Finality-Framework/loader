@@ -14,10 +14,13 @@ import team.rainfall.luminosity.TweakedClass;
 
 import javax.swing.*;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.net.URL;
+import java.nio.channels.FileChannel;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -27,15 +30,23 @@ import java.util.jar.JarFile;
 import static team.rainfall.finality.loader.Main.*;
 
 public class Loader {
+    static ParamParser paramParser = new ParamParser();
     @SuppressWarnings("deprecated")
     public static void loaderMain(String[] args) {
         FinalityLogger.init();
         FinalityLogger.info("Finality Framework Loader " + VERSION);
-
-        unstableWarn();
-
-        ParamParser paramParser = new ParamParser();
+        FileManager.INSTANCE.parseSteamVDF();
         paramParser.parse(args);
+        if(!paramParser.isReboot) {
+            unstableWarn();
+        }
+        if(FileManager.parentFile != null){
+            FinalityLogger.important(Localization.bundle.getString("second_boot"));
+
+            System.out.println("- - - - - - - - - - - - - - - - -");
+            System.exit(dropAndLaunch(FileManager.parentFile,args));
+        }
+
         FileUtil.createPrivateDir();
         FlatIntelliJLaf.setup();
         SplashScreen.create();
@@ -53,7 +64,7 @@ public class Loader {
             gameJar = new JarFile(new File(paramParser.gameFilePath));
             LAUNCHER_CLASS = gameJar.getManifest().getMainAttributes().getValue(Attributes.Name.MAIN_CLASS);
             //Search local mods
-            for (File file : Objects.requireNonNull(new File("mods").listFiles())) {
+            for (File file : Objects.requireNonNull(FileManager.INSTANCE.getFile("mods").listFiles())) {
                 String[] strings = FileManager.INSTANCE.getModsOffFile();
                 List<String> list = Arrays.asList(strings);
                 if (file.isDirectory() && !list.contains("mods/" + file.getName() + "/")) {
@@ -132,8 +143,8 @@ public class Loader {
             if (paramParser.mode == LaunchMode.ONLY_GEN || paramParser.mode == LaunchMode.LAUNCH_AND_GEN) {
                 for(ClassInfo classInfo : environment.classInfos){
                     try {
-                        deleteDir(new File("gen/"));
-                        File file = new File("gen/" + classInfo.name.replace(".", "/") + ".class");
+                        deleteDir(FileManager.INSTANCE.getFile("gen/"));
+                        File file = FileManager.INSTANCE.getFile("gen/" + classInfo.name.replace(".", "/") + ".class");
                         boolean ignored = file.getParentFile().mkdirs();
                         FileOutputStream fos = new FileOutputStream(file);
                         fos.write(classInfo.bytes);
@@ -177,4 +188,48 @@ public class Loader {
             FinalityLogger.warn(Localization.bundle.getString("unstable_tips_2"));
         }
     }
+
+
+    /**
+     * @param gamePath a folder file of game folder.
+     * @return
+     * @author RedreamR
+     */
+    static int dropAndLaunch(File gamePath,String[] args){
+        String currentJarPath = Loader.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+        try {
+            // 解析当前JAR文件的绝对路径（处理空格和中文问题）
+            currentJarPath = java.net.URLDecoder.decode(currentJarPath, "UTF-8");
+
+            // 复制JAR文件到指定目录
+            copyFile(new File(currentJarPath), new File(gamePath,"Finality_Loader.jar"));
+            String[] param = {"java", "-jar", gamePath.getAbsolutePath()+"/"+"Finality_Loader.jar","-reboot"};
+            param = ArrayUtil.mergeArrays(param,args);
+            // 使用ProcessBuilder启动JAR文件
+            ProcessBuilder processBuilder = new ProcessBuilder(param);
+            processBuilder.directory(gamePath); // 设置工作目录
+            processBuilder.inheritIO(); // 继承当前进程的输入输出
+
+            // 启动进程
+            Process process = processBuilder.start();
+            int exitCode = process.waitFor();
+            FinalityLogger.info("END OF EXECUTE,exit code:"+exitCode);
+            return exitCode;
+        } catch (Exception e) {
+            FinalityLogger.error("WTF",e);
+        }
+        return 0;
+    }
+
+    private static void copyFile(File sourceFile, File targetFile) throws IOException {
+        try (FileInputStream fis = new FileInputStream(sourceFile);
+             FileOutputStream fos = new FileOutputStream(targetFile);
+             FileChannel sourceChannel = fis.getChannel();
+             FileChannel targetChannel = fos.getChannel()) {
+
+            targetChannel.transferFrom(sourceChannel, 0, sourceChannel.size());
+        }
+    }
+
+
 }

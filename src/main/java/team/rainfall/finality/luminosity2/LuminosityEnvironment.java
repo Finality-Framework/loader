@@ -4,6 +4,7 @@ import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.tree.AnnotationNode;
 import org.objectweb.asm.tree.ClassNode;
 import team.rainfall.finality.FinalityLogger;
+import team.rainfall.finality.loader.FileManager;
 import team.rainfall.finality.loader.plugin.PluginData;
 import team.rainfall.finality.loader.gui.ErrorCode;
 import team.rainfall.finality.loader.util.FinalityClassLoader;
@@ -99,7 +100,7 @@ public class LuminosityEnvironment {
                 classInfo.bytes = classWriter.toByteArray();
             }
             //Write and load classes from jar to avoid init problem
-            CachePacker.packClassesIntoJar(classInfos,"./.finality/luminosity2.jar");
+            CachePacker.packClassesIntoJar(classInfos, "./.finality/luminosity2.jar");
         }catch (Exception e){
             ErrorCode.showInternalError("Sonata - 02");
             FinalityLogger.error("Exception while writing bytes",e);
