@@ -1,5 +1,7 @@
 package team.rainfall.finality;
 
+import team.rainfall.finality.loader.util.Localization;
+
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
@@ -18,6 +20,7 @@ public class FinalityLogger {
     public static final String YELLOW_BACKGROUND = "\033[43m";
     public static final String GRAY_BACKGROUND = "\033[100m";
     public static final String BLACK_COLOR = "\033[30m";
+    public static final String PURPLE_BACKGROUND = "\033[45m";
     public static final String RESET = "\033[0m";
 
     public static void init() {
@@ -30,19 +33,29 @@ public class FinalityLogger {
                 file.createNewFile();
             }
             FileOutputStream fos = new FileOutputStream("./loader.log");
-            fos.write(new byte[]{(byte) 0xEF, (byte) 0xBB, (byte) 0xBF});
+            fos.write(new byte[]{(byte)0xEF, (byte)0xBB, (byte)0xBF});
             fos.flush();
             logStream = new OutputStreamWriter(fos, StandardCharsets.UTF_8);
             //输出系统的日期
             LocalDateTime dateTime = LocalDateTime.now();
             DateTimeFormatter formatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM).withLocale(Locale.getDefault());
-            logStream.write("Logger initiated at " + dateTime.format(formatter) + "\n");
+            logStream.write("Logger initiated at "+ dateTime.format(formatter) + "\n");
             logStream.flush();
             System.setErr(alternativeOutputStream);
             System.setOut(alternativeOutputStream);
         } catch (IOException ignored) {
 
         }
+    }
+    public static void important(String message){
+        alternativeOutputStream.bypassing = true;
+        System.out.println(PURPLE_BACKGROUND + "[Important] " + message + RESET);
+        output("[Important] " + message);
+        alternativeOutputStream.bypassing = false;
+    }
+
+    public static void localizeInfo(String message){
+        info(String.format(Localization.bundle.getString(message)));
     }
 
     public static void info(String message) {
@@ -61,29 +74,33 @@ public class FinalityLogger {
 
     public static void error(String message, Throwable throwable) {
         alternativeOutputStream.bypassing = true;
-        System.err.println(RED_BACKGROUND + "[Error] " + message + RESET);
-        System.err.println(RED_COLOR + getStackTraceAsString(throwable, true) + RESET);
+        System.err.println(RED_BACKGROUND+"[Error] " + message + RESET);
+        System.err.println(RED_COLOR+getStackTraceAsString(throwable,true)+RESET);
         output("[Error] " + message);
-        output(getStackTraceAsString(throwable, false));
+        output(getStackTraceAsString(throwable,false));
         alternativeOutputStream.bypassing = false;
     }
 
     //将异常堆栈转换为字符串
-    private static String getStackTraceAsString(Throwable throwable, boolean stacktraceLimit) {
+    private static String getStackTraceAsString(Throwable throwable,boolean stacktraceLimit) {
         StringBuilder sb = new StringBuilder();
         sb.append(throwable.toString());
-        if (throwable.getMessage() != null) {
+        if(throwable.getMessage() != null){
             sb.append(":").append(throwable.getMessage());
         }
         int i = 1;
         for (StackTraceElement element : throwable.getStackTrace()) {
-            if (i >= STACKTRACE_LIMIT && stacktraceLimit) {
+            if(i >= STACKTRACE_LIMIT && stacktraceLimit){
                 sb.append("\n").append("... ").append(throwable.getStackTrace().length - i).append(" more");
                 break;
             }
             i++;
             sb.append("\n").append("at ").append(element.toString());
         }
+        if(throwable.getCause() != null) {
+            sb.append("\nCaused by: ").append(getStackTraceAsString(throwable.getCause(),stacktraceLimit));
+        }
+
         return sb.toString();
     }
 
@@ -100,15 +117,15 @@ public class FinalityLogger {
     public static void warn(String message) {
         alternativeOutputStream.bypassing = true;
         System.out.println(YELLOW_BACKGROUND + BLACK_COLOR + "[Warning] " + message + RESET);
-        output("[Warning] " + message);
+        output("[Warning] "+message);
         alternativeOutputStream.bypassing = false;
     }
 
-    public static void output(String message) {
-        try {
-            logStream.write(message + '\n');
+    public static void output(String message){
+        try{
+            logStream.write(message+'\n');
             logStream.flush();
-        } catch (IOException ignored) {
+        }catch (IOException ignored){
 
         }
     }

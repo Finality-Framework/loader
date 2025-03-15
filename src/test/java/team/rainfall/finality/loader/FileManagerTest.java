@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class FileManagerTest {
 
     @Test
-    public void testGetSteamWSFolder() {
+    public void getSteamWSFolder() {
         File steamWSFolder = FileManager.INSTANCE.getSteamWSFolder();
         assertTrue(steamWSFolder.exists());
     }

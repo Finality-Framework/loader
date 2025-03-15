@@ -43,10 +43,13 @@ public class MixinProcessor implements Processor {
     }
     public void mixinMethods(){
         for(MethodNode methodNode:sourceNode.methods){
+            //Skip init method
+            if(methodNode.name.equals("<init>")) continue;
+            if(methodNode.name.equals("<clinit>")) continue;
             if(methodNameList.contains(methodNode.name+methodNode.desc)){
                 targetNode.methods.remove(MethodUtil.findMethodByName(targetNode,methodNode.name+methodNode.desc));
-                targetNode.methods.add(methodNode);
             }
+            targetNode.methods.add(methodNode);
         }
     }
 

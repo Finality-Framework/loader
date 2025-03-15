@@ -2,6 +2,7 @@ package team.rainfall.finality.loader;
 
 import com.formdev.flatlaf.FlatIntelliJLaf;
 import team.rainfall.finality.FinalityLogger;
+import team.rainfall.finality.installer.Installer;
 import team.rainfall.finality.loader.gui.ErrorCode;
 import team.rainfall.finality.loader.gui.SplashScreen;
 import team.rainfall.finality.loader.plugin.PluginData;
@@ -14,10 +15,13 @@ import team.rainfall.luminosity.TweakedClass;
 
 import javax.swing.*;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.net.URL;
+import java.net.URLDecoder;
+import java.nio.channels.FileChannel;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -27,15 +31,29 @@ import java.util.jar.JarFile;
 import static team.rainfall.finality.loader.Main.*;
 
 public class Loader {
+    static ParamParser paramParser = new ParamParser();
+
     @SuppressWarnings("deprecated")
     public static void loaderMain(String[] args) {
         FinalityLogger.init();
         FinalityLogger.info("Finality Framework Loader " + VERSION);
-        ParamParser paramParser = new ParamParser();
         paramParser.parse(args);
-        FileUtil.createPrivateDir();
-        SplashScreen.create();
 
+        if(paramParser.mode == LaunchMode.INSTALL){
+            Installer.install();
+        }
+
+        if(!paramParser.isReboot) {
+            unstableWarn();
+        }
+
+        if(FileManager.parentFile != null){
+            System.exit(dropAndLaunch(FileManager.parentFile,args));
+        }
+
+        FileUtil.createPrivateDir();
+        FlatIntelliJLaf.setup();
+        SplashScreen.create();
         if(GithubUtil.checkUpdate()){
             String [] options = {Localization.bundle.getString("update_now"),Localization.bundle.getString("later")};
             int i = JOptionPane.showOptionDialog(null, String.format(Localization.bundle.getString("new_version"), GithubUtil.latestVersion),Localization.bundle.getString("update"),JOptionPane.YES_NO_OPTION,JOptionPane.QUESTION_MESSAGE,null,options,options[0]);
@@ -43,15 +61,12 @@ public class Loader {
                 BrowserUtil.openUrl(GithubUtil.getLocaleRepoLink()+"/releases/");
             }
         }
-
         long startTime = System.currentTimeMillis();
         FinalityClassLoader classLoader = new FinalityClassLoader(new URL[0]);
-        JarFile gameJar;
-        try {
-            gameJar = new JarFile(new File(paramParser.gameFilePath));
+        try (JarFile gameJar = new JarFile(new File(paramParser.gameFilePath))) {
             LAUNCHER_CLASS = gameJar.getManifest().getMainAttributes().getValue(Attributes.Name.MAIN_CLASS);
             //Search local mods
-            for (File file : Objects.requireNonNull(new File("mods").listFiles())) {
+            for (File file : Objects.requireNonNull(FileManager.INSTANCE.getFile("mods").listFiles())) {
                 String[] strings = FileManager.INSTANCE.getModsOffFile();
                 List<String> list = Arrays.asList(strings);
                 if (file.isDirectory() && !list.contains("mods/" + file.getName() + "/")) {
@@ -59,7 +74,7 @@ public class Loader {
                 }
             }
             for (String str : localMods) {
-                //遍历str文件夹
+                //Find plugins in local mods
                 File file = new File(str);
                 PluginManager.INSTANCE.findPlugins(file);
             }
@@ -81,21 +96,16 @@ public class Loader {
                     }
                 }
             }
-
             //Luminosity Tweak
             TweakProcess process = new TweakProcess(PluginManager.INSTANCE.pluginDataList, new JarFile(new File(paramParser.gameFilePath)));
             process.targetFile = new File(paramParser.gameFilePath);
             process.tweak();
 
             //Luminosity2
-            LuminosityEnvironment environment = new LuminosityEnvironment(PluginManager.INSTANCE.pluginDataList,new File(paramParser.gameFilePath));
+            LuminosityEnvironment environment = new LuminosityEnvironment(PluginManager.INSTANCE.pluginDataList, new File(paramParser.gameFilePath));
             environment.run();
 
-            for (PluginData data:PluginManager.INSTANCE.pluginDataList) {
-                classLoader.addUrl2(data.file.toURI().toURL());
-            }
-
-            classLoader.addUrl2((new File(paramParser.gameFilePath)).toURI().toURL());
+            //Luminosity should run earlier than other classloader load
             if (paramParser.mode != LaunchMode.ONLY_GEN) {
                 process.tweakedClasses.forEach((tweakedClass) ->
                 {
@@ -105,6 +115,13 @@ public class Loader {
 
                 environment.load(classLoader);
             }
+
+            for (PluginData data : PluginManager.INSTANCE.pluginDataList) {
+                classLoader.addUrl2(data.file.toURI().toURL());
+            }
+
+            classLoader.addUrl2((new File(paramParser.gameFilePath)).toURI().toURL());
+
             //Luminosity Tweak end
 
             //Hijack SteamManager to load mods only when Steam API is disabled.
@@ -126,15 +143,15 @@ public class Loader {
             } catch (Exception ignored) {
             }
             if (paramParser.mode == LaunchMode.ONLY_GEN || paramParser.mode == LaunchMode.LAUNCH_AND_GEN) {
-                for(ClassInfo classInfo : environment.classInfos){
+                for (ClassInfo classInfo : environment.classInfos) {
                     try {
-                        deleteDir(new File("gen/"));
-                        File file = new File("gen/" + classInfo.name.replace(".", "/") + ".class");
+                        deleteDir(FileManager.INSTANCE.getFile("gen/"));
+                        File file = FileManager.INSTANCE.getFile("gen/" + classInfo.name.replace(".", "/") + ".class");
                         boolean ignored = file.getParentFile().mkdirs();
                         FileOutputStream fos = new FileOutputStream(file);
                         fos.write(classInfo.bytes);
                     } catch (IOException var17) {
-                        FinalityLogger.error("Gen err",var17);
+                        FinalityLogger.error("Gen err", var17);
                     }
                 }
                 for (TweakedClass tweakedClass : process.tweakedClasses) {
@@ -145,24 +162,72 @@ public class Loader {
                         FileOutputStream fos = new FileOutputStream(file);
                         fos.write(tweakedClass.classBytes);
                     } catch (IOException var17) {
-                        FinalityLogger.error("Gen err",var17);
+                        FinalityLogger.error("Gen err", var17);
                     }
                 }
             }
             if (paramParser.mode == LaunchMode.ONLY_LAUNCH || paramParser.mode == LaunchMode.LAUNCH_AND_GEN) {
-                FinalityLogger.info("Ready to launch game,time spending " + (System.currentTimeMillis() - startTime) + "ms");
+                FinalityLogger.info(String.format(Localization.bundle.getString("ready_to_launch"), (System.currentTimeMillis() - startTime)));
                 try {
                     SplashScreen.destroy();
                     classLoader.loadClass(LAUNCHER_CLASS).getMethod("main", String[].class).invoke(null, (Object) new String[0]);
-                }catch (Exception e){
-                    JOptionPane.showMessageDialog(null,Localization.bundle.getString("game_crashed"),Localization.bundle.getString("error"),JOptionPane.ERROR_MESSAGE);
+                } catch (Exception e) {
+                    FinalityLogger.error("Game err", e);
+                    JOptionPane.showMessageDialog(null, Localization.bundle.getString("game_crashed"), Localization.bundle.getString("error"), JOptionPane.ERROR_MESSAGE);
                 }
             }
         } catch (Exception var18) {
-            FinalityLogger.error("Unknown err",var18);
+            FinalityLogger.error("Unknown err", var18);
             ErrorCode.showInternalError("Etude - 01");
             System.exit(1);
         }
         SplashScreen.destroy();
     }
+
+    static void unstableWarn(){
+        if(VERSION_TYPE != VersionType.RELEASE) {
+            FinalityLogger.warn(Localization.bundle.getString("unstable_tips_1"));
+            FinalityLogger.warn(Localization.bundle.getString("unstable_tips_2"));
+        }
+    }
+
+
+    /**
+     * drop loader itself into the game folder,and execute it again to launch the game.
+     * Note:Steam will block our launch if we try to launch game from the folder which is different from the game folder.
+     * @param gamePath a folder file of game folder.
+     * @return exit code
+     * @author RedreamR
+     */
+    static int dropAndLaunch(File gamePath,String[] args){
+        String currentJarPath = Loader.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+        try {
+            currentJarPath = URLDecoder.decode(currentJarPath, "UTF-8");
+            copyFile(new File(currentJarPath), new File(gamePath,"Finality_Loader.jar"));
+            String[] param = {"java", "-jar", gamePath.getAbsolutePath()+"/"+"Finality_Loader.jar","-reboot"};
+            param = ArrayUtil.mergeArrays(param,args);
+            ProcessBuilder processBuilder = new ProcessBuilder(param);
+            processBuilder.directory(gamePath);
+            processBuilder.inheritIO();
+            Process process = processBuilder.start();
+            int exitCode = process.waitFor();
+            FinalityLogger.info("END OF EXECUTE,exit code:"+exitCode);
+            return exitCode;
+        } catch (Exception e) {
+            FinalityLogger.error("WTF",e);
+        }
+        return 0;
+    }
+
+    public static void copyFile(File sourceFile, File targetFile) throws IOException {
+        try (FileInputStream fis = new FileInputStream(sourceFile);
+             FileOutputStream fos = new FileOutputStream(targetFile);
+             FileChannel sourceChannel = fis.getChannel();
+             FileChannel targetChannel = fos.getChannel()) {
+
+            targetChannel.transferFrom(sourceChannel, 0, sourceChannel.size());
+        }
+    }
+
+
 }

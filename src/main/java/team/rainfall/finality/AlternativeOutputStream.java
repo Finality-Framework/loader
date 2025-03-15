@@ -5,7 +5,7 @@ import java.io.PrintStream;
 
 public class AlternativeOutputStream extends PrintStream {
     public boolean bypassing = false;
-    private OutputStream parentOS;
+    private final OutputStream parentOS;
     public AlternativeOutputStream(OutputStream out) {
         super(out);
         parentOS = out;
@@ -15,5 +15,9 @@ public class AlternativeOutputStream extends PrintStream {
         if(!bypassing) {
             FinalityLogger.output("[Game] " + s);
         }
+    }
+
+    public OutputStream getParentOS() {
+        return parentOS;
     }
 }

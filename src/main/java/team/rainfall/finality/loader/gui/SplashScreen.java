@@ -26,8 +26,9 @@ public class SplashScreen extends JFrame {
     }
 
     public static void destroy(){
-        if(splashScreen != null)
+        if(splashScreen != null) {
             splashScreen.dispose();
             splashScreen = null;
+        }
     }
 }

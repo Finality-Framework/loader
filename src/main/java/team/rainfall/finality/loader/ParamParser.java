@@ -1,19 +1,26 @@
 package team.rainfall.finality.loader;
 
 import team.rainfall.finality.FinalityLogger;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.ArrayList;
+import team.rainfall.finality.loader.util.Localization;
 
 public class ParamParser {
-    public ArrayList<String> modPaths = new ArrayList<>();
+    public boolean forceNoVDF = false;
+    public boolean isReboot = false;
     public LaunchMode mode = LaunchMode.ONLY_LAUNCH;
-    public String gameFilePath = FileManager.INSTANCE.findGameFile();
+    public String gameFilePath = null;
     public boolean disableSteamAPI = false;
     public void parse(String[] args) {
+        gameFilePath = FileManager.INSTANCE.findGameFile();
         for (int i = 0; i < args.length; i++) {
+            if(args[i].equals("-forceNoVDF")){
+                forceNoVDF = true;
+            }
+            if(args[i].equals("-ignore")){
+                break;
+            }
+            if(args[i].equals("-reboot")){
+                isReboot = true;
+            }
             if (args[i].equals("-debug")) {
                 FinalityLogger.isDebug = true;
             }
@@ -30,10 +37,13 @@ public class ParamParser {
             }
             if (args[i].equals("-launchMode")) {
                 if(args.length <= i + 1){
-                    FinalityLogger.warn("Invalid launch mode, defaulting to only-launch");
+                    FinalityLogger.warn(Localization.bundle.getString("invalid_launch_mode"));
                     break;
                 }
                 switch (args[i + 1]) {
+                    case "install":
+                        mode = LaunchMode.INSTALL;
+                        break;
                     case "only-launch":
                         mode = LaunchMode.ONLY_LAUNCH;
                         break;
@@ -44,7 +54,7 @@ public class ParamParser {
                         mode = LaunchMode.LAUNCH_AND_GEN;
                         break;
                     default:
-                        FinalityLogger.warn("Invalid launch mode, defaulting to only-launch");
+                        FinalityLogger.warn(Localization.bundle.getString("invalid_launch_mode"));
                         break;
 
                 }

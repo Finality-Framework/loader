@@ -2,11 +2,11 @@ package team.rainfall.finality.loader.util;
 
 import com.alibaba.fastjson2.JSONObject;
 import kong.unirest.Unirest;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
 import team.rainfall.finality.FinalityLogger;
+import team.rainfall.finality.loader.FileManager;
 import team.rainfall.finality.loader.Main;
+import team.rainfall.finality.loader.VersionType;
+
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
@@ -21,15 +21,22 @@ public class GithubUtil {
     public static final String GITHUB_LATEST_RELEASE_LINK = "https://api.github.com/repos/finality-framework/loader/releases/latest";
     public static final String GITEE_LATEST_RELEASE_LINK = "https://gitee.com/api/v5/repos/finality-framework/loader/releases/latest";
     public static String latestVersion = Main.VERSION;
+
     public static boolean checkUpdate() {
-        FileUtil.deleteFileIfThreeDaysPast(new File("./.finality/update"));
+       if(Main.VERSION_TYPE == VersionType.DEV){
+           //Bypass update
+           return false;
+       }
+
+        FileUtil.deleteFileIfThreeDaysPast(FileManager.INSTANCE.getFile("./.finality/update"));
         if(CacheCheck()) return false;
+
         try {
             Unirest.config().verifySsl(false);
             String response = Unirest.get(getLocaleAPILink()).asJson().getBody().toString();
             JSONObject jsonObject = JSONObject.parseObject(response);
             String tag = jsonObject.getString("tag_name");
-            File file = new File("./.finality/update");
+            File file = FileManager.INSTANCE.getFile("./.finality/update");
             boolean ignored = file.createNewFile();
             if(tag.equals(Main.VERSION)){
                 return false;
@@ -43,7 +50,7 @@ public class GithubUtil {
         }
     }
     public static boolean CacheCheck() {
-        File file = new File("./.finality/update");
+        File file = FileManager.INSTANCE.getFile("./.finality/update");
         return file.exists();
     }
     //Bypass SSL Cert
