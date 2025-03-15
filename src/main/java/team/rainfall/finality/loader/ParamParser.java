@@ -4,6 +4,7 @@ import team.rainfall.finality.FinalityLogger;
 import team.rainfall.finality.loader.util.Localization;
 
 public class ParamParser {
+    public boolean forceNoVDF = false;
     public boolean isReboot = false;
     public LaunchMode mode = LaunchMode.ONLY_LAUNCH;
     public String gameFilePath = null;
@@ -11,6 +12,12 @@ public class ParamParser {
     public void parse(String[] args) {
         gameFilePath = FileManager.INSTANCE.findGameFile();
         for (int i = 0; i < args.length; i++) {
+            if(args[i].equals("-forceNoVDF")){
+                forceNoVDF = true;
+            }
+            if(args[i].equals("-ignore")){
+                break;
+            }
             if(args[i].equals("-reboot")){
                 isReboot = true;
             }

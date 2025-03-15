@@ -1,5 +1,7 @@
 package team.rainfall.finality;
 
+import team.rainfall.finality.loader.util.Localization;
+
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
@@ -51,6 +53,11 @@ public class FinalityLogger {
         output("[Important] " + message);
         alternativeOutputStream.bypassing = false;
     }
+
+    public static void localizeInfo(String message){
+        info(String.format(Localization.bundle.getString(message)));
+    }
+
     public static void info(String message) {
         alternativeOutputStream.bypassing = true;
         System.out.println(WHITE_BACKGROUND + BLACK_COLOR + "[Info] " + message + RESET);

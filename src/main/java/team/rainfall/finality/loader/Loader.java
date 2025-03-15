@@ -2,6 +2,7 @@ package team.rainfall.finality.loader;
 
 import com.formdev.flatlaf.FlatIntelliJLaf;
 import team.rainfall.finality.FinalityLogger;
+import team.rainfall.finality.installer.Installer;
 import team.rainfall.finality.loader.gui.ErrorCode;
 import team.rainfall.finality.loader.gui.SplashScreen;
 import team.rainfall.finality.loader.plugin.PluginData;
@@ -19,8 +20,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.nio.channels.FileChannel;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -31,19 +32,22 @@ import static team.rainfall.finality.loader.Main.*;
 
 public class Loader {
     static ParamParser paramParser = new ParamParser();
+
     @SuppressWarnings("deprecated")
     public static void loaderMain(String[] args) {
         FinalityLogger.init();
         FinalityLogger.info("Finality Framework Loader " + VERSION);
-        FileManager.INSTANCE.parseSteamVDF();
         paramParser.parse(args);
+
+        if(paramParser.mode == LaunchMode.INSTALL){
+            Installer.install();
+        }
+
         if(!paramParser.isReboot) {
             unstableWarn();
         }
-        if(FileManager.parentFile != null){
-            FinalityLogger.important(Localization.bundle.getString("second_boot"));
 
-            System.out.println("- - - - - - - - - - - - - - - - -");
+        if(FileManager.parentFile != null){
             System.exit(dropAndLaunch(FileManager.parentFile,args));
         }
 
@@ -59,9 +63,7 @@ public class Loader {
         }
         long startTime = System.currentTimeMillis();
         FinalityClassLoader classLoader = new FinalityClassLoader(new URL[0]);
-        JarFile gameJar;
-        try {
-            gameJar = new JarFile(new File(paramParser.gameFilePath));
+        try (JarFile gameJar = new JarFile(new File(paramParser.gameFilePath))) {
             LAUNCHER_CLASS = gameJar.getManifest().getMainAttributes().getValue(Attributes.Name.MAIN_CLASS);
             //Search local mods
             for (File file : Objects.requireNonNull(FileManager.INSTANCE.getFile("mods").listFiles())) {
@@ -72,7 +74,7 @@ public class Loader {
                 }
             }
             for (String str : localMods) {
-                //遍历str文件夹
+                //Find plugins in local mods
                 File file = new File(str);
                 PluginManager.INSTANCE.findPlugins(file);
             }
@@ -100,7 +102,7 @@ public class Loader {
             process.tweak();
 
             //Luminosity2
-            LuminosityEnvironment environment = new LuminosityEnvironment(PluginManager.INSTANCE.pluginDataList,new File(paramParser.gameFilePath));
+            LuminosityEnvironment environment = new LuminosityEnvironment(PluginManager.INSTANCE.pluginDataList, new File(paramParser.gameFilePath));
             environment.run();
 
             //Luminosity should run earlier than other classloader load
@@ -114,7 +116,7 @@ public class Loader {
                 environment.load(classLoader);
             }
 
-            for (PluginData data:PluginManager.INSTANCE.pluginDataList) {
+            for (PluginData data : PluginManager.INSTANCE.pluginDataList) {
                 classLoader.addUrl2(data.file.toURI().toURL());
             }
 
@@ -141,7 +143,7 @@ public class Loader {
             } catch (Exception ignored) {
             }
             if (paramParser.mode == LaunchMode.ONLY_GEN || paramParser.mode == LaunchMode.LAUNCH_AND_GEN) {
-                for(ClassInfo classInfo : environment.classInfos){
+                for (ClassInfo classInfo : environment.classInfos) {
                     try {
                         deleteDir(FileManager.INSTANCE.getFile("gen/"));
                         File file = FileManager.INSTANCE.getFile("gen/" + classInfo.name.replace(".", "/") + ".class");
@@ -149,7 +151,7 @@ public class Loader {
                         FileOutputStream fos = new FileOutputStream(file);
                         fos.write(classInfo.bytes);
                     } catch (IOException var17) {
-                        FinalityLogger.error("Gen err",var17);
+                        FinalityLogger.error("Gen err", var17);
                     }
                 }
                 for (TweakedClass tweakedClass : process.tweakedClasses) {
@@ -160,22 +162,22 @@ public class Loader {
                         FileOutputStream fos = new FileOutputStream(file);
                         fos.write(tweakedClass.classBytes);
                     } catch (IOException var17) {
-                        FinalityLogger.error("Gen err",var17);
+                        FinalityLogger.error("Gen err", var17);
                     }
                 }
             }
             if (paramParser.mode == LaunchMode.ONLY_LAUNCH || paramParser.mode == LaunchMode.LAUNCH_AND_GEN) {
-                FinalityLogger.info(String.format(Localization.bundle.getString("ready_to_launch"),(System.currentTimeMillis() - startTime)));
+                FinalityLogger.info(String.format(Localization.bundle.getString("ready_to_launch"), (System.currentTimeMillis() - startTime)));
                 try {
                     SplashScreen.destroy();
                     classLoader.loadClass(LAUNCHER_CLASS).getMethod("main", String[].class).invoke(null, (Object) new String[0]);
-                }catch (Exception e){
-                    FinalityLogger.error("Game err",e);
-                    JOptionPane.showMessageDialog(null,Localization.bundle.getString("game_crashed"),Localization.bundle.getString("error"),JOptionPane.ERROR_MESSAGE);
+                } catch (Exception e) {
+                    FinalityLogger.error("Game err", e);
+                    JOptionPane.showMessageDialog(null, Localization.bundle.getString("game_crashed"), Localization.bundle.getString("error"), JOptionPane.ERROR_MESSAGE);
                 }
             }
         } catch (Exception var18) {
-            FinalityLogger.error("Unknown err",var18);
+            FinalityLogger.error("Unknown err", var18);
             ErrorCode.showInternalError("Etude - 01");
             System.exit(1);
         }
@@ -191,26 +193,22 @@ public class Loader {
 
 
     /**
+     * drop loader itself into the game folder,and execute it again to launch the game.
+     * Note:Steam will block our launch if we try to launch game from the folder which is different from the game folder.
      * @param gamePath a folder file of game folder.
-     * @return
+     * @return exit code
      * @author RedreamR
      */
     static int dropAndLaunch(File gamePath,String[] args){
         String currentJarPath = Loader.class.getProtectionDomain().getCodeSource().getLocation().getPath();
         try {
-            // 解析当前JAR文件的绝对路径（处理空格和中文问题）
-            currentJarPath = java.net.URLDecoder.decode(currentJarPath, "UTF-8");
-
-            // 复制JAR文件到指定目录
+            currentJarPath = URLDecoder.decode(currentJarPath, "UTF-8");
             copyFile(new File(currentJarPath), new File(gamePath,"Finality_Loader.jar"));
             String[] param = {"java", "-jar", gamePath.getAbsolutePath()+"/"+"Finality_Loader.jar","-reboot"};
             param = ArrayUtil.mergeArrays(param,args);
-            // 使用ProcessBuilder启动JAR文件
             ProcessBuilder processBuilder = new ProcessBuilder(param);
-            processBuilder.directory(gamePath); // 设置工作目录
-            processBuilder.inheritIO(); // 继承当前进程的输入输出
-
-            // 启动进程
+            processBuilder.directory(gamePath);
+            processBuilder.inheritIO();
             Process process = processBuilder.start();
             int exitCode = process.waitFor();
             FinalityLogger.info("END OF EXECUTE,exit code:"+exitCode);
@@ -221,7 +219,7 @@ public class Loader {
         return 0;
     }
 
-    private static void copyFile(File sourceFile, File targetFile) throws IOException {
+    public static void copyFile(File sourceFile, File targetFile) throws IOException {
         try (FileInputStream fis = new FileInputStream(sourceFile);
              FileOutputStream fos = new FileOutputStream(targetFile);
              FileChannel sourceChannel = fis.getChannel();

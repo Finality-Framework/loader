@@ -1,8 +1,8 @@
 package team.rainfall.finality.loader.util;
 import team.rainfall.finality.FinalityLogger;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.time.Instant;
@@ -42,6 +42,19 @@ public class FileUtil {
         } catch (IOException e) {
             FinalityLogger.error("Failed while readString(File)",e);
             return null;
+        }
+    }
+    public static String readString_UTF8(File file){
+        try {
+            return new String(Files.readAllBytes(file.toPath()),StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            FinalityLogger.error("Failed while readString(File)",e);
+            return null;
+        }
+    }
+    public static void clearAndWriteFile(File file, String content) throws IOException {
+        try (OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(file, false),StandardCharsets.UTF_8)) {
+            writer.write(content);
         }
     }
 }
