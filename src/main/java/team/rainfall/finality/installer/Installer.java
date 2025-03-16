@@ -27,6 +27,9 @@ public class Installer {
             ErrorCode.showInternalError("Aria - 03");
             System.exit(1);
         }
+        if(FileManager.parentFile == null){
+            FileManager.INSTANCE.findGameFileByVDF();
+        }
     }
 
     public static void install() {
@@ -48,9 +51,10 @@ public class Installer {
                     launchOption = StringUtil.escapeString(launchOption);
 
                     FinalityLogger.localizeInfo("installing");
-                    accountName = node.getSubNode(stringEntry.getKey()).getString("PersonaName");
+                    accountName = node.getSubNode(stringEntry.getKey()).getString("AccountName");
+                    String id64 = stringEntry.getKey();
                     FinalityLogger.info(String.format(Localization.bundle.getString("install_for"), accountName));
-                    File folder = findUserFolder(accountName);
+                    File folder = findUserFolder(id64);
                     File config = new File(folder, "config/localconfig.vdf");
                     VDFNode node2 = parser.parse(Objects.requireNonNull(FileUtil.readString_UTF8(config)));
                     VDFNode gameNode = node2.getSubNode("UserLocalConfigStore").getSubNode("Software").getSubNode("Valve").getSubNode("Steam").getSubNode("apps").getSubNode("2772750");
@@ -91,20 +95,27 @@ public class Installer {
 
     }
 
-    private static File findUserFolder(String accountName) {
+    private static File findUserFolder(String accountID) {
+        accountID = SteamIdConverter.id64ToFriendCode(accountID,false);
         File userdataFolder = new File(VdfManager.getINSTANCE().steamPath, "userdata");
-        for (File file : Objects.requireNonNull(userdataFolder.listFiles())) {
-            if (file.exists() && file.isDirectory()) {
-                File config = new File(file, "config/localconfig.vdf");
-                VDFParser parser = new VDFParser();
-                VDFNode node = parser.parse(Objects.requireNonNull(FileUtil.readString_UTF8(config)));
-                String name = node.getSubNode("UserLocalConfigStore").getSubNode("friends").getString("PersonaName");
-                FinalityLogger.debug("INSTALL1 " + name);
-                if (name.equals(accountName)) {
-                    FinalityLogger.debug("FOUND USERDATA FOLDER");
-                    return file;
-                }
+        //如果userdataFolder下只有一个目录，直接返回该目录的File对象
+        File singleFolder = null;
+        for(File file : Objects.requireNonNull(userdataFolder.listFiles())) {
+            if(file.exists() && file.isDirectory()) {
+                singleFolder = file;
+                continue;
             }
+            if(file.exists() && file.isDirectory() && singleFolder != null){
+                singleFolder = null;
+                break;
+            }
+        }
+        if(singleFolder != null) {
+            return singleFolder;
+        }
+        File file = new File(userdataFolder,accountID+"/config/localconfig.vdf");
+        if(file.exists()) {
+            return file;
         }
         return null;
     }

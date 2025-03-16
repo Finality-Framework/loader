@@ -19,6 +19,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.channels.FileChannel;
@@ -32,7 +33,7 @@ import static team.rainfall.finality.loader.Main.*;
 
 public class Loader {
     static ParamParser paramParser = new ParamParser();
-
+    static FinalityClassLoader classLoader;
     @SuppressWarnings("deprecated")
     public static void loaderMain(String[] args) {
         FinalityLogger.init();
@@ -59,10 +60,11 @@ public class Loader {
             int i = JOptionPane.showOptionDialog(null, String.format(Localization.bundle.getString("new_version"), GithubUtil.latestVersion),Localization.bundle.getString("update"),JOptionPane.YES_NO_OPTION,JOptionPane.QUESTION_MESSAGE,null,options,options[0]);
             if(i == 0){
                 BrowserUtil.openUrl(GithubUtil.getLocaleRepoLink()+"/releases/");
+                System.exit(0);
             }
         }
         long startTime = System.currentTimeMillis();
-        FinalityClassLoader classLoader = new FinalityClassLoader(new URL[0]);
+        classLoader = new FinalityClassLoader(new URL[0]);
         try (JarFile gameJar = new JarFile(new File(paramParser.gameFilePath))) {
             LAUNCHER_CLASS = gameJar.getManifest().getMainAttributes().getValue(Attributes.Name.MAIN_CLASS);
             //Search local mods
@@ -96,52 +98,12 @@ public class Loader {
                     }
                 }
             }
-            //Luminosity Tweak
-            TweakProcess process = new TweakProcess(PluginManager.INSTANCE.pluginDataList, new JarFile(new File(paramParser.gameFilePath)));
-            process.targetFile = new File(paramParser.gameFilePath);
-            process.tweak();
-
             //Luminosity2
             LuminosityEnvironment environment = new LuminosityEnvironment(PluginManager.INSTANCE.pluginDataList, new File(paramParser.gameFilePath));
-            environment.run();
+            tweak(environment);
 
-            //Luminosity should run earlier than other classloader load
-            if (paramParser.mode != LaunchMode.ONLY_GEN) {
-                process.tweakedClasses.forEach((tweakedClass) ->
-                {
-                    FinalityLogger.debug("TWEAKED CLAZZ " + tweakedClass.className);
-                    classLoader.defineClass2(tweakedClass.className, tweakedClass.classBytes, 0, tweakedClass.classBytes.length);
-                });
+            hijackSteamManager();
 
-                environment.load(classLoader);
-            }
-
-            for (PluginData data : PluginManager.INSTANCE.pluginDataList) {
-                classLoader.addUrl2(data.file.toURI().toURL());
-            }
-
-            classLoader.addUrl2((new File(paramParser.gameFilePath)).toURI().toURL());
-
-            //Luminosity Tweak end
-
-            //Hijack SteamManager to load mods only when Steam API is disabled.
-            //But where is my Steam Workshop mods? To hell with those mods.
-            try {
-                if (paramParser.disableSteamAPI) {
-                    for (String str : localMods) {
-                        Field foldersAllListField = classLoader.loadClass(STEAM_MANAGER_CLASS).getField("modsFoldersAll");
-                        List<String> foldersAllList = (List) foldersAllListField.get(null);
-                        Field foldersListField = classLoader.loadClass(STEAM_MANAGER_CLASS).getField("modsFolders");
-                        List<String> foldersList = (List) foldersListField.get(null);
-                        Field foldersListSizeField = classLoader.loadClass(STEAM_MANAGER_CLASS).getField("modsFoldersSize");
-                        int folderListSize = foldersListSizeField.getInt(null);
-                        foldersAllList.add(str);
-                        foldersList.add(str);
-                        foldersListSizeField.setInt(null, folderListSize + 1);
-                    }
-                }
-            } catch (Exception ignored) {
-            }
             if (paramParser.mode == LaunchMode.ONLY_GEN || paramParser.mode == LaunchMode.LAUNCH_AND_GEN) {
                 for (ClassInfo classInfo : environment.classInfos) {
                     try {
@@ -150,18 +112,9 @@ public class Loader {
                         boolean ignored = file.getParentFile().mkdirs();
                         FileOutputStream fos = new FileOutputStream(file);
                         fos.write(classInfo.bytes);
+                        fos.close();
                     } catch (IOException var17) {
-                        FinalityLogger.error("Gen err", var17);
-                    }
-                }
-                for (TweakedClass tweakedClass : process.tweakedClasses) {
-                    try {
-                        deleteDir(new File("gen/"));
-                        File file = new File("gen/" + tweakedClass.className.replace(".", "/") + ".class");
-                        boolean ignored = file.getParentFile().mkdirs();
-                        FileOutputStream fos = new FileOutputStream(file);
-                        fos.write(tweakedClass.classBytes);
-                    } catch (IOException var17) {
+
                         FinalityLogger.error("Gen err", var17);
                     }
                 }
@@ -193,7 +146,7 @@ public class Loader {
 
 
     /**
-     * drop loader itself into the game folder,and execute it again to launch the game.
+     * drop loader itself into the game folder,and execute it again to launch the game.<br/>
      * Note:Steam will block our launch if we try to launch game from the folder which is different from the game folder.
      * @param gamePath a folder file of game folder.
      * @return exit code
@@ -229,5 +182,38 @@ public class Loader {
         }
     }
 
+    //Hijack SteamManager to load mods only when Steam API is disabled.
+    //But where is my Steam Workshop mods? To hell with those mods.
+    private static void hijackSteamManager(){
+        try {
+            if (paramParser.disableSteamAPI) {
+                for (String str : localMods) {
+                    Field foldersAllListField = classLoader.loadClass(STEAM_MANAGER_CLASS).getField("modsFoldersAll");
+                    List<String> foldersAllList = (List) foldersAllListField.get(null);
+                    Field foldersListField = classLoader.loadClass(STEAM_MANAGER_CLASS).getField("modsFolders");
+                    List<String> foldersList = (List) foldersListField.get(null);
+                    Field foldersListSizeField = classLoader.loadClass(STEAM_MANAGER_CLASS).getField("modsFoldersSize");
+                    int folderListSize = foldersListSizeField.getInt(null);
+                    foldersAllList.add(str);
+                    foldersList.add(str);
+                    foldersListSizeField.setInt(null, folderListSize + 1);
+                }
+            }
+        } catch (Exception ignored) {
+        }
+    }
+
+    private static void tweak(LuminosityEnvironment environment) throws MalformedURLException {
+        environment.run();
+        //Luminosity should run earlier than other classloader load
+        if (paramParser.mode != LaunchMode.ONLY_GEN) {
+            environment.load(classLoader);
+        }
+        for (PluginData data : PluginManager.INSTANCE.pluginDataList) {
+            classLoader.addUrl2(data.file.toURI().toURL());
+        }
+        classLoader.addUrl2((new File(paramParser.gameFilePath)).toURI().toURL());
+
+    }
 
 }
