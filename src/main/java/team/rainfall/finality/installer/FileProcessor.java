@@ -41,7 +41,7 @@ public class FileProcessor {
         try {
             return Files.readAllLines(Paths.get(filePath));
         } catch (IOException e) {
-            e.printStackTrace();
+            FinalityLogger.error("Failed to read file: " + filePath, e);
             return new ArrayList<>();
         }
     }
@@ -50,7 +50,7 @@ public class FileProcessor {
         try {
             Files.write(Paths.get(filePath), lines);
         } catch (IOException e) {
-            e.printStackTrace();
+            FinalityLogger.error("Failed to write file: " + filePath, e);
         }
     }
 }
