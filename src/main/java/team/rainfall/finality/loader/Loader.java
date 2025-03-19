@@ -31,9 +31,25 @@ import java.util.jar.JarFile;
 
 import static team.rainfall.finality.loader.Main.*;
 
+/**
+ * The Loader class is responsible for initializing and launching the application.
+ * It handles various tasks such as parsing parameters, managing plugins, and
+ * interacting with the Steam API.
+ *
+ * @author RedreamR
+ */
 public class Loader {
+
     static ParamParser paramParser = new ParamParser();
     static FinalityClassLoader classLoader;
+
+    /**
+     * The main method for the loader. It initializes the logger, parses parameters,
+     * installs the application if needed, and launches the game.
+     *
+     * @param args the command-line arguments
+     * @author Greyeon, RedreamR
+     */
     @SuppressWarnings("deprecated")
     public static void loaderMain(String[] args) {
         FinalityLogger.init();
@@ -137,6 +153,9 @@ public class Loader {
         SplashScreen.destroy();
     }
 
+    /**
+     * Logs a warning if the version type is not a release.
+     */
     static void unstableWarn(){
         if(VERSION_TYPE != VersionType.RELEASE) {
             FinalityLogger.warn(Localization.bundle.getString("unstable_tips_1"));
@@ -146,10 +165,11 @@ public class Loader {
 
 
     /**
-     * drop loader itself into the game folder,and execute it again to launch the game.<br/>
-     * Note:Steam will block our launch if we try to launch game from the folder which is different from the game folder.
-     * @param gamePath a folder file of game folder.
-     * @return exit code
+     * Drops loader itself into the game folder,and execute it again to launch the game.
+     * Note: Steam will block our launch if we try to launch game from the folder which is different from the game folder.
+     * @param gamePath a folder file of game folder
+     * @param args the command-line arguments
+     * @return the exit code
      * @author RedreamR
      */
     static int dropAndLaunch(File gamePath,String[] args){
@@ -172,6 +192,14 @@ public class Loader {
         return 0;
     }
 
+    /**
+     * Copies a file from the source to the target location.
+     *
+     * @param sourceFile the source file
+     * @param targetFile the target file
+     * @throws IOException if an I/O error occurs
+     * @author RedreamR
+     */
     public static void copyFile(File sourceFile, File targetFile) throws IOException {
         try (FileInputStream fis = new FileInputStream(sourceFile);
              FileOutputStream fos = new FileOutputStream(targetFile);
@@ -182,8 +210,11 @@ public class Loader {
         }
     }
 
-    //Hijack SteamManager to load mods only when Steam API is disabled.
-    //But where is my Steam Workshop mods? To hell with those mods.
+    /**
+     * Hijacks the SteamManager to load mods only when the Steam API is disabled.
+     * But where is my Steam Workshop mods? To hell with those mods.
+     * @author RedreamR
+     */
     private static void hijackSteamManager(){
         try {
             if (paramParser.disableSteamAPI) {
@@ -203,6 +234,12 @@ public class Loader {
         }
     }
 
+    /**
+     * Tweaks the Luminosity environment by running it and loading the class loader.
+     *
+     * @param environment the Luminosity environment
+     * @throws MalformedURLException if a URL is malformed
+     */
     private static void tweak(LuminosityEnvironment environment) throws MalformedURLException {
         environment.run();
         //Luminosity should run earlier than other classloader load

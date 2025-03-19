@@ -11,11 +11,14 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 
 /**
+ * The PluginManifest class represents the manifest of a plugin.
+ * It contains metadata about the plugin such as its version, id, name, and other properties.
+ * This class is responsible for parsing the manifest information from an input stream.
+ *
  * @author RedreamR
- * Manifest object of Plugin.
  */
-
 public class PluginManifest {
+
     public String sdkVersion;
     //Version of Plugin,should be semVer
     public String version;
@@ -25,6 +28,14 @@ public class PluginManifest {
     public String tweaker;
     public Boolean useLuminosity = false;
     public ArrayList<String> tweakClasses = new ArrayList<>();
+
+
+    /**
+     * Constructs a PluginManifest object by parsing the provided input stream.
+     *
+     * @param is the input stream containing the plugin manifest JSON data
+     * @author RedreamR
+     */
     public PluginManifest(InputStream is){
         JSONObject jsonObject = JSON.parseObject(is, Charset.defaultCharset());
         useLuminosity = jsonObject.getBoolean("useLuminosity");
@@ -50,5 +61,7 @@ public class PluginManifest {
             useLuminosity = false;
         }
     }
+
     public PluginManifest(){}
+
 }

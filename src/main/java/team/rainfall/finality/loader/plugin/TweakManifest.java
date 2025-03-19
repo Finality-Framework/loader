@@ -7,11 +7,26 @@ import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 
+/**
+ * The TweakManifest class represents the manifest of a tweak.
+ * It contains metadata about the tweak such as its SDK version, package name, and lists of tweak and publicized classes.
+ * This class is responsible for parsing the manifest information from an input stream.
+ *
+ * @author RedreamR
+ */
 public class TweakManifest {
+
     public ArrayList<String> tweakClasses = new ArrayList<>();
     public ArrayList<String> publicizedClasses = new ArrayList<>();
     public int sdkVersion;
     public String packageName;
+
+    /**
+     * Constructs a TweakManifest object by parsing the provided input stream.
+     *
+     * @param is the input stream containing the tweak manifest JSON data
+     * @author RedreamR
+     */
     public TweakManifest(InputStream is){
         JSONObject jsonObject = JSON.parseObject(is, Charset.defaultCharset());
         sdkVersion = jsonObject.getInteger("sdkVersion");

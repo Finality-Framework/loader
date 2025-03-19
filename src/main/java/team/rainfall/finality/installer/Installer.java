@@ -20,7 +20,22 @@ import java.util.Objects;
 
 import static team.rainfall.finality.loader.Loader.copyFile;
 
+/**
+ * The Installer class provides methods to check the environment and install the Finality Loader.
+ * It ensures the operating system is supported, finds the game file, and modifies the Steam configuration
+ * to include the necessary launch options for the Finality Loader.
+ *
+ * @author RedreamR
+ */
 public class Installer {
+
+    /**
+     * Checks the environment to ensure the operating system is supported and finds the game file.
+     * If the operating system is not Windows, it logs an error and exits the application.
+     * If the game file is not found, it attempts to find it using the VDF file.
+     *
+     * @author RedreamR
+     */
     public static void checkEnv() {
         if(!Platform.isWindows()){
             FinalityLogger.error("Unsupported operating system!");
@@ -32,6 +47,14 @@ public class Installer {
         }
     }
 
+
+    /**
+     * Installs the Finality Loader by modifying the Steam configuration.
+     * It checks the environment, finds the Steam installation, and updates the launch options
+     * for the game in the Steam configuration. If necessary, it restarts the Steam client.
+     *
+     * @author RedreamR
+     */
     public static void install() {
         checkEnv();
         boolean shouldRestartSteam = false;
@@ -95,6 +118,15 @@ public class Installer {
 
     }
 
+    /**
+     * Finds the user folder for the given account ID.
+     * It converts the account ID to a friend code and searches for the corresponding folder
+     * in the userdata directory.
+     *
+     * @param accountID the account ID to find the user folder for
+     * @return the File object representing the user folder, or null if not found
+     * @author RedreamR
+     */
     private static File findUserFolder(String accountID) {
         accountID = SteamIdConverter.id64ToFriendCode(accountID,false);
         File userdataFolder = new File(VdfManager.getINSTANCE().steamPath, "userdata");
@@ -120,6 +152,15 @@ public class Installer {
         return null;
     }
 
+    /**
+     * Detects if the Steam client is running and, if so, terminates it.
+     * It executes the tasklist command to check for the Steam process and, if found,
+     * executes the taskkill command to terminate it.
+     *
+     * @return true if the Steam client was running and terminated, false otherwise
+     * @throws IOException if an I/O error occurs
+     * @author RedreamR
+     */
     private static boolean detectSteam() throws IOException {
         String taskListCommand = "tasklist";
         Process process = Runtime.getRuntime().exec(taskListCommand);
@@ -148,6 +189,13 @@ public class Installer {
         return false;
     }
 
+    /**
+     * Copies the current JAR file to the parent file directory.
+     * It decodes the current JAR file path and copies it to the Finality_Loader.jar file
+     * in the parent file directory.
+     *
+     * @author RedreamR
+     */
     private static void dropFile() {
         String currentJarPath = Loader.class.getProtectionDomain().getCodeSource().getLocation().getPath();
         try {
@@ -157,4 +205,5 @@ public class Installer {
             FinalityLogger.error("WTF", e);
         }
     }
+
 }

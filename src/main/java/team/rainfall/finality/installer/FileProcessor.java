@@ -8,7 +8,23 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The FileProcessor class provides methods to process files by reading their content,
+ * modifying it based on certain conditions, and writing the modified content back to the file.
+ * @author RedreamR
+ */
 public class FileProcessor {
+
+    /**
+     * Processes the file at the given file path by reading its content, modifying it based on the provided parameters,
+     * and writing the modified content back to the file.
+     *
+     * @param filePath the path of the file to process
+     * @param a the string to search for in the file content
+     * @param b the string to insert into the file content
+     * @param c the string to check for skipping lines in the file content
+     * @author RedreamR
+     */
     public static void processFile(String filePath, String a, String b,String c) {
         // 读取文件内容到列表中
         List<String> lines = readFile(filePath);
@@ -37,6 +53,13 @@ public class FileProcessor {
         writeFile(filePath, processedLines);
     }
 
+    /**
+     * Reads the content of the file at the given file path and returns it as a list of strings.
+     *
+     * @param filePath the path of the file to read
+     * @return a list of strings representing the content of the file
+     * @author RedreamR
+     */
     private static List<String> readFile(String filePath) {
         try {
             return Files.readAllLines(Paths.get(filePath));
@@ -46,6 +69,13 @@ public class FileProcessor {
         }
     }
 
+    /**
+     * Writes the given list of strings to the file at the given file path.
+     *
+     * @param filePath the path of the file to write to
+     * @param lines a list of strings representing the content to write to the file
+     * @author RedreamR
+     */
     private static void writeFile(String filePath, List<String> lines) {
         try {
             Files.write(Paths.get(filePath), lines);
@@ -53,4 +83,5 @@ public class FileProcessor {
             FinalityLogger.error("Failed to write file: " + filePath, e);
         }
     }
+
 }
