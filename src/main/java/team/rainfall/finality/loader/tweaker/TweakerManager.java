@@ -8,9 +8,10 @@ import team.rainfall.luminosity.annotations.Tweak;
 import java.util.ArrayList;
 
 /**
- * The TweakerManager class manages a list of tweakers and provides methods to add tweakers from plugins and apply tweaks to class bytes.
- * It uses a singleton pattern to ensure a single instance of the manager.
- * The class loader is used to load tweaker classes dynamically.
+ * <p>TThe TweakerManager class manages a list of tweakers and provides methods<br>
+ * to add tweakers from plugins and apply tweaks to class bytes.
+ * <p>TIt uses a singleton pattern to ensure a single instance of the manager.
+ * <p>TThe class loader is used to load tweaker classes dynamically.
  *
  * @author RedreamR
  */
@@ -25,7 +26,7 @@ public class TweakerManager {
 
 
     /**
-     * Returns the list of tweakers.
+     * <p>TReturns the list of tweakers.
      *
      * @author RedreamR
      */
@@ -41,7 +42,7 @@ public class TweakerManager {
     }
 
     /**
-     * Adds a tweaker from the given plugin data.
+     * <p>TAdds a tweaker from the given plugin data.
      *
      * @param classBytes the plugin data containing the tweaker information
      * @author RedreamR

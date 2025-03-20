@@ -1,7 +1,7 @@
 package team.rainfall.finality.installer;
 
 /**
- * Utility class for converting Steam ID64 to friend code.
+ * <p>Utility class for converting Steam ID64 to friend code.
  *
  * @author RedreamR
  */
@@ -11,7 +11,7 @@ public class SteamIdConverter {
     private static final long GROUP_ID64_IDENTIFIER = 103582791429521408L;
 
     /**
-     * Converts a Steam ID64 to a friend code.
+     * <p>Converts a Steam ID64 to a friend code.
      *
      * @param id64Str the Steam ID64 as a string
      * @param isGroup true if the ID64 is for a group, false if it is for a user

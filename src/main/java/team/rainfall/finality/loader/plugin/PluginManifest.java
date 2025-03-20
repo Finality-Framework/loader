@@ -11,9 +11,9 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 
 /**
- * The PluginManifest class represents the manifest of a plugin.
- * It contains metadata about the plugin such as its version, id, name, and other properties.
- * This class is responsible for parsing the manifest information from an input stream.
+ * <p>The PluginManifest class represents the manifest of a plugin.
+ * <p>It contains metadata about the plugin such as its version, id, name, and other properties.
+ * <p>This class is responsible for parsing the manifest information from an input stream.
  *
  * @author RedreamR
  */
@@ -31,7 +31,7 @@ public class PluginManifest {
 
 
     /**
-     * Constructs a PluginManifest object by parsing the provided input stream.
+     * <p>Constructs a PluginManifest object by parsing the provided input stream.
      *
      * @param is the input stream containing the plugin manifest JSON data
      * @author RedreamR

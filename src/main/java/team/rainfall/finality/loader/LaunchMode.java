@@ -1,7 +1,7 @@
 package team.rainfall.finality.loader;
 
 /**
- * Enum representing the different launch modes for the application.
+ * <p>Enum representing the different launch modes for the application.
  *
  * @author RedreamR
  */

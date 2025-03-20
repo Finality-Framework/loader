@@ -21,8 +21,8 @@ import java.util.Objects;
 import static team.rainfall.finality.loader.Loader.copyFile;
 
 /**
- * The Installer class provides methods to check the environment and install the Finality Loader.
- * It ensures the operating system is supported, finds the game file, and modifies the Steam configuration
+ * <p>The Installer class provides methods to check the environment and install the Finality Loader.
+ * <p>It ensures the operating system is supported, finds the game file, and modifies the Steam configuration<br>
  * to include the necessary launch options for the Finality Loader.
  *
  * @author RedreamR
@@ -30,9 +30,9 @@ import static team.rainfall.finality.loader.Loader.copyFile;
 public class Installer {
 
     /**
-     * Checks the environment to ensure the operating system is supported and finds the game file.
-     * If the operating system is not Windows, it logs an error and exits the application.
-     * If the game file is not found, it attempts to find it using the VDF file.
+     * <p>Checks the environment to ensure the operating system is supported and finds the game file.
+     * <p>If the operating system is not Windows, it logs an error and exits the application.
+     * <p>If the game file is not found, it attempts to find it using the VDF file.
      *
      * @author RedreamR
      */
@@ -49,8 +49,8 @@ public class Installer {
 
 
     /**
-     * Installs the Finality Loader by modifying the Steam configuration.
-     * It checks the environment, finds the Steam installation, and updates the launch options
+     * <p>Installs the Finality Loader by modifying the Steam configuration.
+     * <p>It checks the environment, finds the Steam installation, and updates the launch options<br>
      * for the game in the Steam configuration. If necessary, it restarts the Steam client.
      *
      * @author RedreamR
@@ -119,8 +119,8 @@ public class Installer {
     }
 
     /**
-     * Finds the user folder for the given account ID.
-     * It converts the account ID to a friend code and searches for the corresponding folder
+     * <p>Finds the user folder for the given account ID.
+     * <p>It converts the account ID to a friend code and searches for the corresponding folder<br>
      * in the userdata directory.
      *
      * @param accountID the account ID to find the user folder for
@@ -153,8 +153,8 @@ public class Installer {
     }
 
     /**
-     * Detects if the Steam client is running and, if so, terminates it.
-     * It executes the tasklist command to check for the Steam process and, if found,
+     * <p>Detects if the Steam client is running and, if so, terminates it.
+     * <p>It executes the tasklist command to check for the Steam process and, if found,<br>
      * executes the taskkill command to terminate it.
      *
      * @return true if the Steam client was running and terminated, false otherwise
@@ -190,8 +190,8 @@ public class Installer {
     }
 
     /**
-     * Copies the current JAR file to the parent file directory.
-     * It decodes the current JAR file path and copies it to the Finality_Loader.jar file
+     * <p>Copies the current JAR file to the parent file directory.
+     * <p>It decodes the current JAR file path and copies it to the Finality_Loader.jar file<br>
      * in the parent file directory.
      *
      * @author RedreamR

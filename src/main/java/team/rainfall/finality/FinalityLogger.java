@@ -10,9 +10,9 @@ import java.time.format.FormatStyle;
 import java.util.Locale;
 
 /**
- * The FinalityLogger class provides logging functionality for the application.
- * It supports different log levels such as info, debug, warning, error, and important messages.
- * It also writes logs to a file and formats the output with colors for better readability.
+ * <p>The FinalityLogger class provides logging functionality for the application.
+ * <p>It supports different log levels such as info, debug, warning, error, and important messages.
+ * <p>It also writes logs to a file and formats the output with colors for better readability.
  *
  * @author RedreamR
  */
@@ -32,7 +32,7 @@ public class FinalityLogger {
     public static final String RESET = "\033[0m";
 
     /**
-     * Initializes the logger by creating or resetting the log file and setting up the output streams.
+     * <p>Initializes the logger by creating or resetting the log file and setting up the output streams.
      *
      * @author RedreamR
      */
@@ -62,7 +62,7 @@ public class FinalityLogger {
     }
 
     /**
-     * Logs an important message.
+     * <p>Logs an important message.
      *
      * @param message the message to log
      * @author RedreamR
@@ -75,7 +75,7 @@ public class FinalityLogger {
     }
 
     /**
-     * Logs a localized info message.
+     * <p>Logs a localized info message.
      *
      * @param message the message key to localize and log
      * @author RedreamR
@@ -92,7 +92,7 @@ public class FinalityLogger {
     }
 
     /**
-     * Logs an info message.
+     * <p>Logs an info message.
      *
      * @param message the message to log
      * @author RedreamR
@@ -105,7 +105,7 @@ public class FinalityLogger {
     }
 
     /**
-     * Logs an error message with a throwable stack trace.
+     * <p>Logs an error message with a throwable stack trace.
      *
      * @param message   the message to log
      * @param throwable the throwable to log
@@ -122,7 +122,7 @@ public class FinalityLogger {
 
 
     /**
-     * Converts a throwable stack trace to a string.
+     * <p>Converts a throwable stack trace to a string.
      *
      * @param throwable      the throwable to convert
      * @param stacktraceLimit whether to limit the stack trace length
@@ -152,7 +152,7 @@ public class FinalityLogger {
     }
 
     /**
-     * Logs a debug message if debug mode is enabled.
+     * <p>Logs a debug message if debug mode is enabled.
      *
      * @param message the message to log
      * @author RedreamR
@@ -167,7 +167,7 @@ public class FinalityLogger {
     }
 
     /**
-     * Logs a warning message.
+     * <p>Logs a warning message.
      *
      * @param message the message to log
      * @author RedreamR
@@ -181,7 +181,7 @@ public class FinalityLogger {
 
 
     /**
-     * Writes a message to the log file.
+     * <p>Writes a message to the log file.
      *
      * @param message the message to write
      * @author RedreamR

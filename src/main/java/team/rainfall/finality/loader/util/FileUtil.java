@@ -11,10 +11,10 @@ import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 
 /**
- * Utility class for file operations.
- * This class provides methods to handle various file-related operations such as creating directories,
- * deleting files based on their age, and reading/writing file contents.
- * Note: This class uses {@link Files} and {@link BasicFileAttributes} to perform file operations.
+ * <p>Utility class for file operations.
+ * <p>This class provides methods to handle various file-related operations such as creating directories,
+ * <p>deleting files based on their age, and reading/writing file contents.
+ * <p>Note: This class uses {@link Files} and {@link BasicFileAttributes} to perform file operations.
  *
  * @see Files
  * @see BasicFileAttributes
@@ -23,8 +23,8 @@ import java.time.temporal.ChronoUnit;
 public class FileUtil {
 
     /**
-     * Creates a private directory named ".finality" in the current working directory.
-     * If the directory does not exist, it will be created.
+     * <p>Creates a private directory named ".finality" in the current working directory.
+     * <p>If the directory does not exist, it will be created.
      *
      * @author RedreamR
      */
@@ -36,8 +36,8 @@ public class FileUtil {
     }
 
     /**
-     * Deletes the specified file if it was created more than three days ago.
-     * This method checks the creation time of the file and deletes it if the file is older than three days.
+     * <p>Deletes the specified file if it was created more than three days ago.
+     * <p>This method checks the creation time of the file and deletes it if the file is older than three days.
      *
      * @param file the file to be checked and potentially deleted
      * @author RedreamR
@@ -63,8 +63,8 @@ public class FileUtil {
     }
 
     /**
-     * Reads the content of the specified file as a string.
-     * This method reads all bytes from the file and converts them to a string.
+     * <p>Reads the content of the specified file as a string.
+     * <p>This method reads all bytes from the file and converts them to a string.
      *
      * @param file the file to be read
      * @return the content of the file as a string, or null if an error occurs
@@ -80,8 +80,8 @@ public class FileUtil {
     }
 
     /**
-     * Reads the content of the specified file as a UTF-8 encoded string.
-     * This method reads all bytes from the file and converts them to a UTF-8 encoded string.
+     * <p>Reads the content of the specified file as a UTF-8 encoded string.
+     * <p>This method reads all bytes from the file and converts them to a UTF-8 encoded string.
      *
      * @param file the file to be read
      * @return the content of the file as a UTF-8 encoded string, or null if an error occurs
@@ -97,8 +97,8 @@ public class FileUtil {
     }
 
     /**
-     * Clears the content of the specified file and writes the given content to it.
-     * This method opens the file in write mode, clearing its existing content, and writes the new content to it.
+     * <p>Clears the content of the specified file and writes the given content to it.
+     * <p>This method opens the file in write mode, clearing its existing content, and writes the new content to it.
      *
      * @param file    the file to be written to
      * @param content the content to be written to the file

@@ -32,8 +32,8 @@ import java.util.jar.JarFile;
 import static team.rainfall.finality.loader.Main.*;
 
 /**
- * The Loader class is responsible for initializing and launching the application.
- * It handles various tasks such as parsing parameters, managing plugins, and
+ * <p>The Loader class is responsible for initializing and launching the application.
+ * <p>It handles various tasks such as parsing parameters, managing plugins, and<br>
  * interacting with the Steam API.
  *
  * @author RedreamR
@@ -44,7 +44,7 @@ public class Loader {
     static FinalityClassLoader classLoader;
 
     /**
-     * The main method for the loader. It initializes the logger, parses parameters,
+     * <p>The main method for the loader. It initializes the logger, parses parameters,<br>
      * installs the application if needed, and launches the game.
      *
      * @param args the command-line arguments
@@ -165,8 +165,9 @@ public class Loader {
 
 
     /**
-     * Drops loader itself into the game folder,and execute it again to launch the game.
-     * Note: Steam will block our launch if we try to launch game from the folder which is different from the game folder.
+     * <p>Drops loader itself into the game folder,and execute it again to launch the game.
+     * <p>Note: Steam will block our launch if we try to launch game from the folder<br>
+     * which is different from the game folder.
      * @param gamePath a folder file of game folder
      * @param args the command-line arguments
      * @return the exit code
@@ -193,7 +194,7 @@ public class Loader {
     }
 
     /**
-     * Copies a file from the source to the target location.
+     * <p>Copies a file from the source to the target location.
      *
      * @param sourceFile the source file
      * @param targetFile the target file
@@ -211,8 +212,8 @@ public class Loader {
     }
 
     /**
-     * Hijacks the SteamManager to load mods only when the Steam API is disabled.
-     * But where is my Steam Workshop mods? To hell with those mods.
+     * <p>Hijacks the SteamManager to load mods only when the Steam API is disabled.
+     * <p>But where is my Steam Workshop mods? To hell with those mods.
      * @author RedreamR
      */
     private static void hijackSteamManager(){
@@ -235,7 +236,7 @@ public class Loader {
     }
 
     /**
-     * Tweaks the Luminosity environment by running it and loading the class loader.
+     * <p>Tweaks the Luminosity environment by running it and loading the class loader.
      *
      * @param environment the Luminosity environment
      * @throws MalformedURLException if a URL is malformed

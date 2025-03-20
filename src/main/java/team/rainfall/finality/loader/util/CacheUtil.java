@@ -4,9 +4,9 @@ import java.io.File;
 import java.io.IOException;
 
 /**
- * Utility class for cache operations.
- * This class provides methods to handle cache-related operations such as generating temporary cache files.
- * Note: This class uses {@link File#createTempFile(String, String)} to create temporary files.
+ * <p>Utility class for cache operations.
+ * <p>This class provides methods to handle cache-related operations such as generating temporary cache files.
+ * <p>Note: This class uses {@link File#createTempFile(String, String)} to create temporary files.
  *
  * @see File
  * @author RedreamR
@@ -14,8 +14,8 @@ import java.io.IOException;
 public class CacheUtil {
 
     /**
-     * Generates a temporary cache file with the specified name.
-     * This method creates a temporary file with the prefix "Finality-Loader" and the specified name as the suffix.
+     * <p>Generates a temporary cache file with the specified name.
+     * <p>This method creates a temporary file with the prefix "Finality-Loader" and the specified name as the suffix.
      *
      * @param name the suffix for the temporary file name
      * @return the generated temporary file

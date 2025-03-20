@@ -9,14 +9,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * The FileProcessor class provides methods to process files by reading their content,
+ * <p>The FileProcessor class provides methods to process files by reading their content, <br>
  * modifying it based on certain conditions, and writing the modified content back to the file.
  * @author RedreamR
  */
 public class FileProcessor {
 
     /**
-     * Processes the file at the given file path by reading its content, modifying it based on the provided parameters,
+     * <p>Processes the file at the given file path by reading its content, modifying it based on the provided parameters, <br>
      * and writing the modified content back to the file.
      *
      * @param filePath the path of the file to process
@@ -54,7 +54,7 @@ public class FileProcessor {
     }
 
     /**
-     * Reads the content of the file at the given file path and returns it as a list of strings.
+     * <p>Reads the content of the file at the given file path and returns it as a list of strings.
      *
      * @param filePath the path of the file to read
      * @return a list of strings representing the content of the file
@@ -70,7 +70,7 @@ public class FileProcessor {
     }
 
     /**
-     * Writes the given list of strings to the file at the given file path.
+     * <p>Writes the given list of strings to the file at the given file path.
      *
      * @param filePath the path of the file to write to
      * @param lines a list of strings representing the content to write to the file

@@ -11,15 +11,15 @@ import java.net.URL;
 import java.net.URLClassLoader;
 
 /**
- * A custom class loader that extends URLClassLoader to provide additional functionality.
- * This class loader allows adding URLs and defining classes with byte arrays.
+ * <p>A custom class loader that extends URLClassLoader to provide additional functionality.
+ * <p>This class loader allows adding URLs and defining classes with byte arrays.
  *
  * @author RedreamR
  */
 public class FinalityClassLoader extends URLClassLoader {
 
     /**
-     * Constructs a new FinalityClassLoader for the specified URLs.
+     * <p>Constructs a new FinalityClassLoader for the specified URLs.
      *
      * @param urls the URLs from which to load classes and resources
      * @author RedreamR
@@ -29,7 +29,7 @@ public class FinalityClassLoader extends URLClassLoader {
     }
 
     /**
-     * Constructs a new FinalityClassLoader for the specified URLs and parent class loader.
+     * <p>Constructs a new FinalityClassLoader for the specified URLs and parent class loader.
      *
      * @param urls   the URLs from which to load classes and resources
      * @param parent the parent class loader for delegation
@@ -40,7 +40,7 @@ public class FinalityClassLoader extends URLClassLoader {
     }
 
     /**
-     * Adds a new URL to the list of URLs to search for classes and resources.
+     * <p>Adds a new URL to the list of URLs to search for classes and resources.
      *
      * @param url the URL to be added
      * @author RedreamR
@@ -51,8 +51,8 @@ public class FinalityClassLoader extends URLClassLoader {
 
 
     /**
-     * Defines a new class with the specified name and byte array.
-     * This method also applies tweaks using the TweakerManager.
+     * <p>Defines a new class with the specified name and byte array.
+     * <p>This method also applies tweaks using the TweakerManager.
      *
      * @param name  the name of the class
      * @param bytes the byte array containing the class data

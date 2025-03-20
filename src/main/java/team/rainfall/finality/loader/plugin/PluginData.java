@@ -8,8 +8,8 @@ import java.io.IOException;
 import java.util.jar.JarFile;
 
 /**
- * The PluginData class represents the data of a plugin, including its JAR file and manifest.
- * It is responsible for loading the plugin's JAR file and manifest from the specified file.
+ * <p>The PluginData class represents the data of a plugin, including its JAR file and manifest.
+ * <p>It is responsible for loading the plugin's JAR file and manifest from the specified file.
  *
  * @author RedreamR
  */
@@ -20,8 +20,8 @@ public class PluginData {
     public File file;
 
     /**
-     * Constructs a PluginData object with the specified file.
-     * Loads the JAR file and manifest if the file is a valid JAR file.
+     * <p>Constructs a PluginData object with the specified file.
+     * <p>Loads the JAR file and manifest if the file is a valid JAR file.
      *
      * @param file the file representing the plugin
      * @throws RuntimeException if the file is not a valid JAR file

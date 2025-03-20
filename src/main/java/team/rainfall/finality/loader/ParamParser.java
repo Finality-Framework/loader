@@ -4,9 +4,9 @@ import team.rainfall.finality.FinalityLogger;
 import team.rainfall.finality.loader.util.Localization;
 
 /**
- * The ParamParser class is responsible for parsing command line arguments
- * and setting the appropriate parameters for the application.
- * It handles various flags and options that can be passed to the application.
+ * <p>The ParamParser class is responsible for parsing command line arguments
+ * <p>and setting the appropriate parameters for the application.
+ * <p>It handles various flags and options that can be passed to the application.
  *
  * @author RedreamR
  */
@@ -19,7 +19,7 @@ public class ParamParser {
     public boolean disableSteamAPI = false;
 
     /**
-     * Parses the command line arguments and sets the corresponding parameters.
+     * <p>Parses the command line arguments and sets the corresponding parameters.
      *
      * @param args the command line arguments
      * @author RedreamR

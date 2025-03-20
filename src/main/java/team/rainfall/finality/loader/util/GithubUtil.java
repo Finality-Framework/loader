@@ -15,13 +15,27 @@ import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 
+/**
+ * <p>Utility class for interacting with GitHub and Gitee repositories.
+ * <p>This class provides methods to check for updates, bypass SSL certificate verification, and get repository links.
+ * <p>Note: This class uses Unirest for HTTP requests and Fastjson for JSON parsing.
+ *
+ * @author RedreamR
+ */
 public class GithubUtil {
+
     public static final String GITHUB_REPO_LINK = "https://github.com/finality-framework/loader";
     public static final String GITEE_REPO_LINK = "https://gitee.com/finality-framework/loader";
     public static final String GITHUB_LATEST_RELEASE_LINK = "https://api.github.com/repos/finality-framework/loader/releases/latest";
     public static final String GITEE_LATEST_RELEASE_LINK = "https://gitee.com/api/v5/repos/finality-framework/loader/releases/latest";
     public static String latestVersion = Main.VERSION;
 
+    /**
+     * <p>Checks for updates by comparing the current version with the latest release version from the repository.
+     *
+     * @return true if an update is available, false otherwise
+     * @author RedreamR
+     */
     public static boolean checkUpdate() {
        if(Main.VERSION_TYPE == VersionType.DEV){
            //Bypass update
@@ -49,11 +63,26 @@ public class GithubUtil {
             return false;
         }
     }
+
+    /**
+     * <p>Checks if the update cache file exists.
+     *
+     * @return true if the cache file exists, false otherwise
+     * @author RedreamR
+     */
     public static boolean CacheCheck() {
         File file = FileManager.INSTANCE.getFile("./.finality/update");
         return file.exists();
     }
-    //Bypass SSL Cert
+
+    /**
+     * <p>Creates an SSLContext that bypasses SSL certificate verification.
+     *
+     * @return an SSLContext that does not verify SSL certificates
+     * @throws NoSuchAlgorithmException if the specified algorithm is not available
+     * @throws KeyManagementException if there is an error initializing the SSLContext
+     * @author RedreamR
+     */
     public static SSLContext createIgnoreVerifySSL() throws NoSuchAlgorithmException, KeyManagementException {
         SSLContext sc = SSLContext.getInstance("TLS");
         // 实现一个X509TrustManager接口，用于绕过验证，不用修改里面的方法
@@ -79,6 +108,13 @@ public class GithubUtil {
         sc.init(null, new TrustManager[]{trustManager}, null);
         return sc;
     }
+
+    /**
+     * <p>Gets the API link for the latest release based on the locale.
+     *
+     * @return the API link for the latest release
+     * @author RedreamR
+     */
     public static String getLocaleAPILink(){
         if(Localization.isChinese()){
             return GITEE_LATEST_RELEASE_LINK;
@@ -86,6 +122,13 @@ public class GithubUtil {
             return GITHUB_LATEST_RELEASE_LINK;
         }
     }
+
+    /**
+     * <p>Gets the repository link based on the locale.
+     *
+     * @return the repository link
+     * @author RedreamR
+     */
     public static String getLocaleRepoLink(){
         if(Localization.isChinese()){
             return GITEE_REPO_LINK;
@@ -93,7 +136,12 @@ public class GithubUtil {
             return GITHUB_REPO_LINK;
         }
     }
+
+    /**
+     * <p>Opens the release page in the default web browser.
+     */
     public static void openReleasePage(){
 
     }
+
 }

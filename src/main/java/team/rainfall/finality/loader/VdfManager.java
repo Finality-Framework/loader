@@ -16,9 +16,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * The VdfManager class is responsible for managing and parsing the Steam VDF (Valve Data Format) files.
- * It provides methods to find the Steam installation path and parse the library folders VDF file to retrieve library paths.
- * This class is implemented as a singleton.
+ * <p>The VdfManager class is responsible for managing and parsing the Steam VDF (Valve Data Format) files.
+ * <p>It provides methods to find the Steam installation path and parse the library folders VDF file<br>
+ * to retrieve library paths.
+ * <p>This class is implemented as a singleton.
  *
  * @author RedreamR
  */
@@ -32,7 +33,7 @@ public class VdfManager {
     }
 
     /**
-     * Returns the singleton instance of the VdfManager class.
+     * <p>Returns the singleton instance of the VdfManager class.
      *
      * @return the singleton instance
      * @author RedreamR
@@ -45,8 +46,8 @@ public class VdfManager {
     }
 
     /**
-     * Returns the list of library paths by parsing the Steam VDF file.
-     * If the library paths are not already parsed, it will parse the VDF file.
+     * <p>Returns the list of library paths by parsing the Steam VDF file.
+     * <p>If the library paths are not already parsed, it will parse the VDF file.
      *
      * @return the list of library paths
      * @author RedreamR
@@ -61,8 +62,8 @@ public class VdfManager {
 
 
     /**
-     * Finds the Steam installation path by checking the Windows registry.
-     * If the Steam installation path is found, it sets the steamPath field.
+     * <p>Finds the Steam installation path by checking the Windows registry.
+     * <p>If the Steam installation path is found, it sets the steamPath field.
      *
      * @author RedreamR
      */
@@ -79,9 +80,9 @@ public class VdfManager {
     }
 
     /**
-     * Parses the Steam VDF file to retrieve the library paths.
-     * If the Steam installation path is not already set, it will find the Steam installation path first.
-     * If the VDF file is found, it will parse the file and add the library paths to the libraryPaths list.
+     * <p>Parses the Steam VDF file to retrieve the library paths.
+     * <p>If the Steam installation path is not already set, it will find the Steam installation path first.
+     * <p>If the VDF file is found, it will parse the file and add the library paths to the libraryPaths list.
      *
      * @author RedreamR
      */

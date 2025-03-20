@@ -6,9 +6,9 @@ import javax.swing.*;
 import java.util.Objects;
 
 /**
- * The SplashScreen class represents a splash screen that is displayed when the application starts.
- * It shows an image and provides methods to create and destroy the splash screen.
- * This class is implemented as a singleton.
+ * <p>The SplashScreen class represents a splash screen that is displayed when the application starts.
+ * <p>It shows an image and provides methods to create and destroy the splash screen.
+ * <p>This class is implemented as a singleton.
  *
  * @author RedreamR
  */
@@ -17,8 +17,8 @@ public class SplashScreen extends JFrame {
     public static SplashScreen splashScreen = null;
 
     /**
-     * Private constructor to prevent instantiation.
-     * Initializes the splash screen with an image and sets its properties.
+     * <p>Private constructor to prevent instantiation.
+     * <p>Initializes the splash screen with an image and sets its properties.
      *
      * @author RedreamR
      */
@@ -36,7 +36,7 @@ public class SplashScreen extends JFrame {
     }
 
     /**
-     * Creates the splash screen if it does not already exist.
+     * <p>Creates the splash screen if it does not already exist.
      *
      * @author RedreamR
      */
@@ -47,7 +47,7 @@ public class SplashScreen extends JFrame {
     }
 
     /**
-     * Destroys the splash screen if it exists.
+     * <p>Destroys the splash screen if it exists.
      *
      * @author RedreamR
      */
