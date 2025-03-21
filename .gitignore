@@ -14,7 +14,6 @@ loader.log
 game.jar
 bin
 .idea/encodings.xml
-implementation-plan.md
 
 ### IntelliJ IDEA ###
 .idea/modules.xml

@@ -5,8 +5,23 @@ import team.rainfall.finality.loader.util.Localization;
 import javax.swing.*;
 import java.util.Objects;
 
+/**
+ * <p>The SplashScreen class represents a splash screen that is displayed when the application starts.</p>
+ * <p>It shows an image and provides methods to create and destroy the splash screen.</p>
+ * <p>This class is implemented as a singleton.</p>
+ *
+ * @author RedreamR
+ */
 public class SplashScreen extends JFrame {
+
     public static SplashScreen splashScreen = null;
+
+    /**
+     * <p>Private constructor to prevent instantiation.</p>
+     * <p>Initializes the splash screen with an image and sets its properties.</p>
+     *
+     * @author RedreamR
+     */
     protected SplashScreen() {
         super(Localization.bundle.getString("splash_title"));
         //使用工程内的resources/splash.png文件
@@ -19,16 +34,28 @@ public class SplashScreen extends JFrame {
         this.setVisible(true);
 
     }
+
+    /**
+     * <p>Creates the splash screen if it does not already exist.</p>
+     *
+     * @author RedreamR
+     */
     public static void create(){
         if(splashScreen == null){
             splashScreen = new SplashScreen();
         }
     }
 
+    /**
+     * <p>Destroys the splash screen if it exists.</p>
+     *
+     * @author RedreamR
+     */
     public static void destroy(){
         if(splashScreen != null) {
             splashScreen.dispose();
             splashScreen = null;
         }
     }
+
 }

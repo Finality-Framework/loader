@@ -14,11 +14,28 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Objects;
 
+/**
+ * <p>The PluginManager class is responsible for managing and loading plugins.</p>
+ * <p>It finds plugins in the specified folder, checks their compatibility, and loads them.</p>
+ * <p>This class is implemented as a singleton.</p>
+ *
+ * @author RedreamR
+ */
 public class PluginManager {
+
     public static PluginManager INSTANCE = new PluginManager();
     public ArrayList<PluginData> pluginDataList = new ArrayList<>();
+
     public PluginManager() {
     }
+
+    /**
+     * <p>Finds and loads plugins from the specified folder.</p>
+     * <p>It checks if the plugins are compatible with the current SDK version before loading them.</p>
+     *
+     * @param folder the folder to search for plugins
+     * @author RedreamR
+     */
     public void findPlugins(File folder) {
         if (folder.isDirectory()) {
             File folder2 = new File(folder, "plugins");
@@ -44,6 +61,6 @@ public class PluginManager {
                 }
             }
         }
-
     }
+
 }

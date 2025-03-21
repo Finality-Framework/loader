@@ -14,14 +14,30 @@ import java.util.*;
 import com.formdev.flatlaf.FlatIntelliJLaf;
 import team.rainfall.finality.FinalityLogger;
 import team.rainfall.finality.loader.gui.ErrorCode;
+
+/**
+ * <p>The Main class serves as the entry point for the application.</p>
+ * <p>It initializes the application and handles any uncaught exceptions.</p>
+ *
+ * @author RedreamR
+ */
 @SuppressWarnings("unused")
 public class Main {
+
     public static final String CODENAME = "RAIDEN";
-    public static final String VERSION = "1.3.1";
+    public static final String VERSION = "1.3.2";
     public static final VersionType VERSION_TYPE = VersionType.RELEASE;
     public static final String STEAM_MANAGER_CLASS = "aoh.kingdoms.history.mainGame.Steam.SteamManager";
     public static String LAUNCHER_CLASS = "aoh.kingdoms.history.mainGame.desktop.DesktopLauncher";
     public static ArrayList<String> localMods = new ArrayList<>();
+
+    /**
+     * <p>The main method serves as the entry point for the application.</p>
+     * <p>It sets up the FlatIntelliJLaf look and feel and calls the loaderMain method.</p>
+     *
+     * @param args the command line arguments
+     * @author Greyeon, RedreamR
+     */
     public static void main(String[] args) {
         try {
             FlatIntelliJLaf.setup();
@@ -33,6 +49,13 @@ public class Main {
         }
     }
 
+    /**
+     * <p>Deletes the specified directory and all its contents.</p>
+     *
+     * @param dir the directory to delete
+     * @return true if the directory was successfully deleted, false otherwise
+     * @author Greyeon, RedreamR
+     */
     public static boolean deleteDir(File dir) {
         if (dir.isDirectory()) {
             String[] children = dir.list();
@@ -45,7 +68,6 @@ public class Main {
                 }
             }
         }
-
         return dir.delete();
     }
 
