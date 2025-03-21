@@ -15,8 +15,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 
 /**
- * <p>The FileManager class provides methods to manage and locate files and directories.
- * <p>related to the application, including Steam Workshop folders and game files.
+ * <p>The FileManager class provides methods to manage and locate files and directories.</p>
+ * <p>related to the application, including Steam Workshop folders and game files.</p>
  *
  * @author RedreamR
  */
@@ -29,7 +29,7 @@ public class FileManager {
     }
 
     /**
-     * <p>Returns a File object representing the specified path.
+     * <p>Returns a File object representing the specified path.</p>
      *
      * @param path the path to the file
      * @return the File object
@@ -40,7 +40,7 @@ public class FileManager {
     }
 
     /**
-     * <p>Returns the Steam Workshop folder, either directly or globally.
+     * <p>Returns the Steam Workshop folder, either directly or globally.</p>
      *
      * @return the Steam Workshop folder
      * @author RedreamR
@@ -54,7 +54,7 @@ public class FileManager {
     }
 
     /**
-     * <p>Returns the Steam Workshop folder directly by navigating the directory structure.
+     * <p>Returns the Steam Workshop folder directly by navigating the directory structure.</p>
      *
      * @return the Steam Workshop folder, or null if not found
      * @author RedreamR
@@ -73,7 +73,7 @@ public class FileManager {
     }
 
     /**
-     * <p>Returns the Steam Workshop folder globally by checking library paths.
+     * <p>Returns the Steam Workshop folder globally by checking library paths.</p>
      *
      * @return the Steam Workshop folder
      * @author Greyeon, RedreamR
@@ -96,7 +96,7 @@ public class FileManager {
     }
 
     /**
-     * <p>Returns an array of mod names that are turned off, read from the ModsOff.txt file.
+     * <p>Returns an array of mod names that are turned off, read from the ModsOff.txt file.</p>
      *
      * @return an array of mod names
      * @author RedreamR
@@ -118,7 +118,7 @@ public class FileManager {
 
 
     /**
-     * <p>Try to find game core file by parsing Steam VDF File.
+     * <p>Try to find game core file by parsing Steam VDF File.</p>
      *
      * @throws RuntimeException if the game file cannot be found
      * @author RedreamR
@@ -142,7 +142,7 @@ public class FileManager {
     }
 
     /**
-     * <p>Finds and returns the game file path.
+     * <p>Finds and returns the game file path.</p>
      *
      * @return the game file path
      * @author RedreamR

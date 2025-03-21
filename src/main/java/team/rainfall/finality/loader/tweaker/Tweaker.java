@@ -3,9 +3,9 @@ package team.rainfall.finality.loader.tweaker;
 import java.util.jar.JarFile;
 
 /**
- * <p>T The Tweaker class is an abstract class that represents a tweaker.
- * <p>TIt contains a reference to the JAR file of the tweaker and an abstract method for transforming class bytes.
- * <p>TSubclasses should implement the transform method to provide specific transformation logic.
+ * <p>T The Tweaker class is an abstract class that represents a tweaker.</p>
+ * <p>TIt contains a reference to the JAR file of the tweaker and an abstract method for transforming class bytes.</p>
+ * <p>TSubclasses should implement the transform method to provide specific transformation logic.</p>
  *
  * @author RedreamR
  */

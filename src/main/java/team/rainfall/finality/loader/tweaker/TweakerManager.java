@@ -9,9 +9,9 @@ import java.util.ArrayList;
 
 /**
  * <p>TThe TweakerManager class manages a list of tweakers and provides methods<br>
- * to add tweakers from plugins and apply tweaks to class bytes.
- * <p>TIt uses a singleton pattern to ensure a single instance of the manager.
- * <p>TThe class loader is used to load tweaker classes dynamically.
+ * to add tweakers from plugins and apply tweaks to class bytes.</p>
+ * <p>TIt uses a singleton pattern to ensure a single instance of the manager.</p>
+ * <p>TThe class loader is used to load tweaker classes dynamically.</p>
  *
  * @author RedreamR
  */

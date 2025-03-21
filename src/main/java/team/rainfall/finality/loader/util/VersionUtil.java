@@ -3,10 +3,10 @@ package team.rainfall.finality.loader.util;
 import org.semver4j.Semver;
 
 /**
- * <p>Utility class for version comparison using semantic versioning.
+ * <p>Utility class for version comparison using semantic versioning.</p>
  * <p>This class provides methods to compare versions to determine if one version is higher, lower, <br>
- * or equal to another version.
- * <p>Note: This class uses the Semver library for parsing and comparing versions.
+ * or equal to another version.</p>
+ * <p>Note: This class uses the Semver library for parsing and comparing versions.</p>
  *
  * @author RedreamR
  */
@@ -14,7 +14,7 @@ import org.semver4j.Semver;
 public class VersionUtil {
 
     /**
-     * <p>Checks if the first version is higher than the second version.
+     * <p>Checks if the first version is higher than the second version.</p>
      *
      * @param version1 the first version to compare
      * @param version2 the second version to compare
@@ -31,7 +31,7 @@ public class VersionUtil {
     }
 
     /**
-     * <p>Checks if the first version is lower than the second version.
+     * <p>Checks if the first version is lower than the second version.</p>
      *
      * @param version1 the first version to compare
      * @param version2 the second version to compare
@@ -48,7 +48,7 @@ public class VersionUtil {
     }
 
     /**
-     * <p>Checks if the first version is equal to the second version.
+     * <p>Checks if the first version is equal to the second version.</p>
      *
      * @param version1 the first version to compare
      * @param version2 the second version to compare

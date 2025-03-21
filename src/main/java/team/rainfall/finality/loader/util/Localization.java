@@ -4,9 +4,9 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 
 /**
- * <p>Utility class for handling localization and resource bundles.
- * <p>This class provides methods to determine the locale and load resource bundles accordingly.
- * <p>Note: This class uses the default locale to load the resource bundle.
+ * <p>Utility class for handling localization and resource bundles.</p>
+ * <p>This class provides methods to determine the locale and load resource bundles accordingly.</p>
+ * <p>Note: This class uses the default locale to load the resource bundle.</p>
  *
  * @author RedreamR
  */
@@ -19,7 +19,7 @@ public class Localization {
     }
 
     /**
-     * <p>Checks if the current locale is Chinese.
+     * <p>Checks if the current locale is Chinese.</p>
      *
      * @return true if the current locale is Chinese, false otherwise
      * @author RedreamR

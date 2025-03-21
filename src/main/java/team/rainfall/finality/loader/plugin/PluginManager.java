@@ -15,9 +15,9 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 /**
- * <p>The PluginManager class is responsible for managing and loading plugins.
- * <p>It finds plugins in the specified folder, checks their compatibility, and loads them.
- * <p>This class is implemented as a singleton.
+ * <p>The PluginManager class is responsible for managing and loading plugins.</p>
+ * <p>It finds plugins in the specified folder, checks their compatibility, and loads them.</p>
+ * <p>This class is implemented as a singleton.</p>
  *
  * @author RedreamR
  */
@@ -30,8 +30,8 @@ public class PluginManager {
     }
 
     /**
-     * <p>Finds and loads plugins from the specified folder.
-     * <p>It checks if the plugins are compatible with the current SDK version before loading them.
+     * <p>Finds and loads plugins from the specified folder.</p>
+     * <p>It checks if the plugins are compatible with the current SDK version before loading them.</p>
      *
      * @param folder the folder to search for plugins
      * @author RedreamR

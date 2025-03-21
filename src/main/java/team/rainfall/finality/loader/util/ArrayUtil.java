@@ -1,14 +1,14 @@
 package team.rainfall.finality.loader.util;
 
 /**
- * <p>Utility class for array operations.
+ * <p>Utility class for array operations.</p>
  *
  * @author RedreamR
  */
 public class ArrayUtil {
 
     /**
-     * <p>Merges two arrays into one.
+     * <p>Merges two arrays into one.</p>
      *
      * @param array1 the first array
      * @param array2 the second array

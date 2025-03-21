@@ -1,17 +1,17 @@
 package team.rainfall.finality.loader.util;
 
 /**
- * <p>Utility class for string operations.
- * <p>This class provides methods to escape special characters in a string.
- * <p>Note: This class handles null input by returning null.
+ * <p>Utility class for string operations.</p>
+ * <p>This class provides methods to escape special characters in a string.</p>
+ * <p>Note: This class handles null input by returning null.</p>
  *
  * @author RedreamR
  */
 public class StringUtil {
 
     /**
-     * <p>Escapes special characters in the input string.
-     * <p>This method replaces special characters with their escape sequences.
+     * <p>Escapes special characters in the input string.</p>
+     * <p>This method replaces special characters with their escape sequences.</p>
      *
      * @param input the input string to be escaped
      * @return the escaped string, or null if the input is null

@@ -11,16 +11,16 @@ import java.util.PropertyResourceBundle;
 import java.util.ResourceBundle;
 
 /**
- * <p>Custom ResourceBundle.Control implementation to read properties files as UTF-8.
- * <p>This class overrides the newBundle method to ensure properties files are read using UTF-8 encoding.
- * <p>Note: This class is used to handle localization with UTF-8 encoded properties files.
+ * <p>Custom ResourceBundle.Control implementation to read properties files as UTF-8.</p>
+ * <p>This class overrides the newBundle method to ensure properties files are read using UTF-8 encoding.</p>
+ * <p>Note: This class is used to handle localization with UTF-8 encoded properties files.</p>
  *
  * <@author RedreamR
  */
 public class UTF8Control extends ResourceBundle.Control {
 
     /**
-     * <p>Creates a new ResourceBundle using UTF-8 encoding.
+     * <p>Creates a new ResourceBundle using UTF-8 encoding.</p>
      *
      * @param baseName the base name of the resource bundle
      * @param locale the locale for which the resource bundle should be instantiated

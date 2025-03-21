@@ -16,9 +16,9 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 
 /**
- * <p>Utility class for interacting with GitHub and Gitee repositories.
- * <p>This class provides methods to check for updates, bypass SSL certificate verification, and get repository links.
- * <p>Note: This class uses Unirest for HTTP requests and Fastjson for JSON parsing.
+ * <p>Utility class for interacting with GitHub and Gitee repositories.</p>
+ * <p>This class provides methods to check for updates, bypass SSL certificate verification, and get repository links.</p>
+ * <p>Note: This class uses Unirest for HTTP requests and Fastjson for JSON parsing.</p>
  *
  * @author RedreamR
  */
@@ -31,7 +31,7 @@ public class GithubUtil {
     public static String latestVersion = Main.VERSION;
 
     /**
-     * <p>Checks for updates by comparing the current version with the latest release version from the repository.
+     * <p>Checks for updates by comparing the current version with the latest release version from the repository.</p>
      *
      * @return true if an update is available, false otherwise
      * @author RedreamR
@@ -65,7 +65,7 @@ public class GithubUtil {
     }
 
     /**
-     * <p>Checks if the update cache file exists.
+     * <p>Checks if the update cache file exists.</p>
      *
      * @return true if the cache file exists, false otherwise
      * @author RedreamR
@@ -76,7 +76,7 @@ public class GithubUtil {
     }
 
     /**
-     * <p>Creates an SSLContext that bypasses SSL certificate verification.
+     * <p>Creates an SSLContext that bypasses SSL certificate verification.</p>
      *
      * @return an SSLContext that does not verify SSL certificates
      * @throws NoSuchAlgorithmException if the specified algorithm is not available
@@ -110,7 +110,7 @@ public class GithubUtil {
     }
 
     /**
-     * <p>Gets the API link for the latest release based on the locale.
+     * <p>Gets the API link for the latest release based on the locale.</p>
      *
      * @return the API link for the latest release
      * @author RedreamR
@@ -124,7 +124,7 @@ public class GithubUtil {
     }
 
     /**
-     * <p>Gets the repository link based on the locale.
+     * <p>Gets the repository link based on the locale.</p>
      *
      * @return the repository link
      * @author RedreamR
@@ -138,7 +138,7 @@ public class GithubUtil {
     }
 
     /**
-     * <p>Opens the release page in the default web browser.
+     * <p>Opens the release page in the default web browser.</p>
      */
     public static void openReleasePage(){
 

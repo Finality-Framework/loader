@@ -5,9 +5,9 @@ import team.rainfall.finality.loader.util.Localization;
 import javax.swing.*;
 
 /**
- * <p>The ErrorCode class is responsible for displaying error messages to the user.
- * <p>It ensures that multiple error messages are not shown simultaneously.
- * <p>The error messages are localized using the Localization class.
+ * <p>The ErrorCode class is responsible for displaying error messages to the user.</p>
+ * <p>It ensures that multiple error messages are not shown simultaneously.</p>
+ * <p>The error messages are localized using the Localization class.</p>
  *
  * @author RedreamR
  */
@@ -17,8 +17,8 @@ public class ErrorCode {
     public static boolean showed = false;
 
     /**
-     * <p>Displays an internal error message with the specified error code.
-     * <p>The error message is shown in a dialog box.
+     * <p>Displays an internal error message with the specified error code.</p>
+     * <p>The error message is shown in a dialog box.</p>
      *
      * @param code the error code to display
      * @author RedreamR

@@ -10,14 +10,14 @@ import java.util.List;
 
 /**
  * <p>The FileProcessor class provides methods to process files by reading their content, <br>
- * modifying it based on certain conditions, and writing the modified content back to the file.
+ * modifying it based on certain conditions, and writing the modified content back to the file.</p>
  * @author RedreamR
  */
 public class FileProcessor {
 
     /**
      * <p>Processes the file at the given file path by reading its content, modifying it based on the provided parameters, <br>
-     * and writing the modified content back to the file.
+     * and writing the modified content back to the file.</p>
      *
      * @param filePath the path of the file to process
      * @param a the string to search for in the file content
@@ -54,7 +54,7 @@ public class FileProcessor {
     }
 
     /**
-     * <p>Reads the content of the file at the given file path and returns it as a list of strings.
+     * <p>Reads the content of the file at the given file path and returns it as a list of strings.</p>
      *
      * @param filePath the path of the file to read
      * @return a list of strings representing the content of the file
@@ -70,7 +70,7 @@ public class FileProcessor {
     }
 
     /**
-     * <p>Writes the given list of strings to the file at the given file path.
+     * <p>Writes the given list of strings to the file at the given file path.</p>
      *
      * @param filePath the path of the file to write to
      * @param lines a list of strings representing the content to write to the file

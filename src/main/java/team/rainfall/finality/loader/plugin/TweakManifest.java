@@ -8,10 +8,10 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 
 /**
- * <p>The TweakManifest class represents the manifest of a tweak.
+ * <p>The TweakManifest class represents the manifest of a tweak.</p>
  * <p>It contains metadata about the tweak such as its SDK version, package name, <br>
- * and lists of tweak and publicized classes.
- * <p>This class is responsible for parsing the manifest information from an input stream.
+ * and lists of tweak and publicized classes.</p>
+ * <p>This class is responsible for parsing the manifest information from an input stream.</p>
  *
  * @author RedreamR
  */
@@ -23,7 +23,7 @@ public class TweakManifest {
     public String packageName;
 
     /**
-     * <p>Constructs a TweakManifest object by parsing the provided input stream.
+     * <p>Constructs a TweakManifest object by parsing the provided input stream.</p>
      *
      * @param is the input stream containing the tweak manifest JSON data
      * @author RedreamR
