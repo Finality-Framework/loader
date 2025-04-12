@@ -27,7 +27,6 @@ import java.util.jar.JarFile;
 import java.util.stream.Collectors;
 
 import static team.rainfall.luminosity.utils.JarUtil.getClassFromJar;
-
 public class TweakProcess {
     public final static int writeMode = ClassWriter.COMPUTE_FRAMES;
     //ASM needs dependencies to compute frames

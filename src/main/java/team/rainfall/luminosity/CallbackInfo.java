@@ -1,5 +1,5 @@
 package team.rainfall.luminosity;
-
+@Deprecated
 public class CallbackInfo<T> {
     public T self;
     public Object retValue;

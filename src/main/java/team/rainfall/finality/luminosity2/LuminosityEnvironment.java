@@ -8,7 +8,9 @@ import team.rainfall.finality.loader.FileManager;
 import team.rainfall.finality.loader.plugin.PluginData;
 import team.rainfall.finality.loader.gui.ErrorCode;
 import team.rainfall.finality.loader.util.FinalityClassLoader;
+import team.rainfall.finality.luminosity2.processor.InjectProcessor;
 import team.rainfall.finality.luminosity2.processor.MixinProcessor;
+import team.rainfall.finality.luminosity2.processor.NewFieldProcessor;
 import team.rainfall.finality.luminosity2.utils.AnnotationUtil;
 import team.rainfall.finality.luminosity2.utils.ClassInfo;
 import team.rainfall.finality.luminosity2.utils.JarUtil;
@@ -56,6 +58,10 @@ public class LuminosityEnvironment {
                 for(ClassNode classNode  : entry.getValue()){
                     MixinProcessor mixinProcessor = new MixinProcessor(classNode,targetNode);
                     mixinProcessor.process();
+                    NewFieldProcessor newFieldProcessor = new NewFieldProcessor(classNode,targetNode);
+                    newFieldProcessor.process();
+                    InjectProcessor injectProcessor = new InjectProcessor(targetNode);
+                    injectProcessor.process();
                 }
                 ClassInfo classInfo = new ClassInfo();
                 classInfo.name = entry.getKey();
@@ -91,7 +97,11 @@ public class LuminosityEnvironment {
             }
         }
     }
-    // 写出字节
+
+    /**
+     * Write modified classes to a jar file.<br/>
+     * This can be used to avoid class initialization problems.
+     */
     public void writeBytes(){
         try {
             for (ClassInfo classInfo : classInfos) {

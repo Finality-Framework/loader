@@ -1,4 +1,4 @@
-package team.rainfall.luminosity.utils;
+package team.rainfall.finality.luminosity2.utils;
 
 public class NumberUtil {
     public static boolean isBitSet(int number, int bitPosition) {

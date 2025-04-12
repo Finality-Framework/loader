@@ -3,7 +3,7 @@ package team.rainfall.luminosity.transformers;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.*;
 import team.rainfall.luminosity.utils.AsmUtil;
-import team.rainfall.luminosity.utils.NumberUtil;
+import team.rainfall.finality.luminosity2.utils.NumberUtil;
 import team.rainfall.luminosity.tweakMethods.InjectMethod;
 
 import java.util.ArrayList;
