@@ -18,7 +18,7 @@ public class JarUtil {
         while (entries.hasMoreElements()) {
             JarEntry entry = entries.nextElement();
             if (entry.getName().equalsIgnoreCase(path)) {
-                ClassReader reader = null;
+                ClassReader reader;
                 try {
                     reader = new ClassReader(file.getInputStream(entry));
                 } catch (IOException e) {

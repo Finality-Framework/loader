@@ -1,10 +1,3 @@
-//Lesson learnt: Don't play around with IDEA's ‘security’ remove!
-//Otherwise, you'll have to use a decompiler to retrieve the code, like I did!
-//RedreamR 24.11.8
-//
-// Source code recreated from a .class file by IntelliJ IDEA
-// (powered by FernFlower decompiler)
-//
 
 package team.rainfall.finality.loader;
 
@@ -17,7 +10,7 @@ import team.rainfall.finality.loader.gui.ErrorCode;
 @SuppressWarnings("unused")
 public class Main {
     public static final String CODENAME = "RAIDEN";
-    public static final String VERSION = "1.3.1";
+    public static final String VERSION = "1.4.0";
     public static final VersionType VERSION_TYPE = VersionType.RELEASE;
     public static final String STEAM_MANAGER_CLASS = "aoh.kingdoms.history.mainGame.Steam.SteamManager";
     public static String LAUNCHER_CLASS = "aoh.kingdoms.history.mainGame.desktop.DesktopLauncher";

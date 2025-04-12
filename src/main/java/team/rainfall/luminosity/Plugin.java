@@ -5,7 +5,7 @@ import team.rainfall.finality.loader.plugin.TweakManifest;
 
 import java.io.File;
 import java.util.jar.JarFile;
-
+@Deprecated
 public class Plugin {
     public JarFile jarFile = null;
     public TweakManifest manifest = null;

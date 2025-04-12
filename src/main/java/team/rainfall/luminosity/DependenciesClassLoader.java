@@ -2,7 +2,7 @@ package team.rainfall.luminosity;
 
 import java.net.URL;
 import java.net.URLClassLoader;
-
+@Deprecated
 public class DependenciesClassLoader extends URLClassLoader {
     public DependenciesClassLoader(URL[] urls) {
         super(urls);

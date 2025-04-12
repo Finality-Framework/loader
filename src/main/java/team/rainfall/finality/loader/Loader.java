@@ -10,8 +10,6 @@ import team.rainfall.finality.loader.plugin.PluginManager;
 import team.rainfall.finality.loader.util.*;
 import team.rainfall.finality.luminosity2.LuminosityEnvironment;
 import team.rainfall.finality.luminosity2.utils.ClassInfo;
-import team.rainfall.luminosity.TweakProcess;
-import team.rainfall.luminosity.TweakedClass;
 
 import javax.swing.*;
 import java.io.File;
@@ -40,18 +38,6 @@ public class Loader {
         FinalityLogger.info("Finality Framework Loader " + VERSION);
         paramParser.parse(args);
 
-        if(paramParser.mode == LaunchMode.INSTALL){
-            Installer.install();
-        }
-
-        if(!paramParser.isReboot) {
-            unstableWarn();
-        }
-
-        if(FileManager.parentFile != null){
-            System.exit(dropAndLaunch(FileManager.parentFile,args));
-        }
-
         FileUtil.createPrivateDir();
         FlatIntelliJLaf.setup();
         SplashScreen.create();
@@ -62,6 +48,18 @@ public class Loader {
                 BrowserUtil.openUrl(GithubUtil.getLocaleRepoLink()+"/releases/");
                 System.exit(0);
             }
+        }
+
+        if(paramParser.mode == LaunchMode.INSTALL){
+            Installer.install();
+        }
+
+        if(!paramParser.isReboot) {
+            unstableWarn();
+        }
+
+        if(FileManager.parentFile != null){
+            System.exit(dropAndLaunch(FileManager.parentFile,args));
         }
         long startTime = System.currentTimeMillis();
         classLoader = new FinalityClassLoader(new URL[0]);

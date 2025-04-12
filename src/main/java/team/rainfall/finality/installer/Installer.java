@@ -57,16 +57,13 @@ public class Installer {
                     File folder = findUserFolder(id64);
                     File config = new File(folder, "config/localconfig.vdf");
                     VDFNode node2 = parser.parse(Objects.requireNonNull(FileUtil.readString_UTF8(config)));
-                    VDFNode gameNode = node2.getSubNode("UserLocalConfigStore").getSubNode("Software").getSubNode("Valve").getSubNode("Steam").getSubNode("apps").getSubNode("2772750");
-                    if (gameNode != null) {
-                        gameNode.remove("LaunchOptions");
-                        gameNode.put("LaunchOptions", launchOption);
-                    } else {
-                        FinalityLogger.error(String.format(Localization.bundle.getString("bad_vdf"), "localconfig.vdf"));
+                    try {
+                        VDFNode ignored = node2.getSubNode("UserLocalConfigStore").getSubNode("Software").getSubNode("Valve").getSubNode("Steam").getSubNode("apps").getSubNode("2772750");
+                    }catch (Exception e){
                         ErrorCode.showInternalError("Aria - 01");
+                        FinalityLogger.error("Bad VDF", e);
                         System.exit(1);
                     }
-
                     try {
                         shouldRestartSteam = detectSteam();
                         FileProcessor.processFile(config.getAbsoluteFile().getAbsolutePath(), "\"2772750\"", "\t\t\t\t\t\t\"LaunchOptions\"\t\t\"" + launchOption + "\"", "\"LaunchOptions\"");
