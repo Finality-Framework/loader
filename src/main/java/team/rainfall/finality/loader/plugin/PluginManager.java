@@ -12,6 +12,7 @@ import team.rainfall.finality.loader.util.Localization;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Objects;
 
 public class PluginManager {
@@ -29,7 +30,24 @@ public class PluginManager {
                     if (pluginFile.getName().endsWith(".jar")) {
                         FinalityLogger.info(String.format(Localization.bundle.getString("found_plugin"),pluginFile.getName()));
                         try{
+                            boolean shouldBreak = false;
                             PluginData data = new PluginData(pluginFile);
+                            Iterator<PluginData> pluginDataIterator = pluginDataList.iterator();
+                            while (pluginDataIterator.hasNext()){
+                                PluginData pluginData = pluginDataIterator.next();
+                                if(pluginData.manifest.id.equals(data.manifest.id) && Semver.parse(data.manifest.version).isGreaterThan(pluginData.manifest.version)){
+                                    FinalityLogger.info(String.format(Localization.bundle.getString("duplicate_plugin"), pluginData.manifest.id,data.manifest.version));
+                                    pluginDataIterator.remove();
+                                    break;
+                                } else if (pluginData.manifest.id.equals(data.manifest.id)) {
+                                    FinalityLogger.info(String.format(Localization.bundle.getString("duplicate_plugin"), pluginData.manifest.id,pluginData.manifest.version));
+                                    shouldBreak = true;
+                                    break;
+                                }
+                            }
+                            if(shouldBreak){
+                                continue;
+                            }
                             if(!Objects.requireNonNull(Semver.parse(Main.VERSION)).satisfies(data.manifest.sdkVersion)){
                                 FinalityLogger.warn(String.format(Localization.bundle.getString("incompatible_plugin"), data.manifest.name,data.manifest.sdkVersion));
                                 FinalityLogger.warn(Localization.bundle.getString("it_wont_be_loaded"));
