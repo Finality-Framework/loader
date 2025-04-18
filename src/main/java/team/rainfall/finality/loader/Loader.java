@@ -151,6 +151,7 @@ public class Loader {
      * @author RedreamR
      */
     static int dropAndLaunch(File gamePath,String[] args){
+        SplashScreen.destroy();
         String currentJarPath = Loader.class.getProtectionDomain().getCodeSource().getLocation().getPath();
         try {
             currentJarPath = URLDecoder.decode(currentJarPath, "UTF-8");
