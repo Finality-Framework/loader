@@ -5,7 +5,7 @@ Finality Loader 用于在游戏中加载并修改代码，同时为插件提供�
 ## 安装
 1. 从Releases页面下载最新版的Finality Loader（文件名类似Loader-1.3.0-Release.zip）。
 2. 解压下载到的压缩包。
-3. 确保您已经在电脑上安装了 Java 8 或更高版本，运行解压出的install.cmd文件。
+3. 确保您已经在电脑上安装了 Java 8 或更高版本，运行解压出的install-wrapper.exe文件。
 4. 等待脚本执行完毕，随后您可以通过Steam 客户端启动带Finality 插件支持的《Age of History 3》游戏。
 
 ## 轻量级启动  
