@@ -7,7 +7,7 @@ Finality Loader is used to load and modify code within the game, while also prov
 ## Installation
 1. Download the latest version of Finality Loader from the Releases page (the filename will be similar to Loader-1.3.0-Release.zip).
 2. Extract the downloaded zip file.
-3. Ensure that Java 8 or higher is installed on your computer, then run the extracted install.cmd file.
+3. Ensure that Java 8 or higher is installed on your computer, then run the extracted install-wrapper.exe file.
 4. Wait for the script to complete. Afterward, you can launch "Age of History 3" with Finality plugin support via the Steam client.
 
 ## Lightweight Launch
