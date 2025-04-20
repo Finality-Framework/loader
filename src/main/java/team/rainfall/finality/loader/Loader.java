@@ -21,6 +21,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.channels.FileChannel;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
@@ -37,7 +38,10 @@ public class Loader {
         FinalityLogger.init();
         FinalityLogger.info("Finality Framework Loader " + VERSION);
         paramParser.parse(args);
-
+        FinalityLogger.info("OS Info: "+OSUtil.getSystem());
+        FinalityLogger.info("Java Info: "+OSUtil.getJavaInfo());
+        FinalityLogger.info("CPU ID: "+OSUtil.getProcessorIdentifier());
+        FinalityLogger.info("CPU NAME: "+OSUtil.getCpuName());
         FileUtil.createPrivateDir();
         FlatIntelliJLaf.setup();
         SplashScreen.create();
@@ -61,6 +65,8 @@ public class Loader {
         if(FileManager.parentFile != null){
             System.exit(dropAndLaunch(FileManager.parentFile,args));
         }
+
+
         long startTime = System.currentTimeMillis();
         classLoader = new FinalityClassLoader(new URL[0]);
         try (JarFile gameJar = new JarFile(new File(paramParser.gameFilePath))) {
@@ -103,19 +109,19 @@ public class Loader {
             hijackSteamManager();
 
             if (paramParser.mode == LaunchMode.ONLY_GEN || paramParser.mode == LaunchMode.LAUNCH_AND_GEN) {
-                for (ClassInfo classInfo : environment.classInfos) {
-                    try {
-                        deleteDir(FileManager.INSTANCE.getFile("gen/"));
-                        File file = FileManager.INSTANCE.getFile("gen/" + classInfo.name.replace(".", "/") + ".class");
-                        boolean ignored = file.getParentFile().mkdirs();
-                        FileOutputStream fos = new FileOutputStream(file);
-                        fos.write(classInfo.bytes);
-                        fos.close();
-                    } catch (IOException var17) {
-
-                        FinalityLogger.error("Gen err", var17);
-                    }
+                File l2File = new File("./.finality/luminosity2.jar");
+                ArrayList<File> files = new ArrayList<>();
+                files.add(l2File);
+                for (PluginData pluginData : PluginManager.INSTANCE.pluginDataList) {
+                    files.add(pluginData.file);
                 }
+                File file2 = new File("./.finality/generated.jar");
+                if (file2.exists()) {
+                    file2.delete();
+                }else {
+                    file2.createNewFile();
+                }
+                ZipMerger.mergeZipFiles(files.toArray(new File[0]), new File("./.finality/generated.jar"));
             }
             if (paramParser.mode == LaunchMode.ONLY_LAUNCH || paramParser.mode == LaunchMode.LAUNCH_AND_GEN) {
                 FinalityLogger.info(String.format(Localization.bundle.getString("ready_to_launch"), (System.currentTimeMillis() - startTime)));
