@@ -44,12 +44,13 @@ public class MixinProcessor implements Processor {
     public void mixinMethods(){
         for(MethodNode methodNode:sourceNode.methods){
             //Skip init method
-            if(methodNode.name.equals("<init>")) continue;
-            if(methodNode.name.equals("<clinit>")) continue;
+            if(methodNode.name.equals("<init>") && !AnnotationUtil.annotationExists("Lteam/rainfall/finality/luminosity2/annotations/Overwrite;", methodNode)) continue;
+            if(methodNode.name.equals("<clinit>") && !AnnotationUtil.annotationExists("Lteam/rainfall/finality/luminosity2/annotations/Overwrite;", methodNode)) continue;
             if(methodNameList.contains(methodNode.name+methodNode.desc)){
                 targetNode.methods.remove(MethodUtil.findMethodByName(targetNode,methodNode.name+methodNode.desc));
                 methodNameList.remove(methodNode.name+methodNode.desc);
             }
+            FinalityLogger.debug("L2 Mixin "+methodNode.name+" to "+targetNode.name);
             targetNode.methods.add(methodNode);
             methodNameList.add(methodNode.name+methodNode.desc);
         }

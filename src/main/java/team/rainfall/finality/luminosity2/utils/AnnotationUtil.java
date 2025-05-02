@@ -8,11 +8,20 @@ import team.rainfall.finality.FinalityLogger;
 @SuppressWarnings("unused")
 public class AnnotationUtil {
     public static boolean annotationExists (String name, MethodNode node) {
-        if(node.visibleAnnotations == null) return false;
-        for (AnnotationNode annotation : node.visibleAnnotations) {
-            FinalityLogger.debug("DBG2 "+annotation.desc);
-            if (annotation.desc.equals(name)) {
-                return true;
+        if(node.visibleAnnotations != null) {
+            for (AnnotationNode annotation : node.visibleAnnotations) {
+                FinalityLogger.debug("DBG2 " + annotation.desc);
+                if (annotation.desc.equals(name)) {
+                    return true;
+                }
+            }
+        }
+        if(node.invisibleAnnotations != null) {
+            for (AnnotationNode annotation : node.invisibleAnnotations) {
+                FinalityLogger.debug("DBG2 " + annotation.desc);
+                if (annotation.desc.equals(name)) {
+                    return true;
+                }
             }
         }
         return false;
