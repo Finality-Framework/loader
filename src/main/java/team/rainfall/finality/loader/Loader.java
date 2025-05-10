@@ -4,6 +4,7 @@ import com.formdev.flatlaf.FlatIntelliJLaf;
 import team.rainfall.finality.FinalityLogger;
 import team.rainfall.finality.installer.Installer;
 import team.rainfall.finality.loader.gui.ErrorCode;
+import team.rainfall.finality.loader.gui.FinalityGUI;
 import team.rainfall.finality.loader.gui.SplashScreen;
 import team.rainfall.finality.loader.plugin.PluginData;
 import team.rainfall.finality.loader.plugin.PluginManager;
@@ -33,6 +34,7 @@ import static team.rainfall.finality.loader.Main.*;
 public class Loader {
     static ParamParser paramParser = new ParamParser();
     static FinalityClassLoader classLoader;
+    static String[] args;
     @SuppressWarnings("deprecated")
     public static void loaderMain(String[] args) {
         FinalityLogger.init();
@@ -63,7 +65,11 @@ public class Loader {
         }
 
         if(FileManager.parentFile != null){
-            System.exit(dropAndLaunch(FileManager.parentFile,args));
+            Loader.args = args;
+            SplashScreen.destroy();
+            FinalityGUI.main(args);
+            return;
+
         }
 
 
@@ -148,7 +154,9 @@ public class Loader {
         }
     }
 
-
+    public static int liteLaunch(){
+        return dropAndLaunch(FileManager.parentFile,args);
+    }
     /**
      * drop loader itself into the game folder,and execute it again to launch the game.<br/>
      * Note:Steam will block our launch if we try to launch game from the folder which is different from the game folder.

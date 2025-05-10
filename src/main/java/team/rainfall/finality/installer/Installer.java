@@ -84,7 +84,6 @@ public class Installer {
                     throw new RuntimeException(e);
                 }
             }
-            System.exit(0);
         } else {
             FinalityLogger.error(String.format(Localization.bundle.getString("bad_vdf"), "loginusers.vdf"));
             System.exit(1);

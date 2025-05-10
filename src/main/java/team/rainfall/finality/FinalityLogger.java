@@ -1,5 +1,6 @@
 package team.rainfall.finality;
 
+import team.rainfall.finality.loader.gui.FinalityGUI;
 import team.rainfall.finality.loader.util.Localization;
 
 import java.io.*;
@@ -13,6 +14,7 @@ public class FinalityLogger {
     public static AlternativeOutputStream alternativeOutputStream = new AlternativeOutputStream(System.out);
     public static final int STACKTRACE_LIMIT = 10;
     public static OutputStreamWriter logStream = null;
+    public static boolean outputToGUI = false;
     public static boolean isDebug = false;
     public static final String RED_COLOR = "\033[31m";
     public static final String RED_BACKGROUND = "\033[41m";
@@ -47,12 +49,6 @@ public class FinalityLogger {
 
         }
     }
-    public static void important(String message){
-        alternativeOutputStream.bypassing = true;
-        System.out.println(PURPLE_BACKGROUND + "[Important] " + message + RESET);
-        output("[Important] " + message);
-        alternativeOutputStream.bypassing = false;
-    }
 
     public static void localizeInfo(String message){
         info(String.format(Localization.bundle.getString(message)));
@@ -60,6 +56,7 @@ public class FinalityLogger {
 
     public static void info(String message) {
         alternativeOutputStream.bypassing = true;
+
         System.out.println(WHITE_BACKGROUND + BLACK_COLOR + "[Info] " + message + RESET);
         output("[Info] " + message);
         alternativeOutputStream.bypassing = false;
@@ -123,6 +120,9 @@ public class FinalityLogger {
 
     public static void output(String message){
         try{
+            if(outputToGUI){
+                FinalityGUI.INSTANCE.logMessage(message);
+            }
             logStream.write(message+'\n');
             logStream.flush();
         }catch (IOException ignored){
