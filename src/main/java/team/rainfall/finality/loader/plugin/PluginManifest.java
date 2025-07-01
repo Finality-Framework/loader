@@ -1,6 +1,7 @@
 package team.rainfall.finality.loader.plugin;
 
 import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import org.semver4j.Semver;
 import team.rainfall.finality.FinalityLogger;
@@ -25,9 +26,14 @@ public class PluginManifest {
     public String tweaker;
     public Boolean useLuminosity = false;
     public ArrayList<String> tweakClasses = new ArrayList<>();
+    public ArrayList<String> requirements = new ArrayList<>();
     public PluginManifest(InputStream is){
         JSONObject jsonObject = JSON.parseObject(is, Charset.defaultCharset());
         useLuminosity = jsonObject.getBoolean("useLuminosity");
+        JSONArray requirement = jsonObject.getJSONArray("requirements");
+        if(requirement != null) {
+            requirement.forEach(item -> requirements.add((String) item));
+        }
         if(useLuminosity) {
             jsonObject.getJSONArray("tweakClasses").forEach(item -> tweakClasses.add((String) item));
         }

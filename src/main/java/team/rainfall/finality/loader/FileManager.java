@@ -67,7 +67,6 @@ public class FileManager {
     public String[] getModsOffFile() {
         File file = getFile("settings/ModsOff.txt");
         if (file.exists()) {
-            //将文件内的数据读入String
             try {
                 byte[] bytes = Files.readAllBytes(Paths.get(file.getAbsolutePath()));
                 String content = new String(bytes, StandardCharsets.UTF_8);
@@ -82,7 +81,6 @@ public class FileManager {
 
     /**
      * Try to find game core file by parsing Steam VDF File.
-     *
      * @author RedreamR
      */
     public void findGameFileByVDF() {
