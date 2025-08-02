@@ -35,7 +35,7 @@ public class OSUtil {
         } catch (IOException e) {
             FinalityLogger.error("Failed to get CPU name", e);
         }
-        return "Unknown CPU"; // 如果无法获取，返回未知CPU
+        return "Unknown CPU";
     }
 
 }

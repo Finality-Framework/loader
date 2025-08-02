@@ -40,7 +40,6 @@ public class LuminosityEnvironment {
             classLoader.addUrl2(coreJar.toURI().toURL());
             this.pluginData = pluginData;
             for(PluginData data : pluginData){
-                FinalityLogger.debug("L2 "+data.manifest.id);
                 classLoader.addUrl2(data.file.toURI().toURL());
             }
         } catch (IOException ignored) {
@@ -72,6 +71,11 @@ public class LuminosityEnvironment {
             }
         }
     }
+
+    private void runFieldOp(){
+         
+    }
+
     public void bind(){
         for(PluginData pluginData : pluginData){
             if(pluginData.manifest.useLuminosity){

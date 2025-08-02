@@ -13,4 +13,7 @@ public class MethodUtil {
         }
         return null;
     }
+    public static String getFullName(MethodNode methodNode){
+        return methodNode.name+methodNode.desc;
+    }
 }
