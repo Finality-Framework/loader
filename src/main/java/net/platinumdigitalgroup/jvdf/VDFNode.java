@@ -189,6 +189,14 @@ public class VDFNode extends TreeMap<String, Object[]> {
         return this.getSubNode(key, 0);
     }
 
+    public VDFNode getSubNodeIgnoreCase(String key) {
+        if(this.getSubNode(key, 0) != null){
+            return this.getSubNode(key, 0);
+        }else {
+            return this.getSubNode(key.toLowerCase(), 0);
+        }
+    }
+
     /**
      * Fetches a VDF child node by name and index.
      * @param key the key name

@@ -58,11 +58,11 @@ public class Installer {
                     File config = new File(folder, "config/localconfig.vdf");
                     VDFNode node2 = parser.parse(Objects.requireNonNull(FileUtil.readString_UTF8(config)));
                     try {
-                        VDFNode ignored = node2.getSubNode("UserLocalConfigStore");
-                        ignored = ignored.getSubNode("Software");
-                        ignored = ignored.getSubNode("Valve");
-                        ignored = ignored.getSubNode("Steam");
-                        ignored = ignored.getSubNode("Apps");
+                        VDFNode ignored = node2.getSubNodeIgnoreCase("UserLocalConfigStore");
+                        ignored = ignored.getSubNodeIgnoreCase("Software");
+                        ignored = ignored.getSubNodeIgnoreCase("Valve");
+                        ignored = ignored.getSubNodeIgnoreCase("Steam");
+                        ignored = ignored.getSubNodeIgnoreCase("Apps");
                         ignored = ignored.getSubNode("2772750");
                     }catch (Exception e){
                         ErrorCode.showInternalError("Aria - 01");
