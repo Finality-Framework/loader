@@ -2,6 +2,7 @@ package team.rainfall.finality.luminosity2.processor;
 
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.*;
+import team.rainfall.finality.FinalityLogger;
 import team.rainfall.finality.luminosity2.Processor;
 import team.rainfall.finality.luminosity2.utils.AnnotationUtil;
 import team.rainfall.finality.luminosity2.utils.NumberUtil;
@@ -22,12 +23,15 @@ public class InjectProcessor implements Processor {
     @Override
     public void process() {
         for (MethodNode method : classNode.methods) {
-            if (AnnotationUtil.annotationExists("Lteam/rainfall/finality/luminosity2/annotation/Inject;", method)) {
-                AnnotationNode injectAnnotation = AnnotationUtil.getAnnotation("Lteam/rainfall/finality/luminosity2/annotation/Inject;", method);
+            if (AnnotationUtil.annotationExists("Lteam/rainfall/finality/luminosity2/annotations/Inject;", method)) {
+                FinalityLogger.debug("L2 Inject4 "+ method.name);
+                AnnotationNode injectAnnotation = AnnotationUtil.getAnnotation("Lteam/rainfall/finality/luminosity2/annotations/Inject;", method);
                 if (injectAnnotation != null) {
                     String targetMethodName = (String) AnnotationUtil.getAnnotationValue("methodName", injectAnnotation);
                     for (MethodNode targetMethod : classNode.methods) {
+                        FinalityLogger.debug("L2 Inject "+targetMethod.name +" "+targetMethodName);
                         if (targetMethod.name.equals(targetMethodName)) {
+                            FinalityLogger.debug("L2 Find Inject "+targetMethodName);
                             injectHead(method, targetMethod);
                         }
                     }
