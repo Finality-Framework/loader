@@ -1,21 +1,29 @@
 package team.rainfall.finality.loader.util;
+
 import team.rainfall.finality.FinalityLogger;
 
 import java.io.*;
+import java.nio.ByteBuffer;
+import java.nio.channels.FileChannel;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.security.DigestInputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
+
 public class FileUtil {
-    public static void createPrivateDir(){
+    public static void createPrivateDir() {
         File file = new File("./.finality");
-        if(!file.exists()){
+        if (!file.exists()) {
             boolean ignored = file.mkdir();
         }
     }
+
     public static void deleteFileIfThreeDaysPast(File file) {
         try {
             if (file.exists()) {
@@ -33,28 +41,47 @@ public class FileUtil {
                     boolean ignored = file.delete();
                 }
             }
-        }catch (Exception ignored){}
+        } catch (Exception ignored) {
+        }
     }
 
-    public static String readString(File file){
+    public static String readString(File file) {
         try {
             return new String(Files.readAllBytes(file.toPath()));
         } catch (IOException e) {
-            FinalityLogger.error("Failed while readString(File)",e);
+            FinalityLogger.error("Failed while readString(File)", e);
             return null;
         }
     }
-    public static String readString_UTF8(File file){
+
+    public static String readString_UTF8(File file) {
         try {
-            return new String(Files.readAllBytes(file.toPath()),StandardCharsets.UTF_8);
+            return new String(Files.readAllBytes(file.toPath()), StandardCharsets.UTF_8);
         } catch (IOException e) {
-            FinalityLogger.error("Failed while readString(File)",e);
+            FinalityLogger.error("Failed while readString(File)", e);
             return null;
         }
     }
+
     public static void clearAndWriteFile(File file, String content) throws IOException {
-        try (OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(file, false),StandardCharsets.UTF_8)) {
+        try (OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(file, false), StandardCharsets.UTF_8)) {
             writer.write(content);
+        }
+    }
+
+    public static byte[] calculateSHA256(File file) throws IOException, NoSuchAlgorithmException {
+        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        try (
+                FileInputStream fis = new FileInputStream(file);
+                FileChannel channel = fis.getChannel();
+                DigestInputStream ignored = new DigestInputStream(fis, digest)) {
+            ByteBuffer buffer = ByteBuffer.allocate(8192); // 8 KB buffer
+            while (channel.read(buffer) != -1) {
+                buffer.flip();
+                digest.update(buffer);
+                buffer.clear();
+            }
+            return digest.digest();
         }
     }
 }

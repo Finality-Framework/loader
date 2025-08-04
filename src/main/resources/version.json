@@ -1,0 +1,37 @@
+[
+  {
+    "id": 2013,
+    "hashStr": "6a42b418774de7064d3ef8a672f09b1bd530129e96e1b79601398a23072578dd",
+    "desc": "Latest beta test"
+  },
+  {
+    "id": 2011,
+    "hashStr": "43861A2B9479D1899A416FBAEA1930575E5B9A40CBC9AD08361B864C87C4E4B4",
+    "desc": "Age of Chaos"
+  },
+  {
+    "id": 2010,
+    "hashStr": "7156FBDFA57AD78497E49FC3C3C862B4CA3C3BE675C530588B7570AB70B58B6C",
+    "desc": "Send Ultimatums to Your Vassals"
+  },
+  {
+    "id": 2005,
+    "hashStr": "d651598968aea23405e71a15a3a2ee2b87e8905fb129cb63844ad9baa97a6b37",
+    "desc": "Latest release version"
+  },
+  {
+    "id": 2002,
+    "hashStr": "2787F2E56902C4FBADD56A0D67721F00B9A61C1FD583AF71B8F69A46F4206CEE",
+    "desc": ""
+  },
+  {
+    "id": 2001,
+    "hashStr": "016DE908414A095006D43EA9407B4283CF28277B4E84E5242081A10ADB154880",
+    "desc": ""
+  },
+  {
+    "id": 2000,
+    "hashStr": "016DE908414A095006D43EA9407B4283CF28277B4E84E5242081A10ADB154880",
+    "desc": ""
+  }
+]

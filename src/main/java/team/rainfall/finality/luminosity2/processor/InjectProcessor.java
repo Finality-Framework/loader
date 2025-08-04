@@ -24,12 +24,10 @@ public class InjectProcessor implements Processor {
     public void process() {
         for (MethodNode method : classNode.methods) {
             if (AnnotationUtil.annotationExists("Lteam/rainfall/finality/luminosity2/annotations/Inject;", method)) {
-                FinalityLogger.debug("L2 Inject4 "+ method.name);
                 AnnotationNode injectAnnotation = AnnotationUtil.getAnnotation("Lteam/rainfall/finality/luminosity2/annotations/Inject;", method);
                 if (injectAnnotation != null) {
                     String targetMethodName = (String) AnnotationUtil.getAnnotationValue("methodName", injectAnnotation);
                     for (MethodNode targetMethod : classNode.methods) {
-                        FinalityLogger.debug("L2 Inject "+targetMethod.name +" "+targetMethodName);
                         if (targetMethod.name.equals(targetMethodName)) {
                             FinalityLogger.debug("L2 Find Inject "+targetMethodName);
                             injectHead(method, targetMethod);

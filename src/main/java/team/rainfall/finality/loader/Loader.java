@@ -3,6 +3,7 @@ package team.rainfall.finality.loader;
 import com.formdev.flatlaf.FlatIntelliJLaf;
 import team.rainfall.finality.FinalityLogger;
 import team.rainfall.finality.installer.Installer;
+import team.rainfall.finality.loader.game.VersionDetector;
 import team.rainfall.finality.loader.gui.ErrorCode;
 import team.rainfall.finality.loader.gui.FinalityGUI;
 import team.rainfall.finality.loader.gui.SplashScreen;
@@ -22,6 +23,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.nio.channels.FileChannel;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -32,6 +34,7 @@ import java.util.jar.JarFile;
 import static team.rainfall.finality.loader.Main.*;
 
 public class Loader {
+
     static ParamParser paramParser = new ParamParser();
     static FinalityClassLoader classLoader;
     static String[] args;
@@ -47,15 +50,7 @@ public class Loader {
         FileUtil.createPrivateDir();
         FlatIntelliJLaf.setup();
         SplashScreen.create();
-        if(GithubUtil.checkUpdate()){
-            String [] options = {Localization.bundle.getString("update_now"),Localization.bundle.getString("later")};
-            int i = JOptionPane.showOptionDialog(null, String.format(Localization.bundle.getString("new_version"), GithubUtil.latestVersion),Localization.bundle.getString("update"),JOptionPane.YES_NO_OPTION,JOptionPane.QUESTION_MESSAGE,null,options,options[0]);
-            if(i == 0){
-                BrowserUtil.openUrl(GithubUtil.getLocaleRepoLink()+"/releases/");
-                System.exit(0);
-            }
-        }
-
+        checkUpdate();
         if(paramParser.mode == LaunchMode.INSTALL){
             Installer.install();
         }
@@ -77,6 +72,8 @@ public class Loader {
         classLoader = new FinalityClassLoader(new URL[0]);
         try (JarFile gameJar = new JarFile(new File(paramParser.gameFilePath))) {
             LAUNCHER_CLASS = gameJar.getManifest().getMainAttributes().getValue(Attributes.Name.MAIN_CLASS);
+            checkGameVersion(new File(paramParser.gameFilePath));
+
             //Search local mods
             for (File file : Objects.requireNonNull(FileManager.INSTANCE.getFile("mods").listFiles())) {
                 String[] strings = FileManager.INSTANCE.getModsOffFile();
@@ -215,7 +212,16 @@ public class Loader {
         } catch (Exception ignored) {
         }
     }
-
+    private static void checkUpdate(){
+        if(GithubUtil.checkUpdate()){
+            String [] options = {Localization.bundle.getString("update_now"),Localization.bundle.getString("later")};
+            int i = JOptionPane.showOptionDialog(null, String.format(Localization.bundle.getString("new_version"), GithubUtil.latestVersion),Localization.bundle.getString("update"),JOptionPane.YES_NO_OPTION,JOptionPane.QUESTION_MESSAGE,null,options,options[0]);
+            if(i == 0){
+                BrowserUtil.openUrl(GithubUtil.getLocaleRepoLink()+"/releases/");
+                System.exit(0);
+            }
+        }
+    }
     private static void tweak(LuminosityEnvironment environment) throws MalformedURLException {
         environment.run();
         //Luminosity should run earlier than other classloader load
@@ -227,6 +233,21 @@ public class Loader {
         }
         classLoader.addUrl2((new File(paramParser.gameFilePath)).toURI().toURL());
 
+    }
+    private static void checkGameVersion(File file) throws IOException, NoSuchAlgorithmException {
+        VersionDetector.detector.loadVersions();
+        byte[] hash = FileUtil.calculateSHA256(file);
+        String hashStr = StringUtil.bytesToHex(hash);
+        FinalityLogger.info(String.format(Localization.bundle.getString("sha256_of_the_game"), hashStr));
+        if(VersionDetector.detector.isKnownVersion(hashStr)){
+            FinalityLogger.info(String.format(Localization.bundle.getString("version_of_game"), VersionDetector.detector.getVersionID(hashStr)));
+            FinalityLogger.info(String.format(Localization.bundle.getString("version_desc"), VersionDetector.detector.getVersionDesc(hashStr)));
+            if(VersionDetector.detector.getVersionID(hashStr) != TARGET_GAME_VERSION){
+                FinalityLogger.warn(Localization.bundle.getString("unsupported_version"));
+            }
+        }else {
+            FinalityLogger.warn(Localization.bundle.getString("unknown_version"));
+        }
     }
 
 }

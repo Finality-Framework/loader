@@ -7,8 +7,12 @@ import java.util.*;
 import com.formdev.flatlaf.FlatIntelliJLaf;
 import team.rainfall.finality.FinalityLogger;
 import team.rainfall.finality.loader.gui.ErrorCode;
+
+import javax.swing.plaf.PanelUI;
+
 @SuppressWarnings("unused")
 public class Main {
+    public static final int TARGET_GAME_VERSION = 2013;
     public static final String CODENAME = "RAIDEN";
     public static final String VERSION = "1.4.4";
     public static final VersionType VERSION_TYPE = VersionType.RELEASE;
