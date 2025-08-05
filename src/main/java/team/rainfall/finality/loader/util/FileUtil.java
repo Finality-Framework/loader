@@ -71,15 +71,11 @@ public class FileUtil {
 
     public static byte[] calculateSHA256(File file) throws IOException, NoSuchAlgorithmException {
         MessageDigest digest = MessageDigest.getInstance("SHA-256");
-        try (
-                FileInputStream fis = new FileInputStream(file);
-                FileChannel channel = fis.getChannel();
-                DigestInputStream ignored = new DigestInputStream(fis, digest)) {
-            ByteBuffer buffer = ByteBuffer.allocate(8192); // 8 KB buffer
-            while (channel.read(buffer) != -1) {
-                buffer.flip();
-                digest.update(buffer);
-                buffer.clear();
+        try (FileInputStream fis = new FileInputStream(file);
+             DigestInputStream dis = new DigestInputStream(fis, digest)) {
+            byte[] buffer = new byte[8192]; // 8 KB buffer
+            while (dis.read(buffer) != -1) {
+                // just white for read
             }
             return digest.digest();
         }
