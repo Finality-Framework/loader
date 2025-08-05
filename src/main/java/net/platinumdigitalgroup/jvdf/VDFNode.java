@@ -190,11 +190,12 @@ public class VDFNode extends TreeMap<String, Object[]> {
     }
 
     public VDFNode getSubNodeIgnoreCase(String key) {
-        if(this.getSubNode(key, 0) != null){
-            return this.getSubNode(key, 0);
-        }else {
-            return this.getSubNode(key.toLowerCase(), 0);
+        for (Map.Entry<String, Object[]> stringEntry : this.entrySet()) {
+            if(stringEntry.getKey().equalsIgnoreCase(key)){
+                return (VDFNode) stringEntry.getValue()[0];
+            }
         }
+        return null;
     }
 
     /**

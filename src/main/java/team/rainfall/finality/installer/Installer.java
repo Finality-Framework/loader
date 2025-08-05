@@ -61,9 +61,12 @@ public class Installer {
                         VDFNode ignored = node2.getSubNodeIgnoreCase("UserLocalConfigStore");
                         ignored = ignored.getSubNodeIgnoreCase("Software");
                         ignored = ignored.getSubNodeIgnoreCase("Valve");
+                        for (String s : ignored.keySet()) {
+                            FinalityLogger.debug("Installer "+s);
+                        }
                         ignored = ignored.getSubNodeIgnoreCase("Steam");
                         ignored = ignored.getSubNodeIgnoreCase("Apps");
-                        ignored = ignored.getSubNode("2772750");
+                        ignored = ignored.getSubNodeIgnoreCase("2772750");
                     }catch (Exception e){
                         ErrorCode.showInternalError("Aria - 01");
                         FinalityLogger.error("Bad VDF", e);
