@@ -54,12 +54,7 @@ public class FinalityGUI {
         lightStartButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                new Thread(){
-                    @Override
-                    public void run() {
-                        Loader.liteLaunch();
-                    }
-                }.start();
+                new Thread(Loader::liteLaunch).start();
             }
         });
         topPanel.add(lightStartButton);

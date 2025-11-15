@@ -130,6 +130,7 @@ public class Loader {
                 FinalityLogger.info(String.format(Localization.bundle.getString("ready_to_launch"), (System.currentTimeMillis() - startTime)));
                 try {
                     SplashScreen.destroy();
+                    environment.dispose();
                     classLoader.loadClass(LAUNCHER_CLASS).getMethod("main", String[].class).invoke(null, (Object) new String[0]);
                 } catch (Exception e) {
                     FinalityLogger.error("Game err", e);

@@ -45,6 +45,13 @@ public class LuminosityEnvironment {
         } catch (IOException ignored) {
         }
     }
+    public void dispose(){
+        pluginData = null;
+        classInfos.clear();
+        classInfos = null;
+        classNodeMap.clear();
+        classNodeMap = null;
+    }
     public void run(){
         bind();
         runMixin();

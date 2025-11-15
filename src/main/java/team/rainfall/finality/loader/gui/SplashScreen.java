@@ -17,7 +17,6 @@ public class SplashScreen extends JFrame {
         this.setSize(800, 400);
         this.setLocationRelativeTo(null);
         this.setVisible(true);
-
     }
     public static void create(){
         if(splashScreen == null){

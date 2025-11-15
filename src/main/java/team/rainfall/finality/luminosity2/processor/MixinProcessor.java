@@ -37,6 +37,7 @@ public class MixinProcessor implements Processor {
         }
     }
     public void findMethods(){
+
         for (MethodNode methodNode:targetNode.methods){
             methodNameList.add(methodNode.name+methodNode.desc);
         }
