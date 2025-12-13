@@ -11,7 +11,6 @@ import team.rainfall.finality.loader.plugin.PluginData;
 import team.rainfall.finality.loader.plugin.PluginManager;
 import team.rainfall.finality.loader.util.*;
 import team.rainfall.finality.luminosity2.LuminosityEnvironment;
-import team.rainfall.finality.luminosity2.utils.ClassInfo;
 
 import javax.swing.*;
 import java.io.File;
@@ -25,7 +24,6 @@ import java.net.URLDecoder;
 import java.nio.channels.FileChannel;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.jar.Attributes;
@@ -38,15 +36,14 @@ public class Loader {
     static ParamParser paramParser = new ParamParser();
     static FinalityClassLoader classLoader;
     static String[] args;
+
     @SuppressWarnings("deprecated")
     public static void loaderMain(String[] args) {
         FinalityLogger.init();
         FinalityLogger.info("Finality Framework Loader " + VERSION);
+        paramParser.gameFilePath = FileManager.INSTANCE.findGameFile();
         paramParser.parse(args);
-        FinalityLogger.info("OS Info: "+OSUtil.getSystem());
-        FinalityLogger.info("Java Info: "+OSUtil.getJavaInfo());
-        FinalityLogger.info("CPU ID: "+OSUtil.getProcessorIdentifier());
-        FinalityLogger.info("CPU NAME: "+OSUtil.getCpuName());
+        sendDeviceInfo();
         FileUtil.createPrivateDir();
         FlatIntelliJLaf.setup();
         SplashScreen.create();
@@ -72,17 +69,11 @@ public class Loader {
         classLoader = new FinalityClassLoader(new URL[0]);
         try (JarFile gameJar = new JarFile(new File(paramParser.gameFilePath))) {
             LAUNCHER_CLASS = gameJar.getManifest().getMainAttributes().getValue(Attributes.Name.MAIN_CLASS);
-            checkGameVersion(new File(paramParser.gameFilePath));
+            //checkGameVersion(new File(paramParser.gameFilePath));
 
             //Search local mods
-            for (File file : Objects.requireNonNull(FileManager.INSTANCE.getFile("mods").listFiles())) {
-                String[] strings = FileManager.INSTANCE.getModsOffFile();
-                List<String> list = Arrays.asList(strings);
-                if (file.isDirectory() && !list.contains("mods/" + file.getName() + "/")) {
-                    localMods.add("mods/" + file.getName() + "/");
-                }
-            }
-            for (String str : localMods) {
+            FileManager.INSTANCE.loadLocalMods();
+            for (String str : FileManager.INSTANCE.localMods) {
                 //Find plugins in local mods
                 File file = new File(str);
                 PluginManager.INSTANCE.findPlugins(file);
@@ -120,9 +111,9 @@ public class Loader {
                 }
                 File file2 = new File("./.finality/generated.jar");
                 if (file2.exists()) {
-                    file2.delete();
+                    boolean ignored = file2.delete();
                 }else {
-                    file2.createNewFile();
+                    boolean ignored =  file2.createNewFile();
                 }
                 ZipMerger.mergeZipFiles(files.toArray(new File[0]), new File("./.finality/generated.jar"));
             }
@@ -152,17 +143,17 @@ public class Loader {
         }
     }
 
-    public static int liteLaunch(){
-        return dropAndLaunch(FileManager.parentFile,args);
+    public static void liteLaunch(){
+        dropAndLaunch(FileManager.parentFile, args);
     }
     /**
      * drop loader itself into the game folder,and execute it again to launch the game.<br/>
      * Note:Steam will block our launch if we try to launch game from the folder which is different from the game folder.
+     *
      * @param gamePath a folder file of game folder.
-     * @return exit code
      * @author RedreamR
      */
-    static int dropAndLaunch(File gamePath,String[] args){
+    static void dropAndLaunch(File gamePath, String[] args){
         SplashScreen.destroy();
         String currentJarPath = Loader.class.getProtectionDomain().getCodeSource().getLocation().getPath();
         try {
@@ -176,11 +167,9 @@ public class Loader {
             Process process = processBuilder.start();
             int exitCode = process.waitFor();
             FinalityLogger.info("END OF EXECUTE,exit code:"+exitCode);
-            return exitCode;
         } catch (Exception e) {
             FinalityLogger.error("WTF",e);
         }
-        return 0;
     }
 
     public static void copyFile(File sourceFile, File targetFile) throws IOException {
@@ -194,15 +183,15 @@ public class Loader {
     }
 
     //Hijack SteamManager to load mods only when Steam API is disabled.
-    //But where is my Steam Workshop mods? To hell with those mods.
+    @SuppressWarnings("unchecked")
     private static void hijackSteamManager(){
         try {
             if (paramParser.disableSteamAPI) {
-                for (String str : localMods) {
+                for (String str : FileManager.INSTANCE.localMods) {
                     Field foldersAllListField = classLoader.loadClass(STEAM_MANAGER_CLASS).getField("modsFoldersAll");
-                    List<String> foldersAllList = (List) foldersAllListField.get(null);
+                    List<String> foldersAllList = (List<String>) foldersAllListField.get(null);
                     Field foldersListField = classLoader.loadClass(STEAM_MANAGER_CLASS).getField("modsFolders");
-                    List<String> foldersList = (List) foldersListField.get(null);
+                    List<String> foldersList = (List<String>) foldersListField.get(null);
                     Field foldersListSizeField = classLoader.loadClass(STEAM_MANAGER_CLASS).getField("modsFoldersSize");
                     int folderListSize = foldersListSizeField.getInt(null);
                     foldersAllList.add(str);
@@ -235,6 +224,13 @@ public class Loader {
         classLoader.addUrl2((new File(paramParser.gameFilePath)).toURI().toURL());
 
     }
+    private static void sendDeviceInfo(){
+        FinalityLogger.info("OS Info: "+OSUtil.getSystem());
+        FinalityLogger.info("Java Info: "+OSUtil.getJavaInfo());
+        FinalityLogger.info("CPU ID: "+OSUtil.getProcessorIdentifier());
+        FinalityLogger.info("CPU NAME: "+OSUtil.getCpuName());
+    }
+    @SuppressWarnings("unused")
     private static void checkGameVersion(File file) throws IOException, NoSuchAlgorithmException {
         VersionDetector.detector.loadVersions();
         byte[] hash = FileUtil.calculateSHA256(file);

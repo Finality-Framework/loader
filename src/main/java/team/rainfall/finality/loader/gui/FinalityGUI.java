@@ -15,9 +15,6 @@ public class FinalityGUI {
     public static FinalityGUI INSTANCE = null;
     private JFrame frame;
     private JTextArea logArea;
-    private JButton lightStartButton;
-    private JButton installButton;
-    private JButton exitButton;
 
     public static void main(String[] args) {
         EventQueue.invokeLater(() -> {
@@ -49,25 +46,17 @@ public class FinalityGUI {
         topPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 20, 10));
 
         // 轻量级启动按钮
-        lightStartButton = new JButton(Localization.bundle.getString("lightweight_launch"));
+        JButton lightStartButton = new JButton(Localization.bundle.getString("lightweight_launch"));
         lightStartButton.setPreferredSize(new Dimension(150, 40));
-        lightStartButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                new Thread(Loader::liteLaunch).start();
-            }
-        });
+        lightStartButton.addActionListener(e -> new Thread(Loader::liteLaunch).start());
         topPanel.add(lightStartButton);
 
         // 安装按钮
-        installButton = new JButton(Localization.bundle.getString("install"));
+        JButton installButton = new JButton(Localization.bundle.getString("install"));
         installButton.setPreferredSize(new Dimension(150, 40));
-        installButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                new Thread(Installer::install).start();
-                // 这里添加安装的实际逻辑
-            }
+        installButton.addActionListener(e -> {
+            new Thread(Installer::install).start();
+            // 这里添加安装的实际逻辑
         });
         topPanel.add(installButton);
 
@@ -93,14 +82,9 @@ public class FinalityGUI {
         JPanel bottomPanel = new JPanel();
         bottomPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 10));
 
-        exitButton = new JButton(Localization.bundle.getString("exit"));
+        JButton exitButton = new JButton(Localization.bundle.getString("exit"));
         exitButton.setPreferredSize(new Dimension(100, 30));
-        exitButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                System.exit(0);
-            }
-        });
+        exitButton.addActionListener(e -> System.exit(0));
         bottomPanel.add(exitButton);
 
         frame.getContentPane().add(bottomPanel, BorderLayout.SOUTH);

@@ -13,14 +13,28 @@ import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+
 
 public class FileManager {
+    //The folder of game core
     public static File parentFile = null;
     public static FileManager INSTANCE = new FileManager();
-
+    public ArrayList<String> localMods = new ArrayList<>();
     public FileManager() {
     }
-
+    public void loadLocalMods(){
+        for (File file : Objects.requireNonNull(FileManager.INSTANCE.getFile("mods").listFiles())) {
+            String[] strings = FileManager.INSTANCE.getModsOffFile();
+            List<String> list = Arrays.asList(strings);
+            if (file.isDirectory() && !list.contains("mods/" + file.getName() + "/")) {
+                localMods.add("mods/" + file.getName() + "/");
+            }
+        }
+    }
     public File getFile(String path) {
         return new File(path);
     }
@@ -84,10 +98,7 @@ public class FileManager {
      * @author RedreamR
      */
     public void findGameFileByVDF() {
-        if (Loader.paramParser.forceNoVDF) {
-            ErrorCode.showInternalError("Etude - 03");
-            throw new RuntimeException("Can not found game file");
-        }
+
         FinalityLogger.info(Localization.bundle.getString("find_game_core_by_vdf"));
         for (String libraryPath : VdfManager.getINSTANCE().getLibraryPaths()) {
             File gameFolder = new File(libraryPath, "steamapps/common/Age of History 3");
@@ -110,7 +121,9 @@ public class FileManager {
         if (file.exists()) return "aoh3.jar";
         file = new File("history2020.exe");
         if (file.exists()) return "history2020.exe";
-        findGameFileByVDF();
+        if (!Loader.paramParser.forceNoVDF) {
+            findGameFileByVDF();
+        }
         return "";
     }
 }

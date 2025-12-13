@@ -1,6 +1,7 @@
 package team.rainfall.finality.luminosity2;
 
 import org.objectweb.asm.ClassWriter;
+import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.AnnotationNode;
 import org.objectweb.asm.tree.ClassNode;
 import team.rainfall.finality.FinalityLogger;
@@ -8,9 +9,7 @@ import team.rainfall.finality.loader.FileManager;
 import team.rainfall.finality.loader.plugin.PluginData;
 import team.rainfall.finality.loader.gui.ErrorCode;
 import team.rainfall.finality.loader.util.FinalityClassLoader;
-import team.rainfall.finality.luminosity2.processor.InjectProcessor;
-import team.rainfall.finality.luminosity2.processor.MixinProcessor;
-import team.rainfall.finality.luminosity2.processor.NewFieldProcessor;
+import team.rainfall.finality.luminosity2.processor.*;
 import team.rainfall.finality.luminosity2.utils.AnnotationUtil;
 import team.rainfall.finality.luminosity2.utils.ClassInfo;
 import team.rainfall.finality.luminosity2.utils.JarUtil;
@@ -55,6 +54,7 @@ public class LuminosityEnvironment {
     public void run(){
         bind();
         runMixin();
+        runFieldOp();
         writeBytes();
     }
     public void runMixin(){
@@ -80,7 +80,24 @@ public class LuminosityEnvironment {
     }
 
     private void runFieldOp(){
-         
+        for(Map.Entry<String,List<ClassNode>> entry : classNodeMap.entrySet()){
+            try {
+                ClassNode targetNode = JarUtil.getClassFromJar(coreJar,entry.getKey());
+                for(ClassNode classNode  : entry.getValue()){
+                    SetterProcessor setterProcessor = new SetterProcessor(classNode,targetNode);
+                    setterProcessor.process();
+                    GetterProcessor getterProcessor = new GetterProcessor(classNode,targetNode);
+                    getterProcessor.process();
+                    ClassInfo classInfo = new ClassInfo();
+                    classInfo.name = Type.getObjectType(classNode.name).getClassName();
+                    classInfo.node = classNode;
+                    classInfos.add(classInfo);
+                }
+
+            } catch (FileNotFoundException e) {
+                FinalityLogger.error("Failed to find target class "+entry.getKey(),e);
+            }
+        }
     }
 
     public void bind(){

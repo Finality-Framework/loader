@@ -24,7 +24,6 @@ public class PluginManager {
         if (folder.isDirectory()) {
             File folder2 = new File(folder, "plugins");
             if (folder2.exists()) {
-                FinalityLogger.debug("folder2 exists");
                 File[] var3 = Objects.requireNonNull(folder2.listFiles());
                 for (File pluginFile : var3) {
                     if (pluginFile.getName().endsWith(".jar")) {

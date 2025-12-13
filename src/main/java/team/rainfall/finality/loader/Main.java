@@ -18,7 +18,6 @@ public class Main {
     public static final VersionType VERSION_TYPE = VersionType.RELEASE;
     public static final String STEAM_MANAGER_CLASS = "aoc.kingdoms.lukasz.jakowski.Steam.SteamManager";
     public static String LAUNCHER_CLASS = "aoc.kingdoms.lukasz.jakowski.desktop.DesktopLauncher";
-    public static ArrayList<String> localMods = new ArrayList<>();
     public static void main(String[] args) {
         try {
             FlatIntelliJLaf.setup();

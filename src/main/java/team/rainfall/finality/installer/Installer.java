@@ -66,7 +66,7 @@ public class Installer {
                         }
                         ignored = ignored.getSubNodeIgnoreCase("Steam");
                         ignored = ignored.getSubNodeIgnoreCase("Apps");
-                        ignored = ignored.getSubNodeIgnoreCase("2772750");
+                        ignored.getSubNodeIgnoreCase("2772750");
                     }catch (Exception e){
                         ErrorCode.showInternalError("Aria - 01");
                         FinalityLogger.error("Bad VDF", e);
