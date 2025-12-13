@@ -19,9 +19,11 @@ public class MixinProcessor implements Processor {
     ArrayList<String> methodNameList = new ArrayList<>();
     public void process(){
         FinalityLogger.debug("Mixin Process S "+sourceNode.name+" T "+targetNode.name);
+        ClassNode destNode = new ClassNode();
         removeShadows();
         Remapper remapper = new SimpleRemapper(sourceNode.name,targetNode.name);
-        sourceNode.accept(new ClassRemapper(sourceNode,remapper));
+        sourceNode.accept(new ClassRemapper(destNode,remapper));
+        sourceNode = destNode;
         findMethods();
         mixinMethods();
     }

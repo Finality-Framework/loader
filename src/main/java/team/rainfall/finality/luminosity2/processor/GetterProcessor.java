@@ -1,6 +1,7 @@
 package team.rainfall.finality.luminosity2.processor;
 
 import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.*;
 import team.rainfall.finality.FinalityLogger;
 import team.rainfall.finality.luminosity2.Processor;
@@ -64,7 +65,7 @@ public class GetterProcessor implements Processor {
             instructions.add(new VarInsnNode(Opcodes.ALOAD, 0));
         }
         instructions.add(new FieldInsnNode(isStatic ? Opcodes.GETSTATIC : Opcodes.GETFIELD, targetClassNode.name, fieldName, field.desc));
-        instructions.add(new InsnNode(getReturnOpcode(methodNode.desc.charAt(0))));
+        instructions.add(new InsnNode(getReturnOpcode(Type.getReturnType(methodNode.desc).getDescriptor().charAt(0))));
         methodNode.instructions.add(instructions);
     }
 

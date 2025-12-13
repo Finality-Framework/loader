@@ -30,41 +30,45 @@ public class LuminosityEnvironment {
     public ArrayList<ClassInfo> classInfos = new ArrayList<>();
     ArrayList<PluginData> pluginData = null;
     JarFile coreJar = null;
-    FinalityClassLoader classLoader = new FinalityClassLoader(new URL[]{},Thread.currentThread().getContextClassLoader());
-    HashMap<String, List<ClassNode>> classNodeMap = new HashMap<>();
-    public LuminosityEnvironment(ArrayList<PluginData> pluginData, File coreJar){
+    FinalityClassLoader classLoader = new FinalityClassLoader(new URL[]{}, Thread.currentThread().getContextClassLoader());
+    HashMap<String, List<ClassInfo>> classNodeMap = new HashMap<>();
+
+    public LuminosityEnvironment(ArrayList<PluginData> pluginData, File coreJar) {
         Luminosity_ClassWriter.classLoader = classLoader;
         try {
             this.coreJar = new JarFile(coreJar);
             classLoader.addUrl2(coreJar.toURI().toURL());
             this.pluginData = pluginData;
-            for(PluginData data : pluginData){
+            for (PluginData data : pluginData) {
                 classLoader.addUrl2(data.file.toURI().toURL());
             }
         } catch (IOException ignored) {
         }
     }
-    public void dispose(){
+
+    public void dispose() {
         pluginData = null;
         classInfos.clear();
         classInfos = null;
         classNodeMap.clear();
         classNodeMap = null;
     }
-    public void run(){
+
+    public void run() {
         bind();
         runMixin();
         runFieldOp();
         writeBytes();
     }
-    public void runMixin(){
-        for(Map.Entry<String,List<ClassNode>> entry : classNodeMap.entrySet()){
+
+    public void runMixin() {
+        for (Map.Entry<String, List<ClassInfo>> entry : classNodeMap.entrySet()) {
             try {
-                ClassNode targetNode = JarUtil.getClassFromJar(coreJar,entry.getKey());
-                for(ClassNode classNode  : entry.getValue()){
-                    MixinProcessor mixinProcessor = new MixinProcessor(classNode,targetNode);
+                ClassNode targetNode = JarUtil.getClassFromJar(coreJar, entry.getKey());
+                for (ClassInfo sourceInfo : entry.getValue()) {
+                    MixinProcessor mixinProcessor = new MixinProcessor(sourceInfo.node, targetNode);
                     mixinProcessor.process();
-                    NewFieldProcessor newFieldProcessor = new NewFieldProcessor(classNode,targetNode);
+                    NewFieldProcessor newFieldProcessor = new NewFieldProcessor(sourceInfo.node, targetNode);
                     newFieldProcessor.process();
                     InjectProcessor injectProcessor = new InjectProcessor(targetNode);
                     injectProcessor.process();
@@ -73,64 +77,75 @@ public class LuminosityEnvironment {
                 classInfo.name = entry.getKey();
                 classInfo.node = targetNode;
                 classInfos.add(classInfo);
+                FinalityLogger.info("Added into classInfos "+classInfo.name);
             } catch (FileNotFoundException e) {
-                FinalityLogger.error("Failed to find target class "+entry.getKey(),e);
+                FinalityLogger.error("Failed to find target class " + entry.getKey(), e);
             }
         }
     }
 
-    private void runFieldOp(){
-        for(Map.Entry<String,List<ClassNode>> entry : classNodeMap.entrySet()){
+    private void runFieldOp() {
+        for (Map.Entry<String, List<ClassInfo>> entry : classNodeMap.entrySet()) {
             try {
-                ClassNode targetNode = JarUtil.getClassFromJar(coreJar,entry.getKey());
-                for(ClassNode classNode  : entry.getValue()){
-                    SetterProcessor setterProcessor = new SetterProcessor(classNode,targetNode);
+                ClassNode targetNode = getTargetClass2(entry.getKey());
+                if (targetNode == null) {
+                    targetNode = JarUtil.getClassFromJar(coreJar, entry.getKey());
+                }
+                for (ClassInfo sourceInfo : entry.getValue()) {
+                    MapBackProcessor mapBackProcessor = new MapBackProcessor(sourceInfo.node,sourceInfo.name.replaceAll("\\.","/"));
+                    mapBackProcessor.process();
+                    sourceInfo.node = mapBackProcessor.destNode;
+                    SetterProcessor setterProcessor = new SetterProcessor(sourceInfo.node, targetNode);
                     setterProcessor.process();
-                    GetterProcessor getterProcessor = new GetterProcessor(classNode,targetNode);
+                    GetterProcessor getterProcessor = new GetterProcessor(sourceInfo.node, targetNode);
                     getterProcessor.process();
-                    ClassInfo classInfo = new ClassInfo();
-                    classInfo.name = Type.getObjectType(classNode.name).getClassName();
-                    classInfo.node = classNode;
-                    classInfos.add(classInfo);
+                    classInfos.add(sourceInfo);
                 }
 
             } catch (FileNotFoundException e) {
-                FinalityLogger.error("Failed to find target class "+entry.getKey(),e);
+                FinalityLogger.error("Failed to find target class " + entry.getKey(), e);
             }
         }
     }
 
-    public void bind(){
-        for(PluginData pluginData : pluginData){
-            if(pluginData.manifest.useLuminosity){
-                for(String tweakClassName : pluginData.manifest.tweakClasses){
+    public void bind() {
+        for (PluginData pluginData : pluginData) {
+            if (pluginData.manifest.useLuminosity) {
+                for (String tweakClassName : pluginData.manifest.tweakClasses) {
                     try {
-                        ClassNode node = JarUtil.getClassFromJar(pluginData.jarFile,tweakClassName);
-                        AnnotationNode annotationNode = AnnotationUtil.getAnnotation("Lteam/rainfall/finality/luminosity2/annotations/Mixin;",node);
+                        ClassNode node = JarUtil.getClassFromJar(pluginData.jarFile, tweakClassName);
+                        AnnotationNode annotationNode = AnnotationUtil.getAnnotation("Lteam/rainfall/finality/luminosity2/annotations/Mixin;", node);
                         if (annotationNode != null) {
-                            String targetClassName = (String) AnnotationUtil.getAnnotationValue("mixinClass",annotationNode);
-                            List<ClassNode> boundClasses = classNodeMap.get(targetClassName);
-                            if(boundClasses != null){
-                                boundClasses.add(node);
-                            }else {
-                                ArrayList<ClassNode> tempNodes = new ArrayList<>();
-                                tempNodes.add(node);
-                                classNodeMap.put(targetClassName,tempNodes);
+                            String targetClassName = (String) AnnotationUtil.getAnnotationValue("mixinClass", annotationNode);
+                            List<ClassInfo> boundClasses = classNodeMap.get(targetClassName);
+                            if (boundClasses != null) {
+                                boundClasses.add(new ClassInfo(node,Type.getObjectType(node.name).getClassName()));
+                            } else {
+                                ArrayList<ClassInfo> tempNodes = new ArrayList<>();
+                                tempNodes.add(new ClassInfo(node,Type.getObjectType(node.name).getClassName()));
+                                classNodeMap.put(targetClassName, tempNodes);
                             }
                         }
                     } catch (Exception e) {
-                        FinalityLogger.error("Exception while binding class "+tweakClassName,e);
+                        FinalityLogger.error("Exception while binding class " + tweakClassName, e);
                     }
                 }
             }
         }
     }
 
+    private ClassNode getTargetClass2(String key) {
+        for (ClassInfo classInfo : classInfos) {
+            if (classInfo.name.equals(key)) return classInfo.node;
+        }
+        return null;
+    }
+
     /**
      * Write modified classes to a jar file.<br/>
      * This can be used to avoid class initialization problems.
      */
-    public void writeBytes(){
+    public void writeBytes() {
         try {
             for (ClassInfo classInfo : classInfos) {
                 Luminosity_ClassWriter classWriter = new Luminosity_ClassWriter(ClassWriter.COMPUTE_FRAMES);
@@ -139,17 +154,16 @@ public class LuminosityEnvironment {
             }
             //Write and load classes from jar to avoid init problem
             CachePacker.packClassesIntoJar(classInfos, "./.finality/luminosity2.jar");
-        }catch (Exception e){
+        } catch (Exception e) {
             ErrorCode.showInternalError("Sonata - 02");
-            FinalityLogger.error("Exception while writing bytes",e);
+            FinalityLogger.error("Exception while writing bytes", e);
             System.exit(1);
         }
     }
 
 
-
     public void load(FinalityClassLoader classLoader) throws MalformedURLException {
-       classLoader.addUrl2(new File("./.finality/luminosity2.jar").toURI().toURL());
+        classLoader.addUrl2(new File("./.finality/luminosity2.jar").toURI().toURL());
     }
 
 }
