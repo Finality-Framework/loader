@@ -45,10 +45,13 @@ dependencies {
     testRuntimeOnly 'org.apache.logging.log4j:log4j-core:2.20.0'
     testRuntimeOnly 'org.apache.logging.log4j:log4j-api:2.20.0'
 }
+
 test{
     useJUnitPlatform()
 }
+
 shadowJar {
+    archiveClassifier = ''
     manifest {
         attributes 'Main-Class': 'team.rainfall.finality.loader.Main'
     }
@@ -63,6 +66,13 @@ compileTestJava {
 }
 
 java{
+    withSourcesJar()
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
+}
+// 2. 创建一个任务，依赖于所有你想要生成的 JAR
+task release {
+    description = 'Create a release set of Jars.'
+    group = 'build'
+    dependsOn clean, shadowJar, sourcesJar
 }
