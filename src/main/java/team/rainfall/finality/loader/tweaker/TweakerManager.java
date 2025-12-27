@@ -1,7 +1,6 @@
 package team.rainfall.finality.loader.tweaker;
 
 import team.rainfall.finality.loader.plugin.PluginData;
-import team.rainfall.finality.loader.plugin.TweakManifest;
 import team.rainfall.finality.loader.util.FinalityClassLoader;
 
 

@@ -49,7 +49,9 @@ public class FinalityLogger {
 
         }
     }
-
+    public static void localizeError(String message){
+        error(String.format(Localization.bundle.getString(message)));
+    }
     public static void localizeInfo(String message){
         info(String.format(Localization.bundle.getString(message)));
     }
