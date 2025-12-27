@@ -6,6 +6,8 @@
 package team.rainfall.finality.loader;
 
 import team.rainfall.finality.FinalityLogger;
+import team.rainfall.finality.loader.game.Product;
+import team.rainfall.finality.loader.game.ProductDetector;
 import team.rainfall.finality.loader.gui.ErrorCode;
 import team.rainfall.finality.loader.util.Localization;
 
@@ -27,6 +29,12 @@ public class FileManager {
     public FileManager() {
     }
     public void loadLocalMods(){
+        if (!FileManager.INSTANCE.getFile("mods").exists()) {
+            if(Loader.product != Product.AoH2) {
+                FinalityLogger.warn(Localization.bundle.getString("local_mods_are_missing"));
+            }
+            return;
+        }
         for (File file : Objects.requireNonNull(FileManager.INSTANCE.getFile("mods").listFiles())) {
             String[] strings = FileManager.INSTANCE.getModsOffFile();
             List<String> list = Arrays.asList(strings);
@@ -113,7 +121,16 @@ public class FileManager {
     }
 
     public String findGameFile() {
-        File file = new File("aoh3.exe");
+        File appID_File = new File("steam_appid.txt");
+        Product product = ProductDetector.detectBySteamAppID(appID_File);
+        File file;
+        if(product == Product.AoH2){
+            file = new File("AoC2.exe");
+            if(file.exists()) return "AoC2.exe";
+            return "";
+        }
+
+        file = new File("aoh3.exe");
         if (file.exists()) return "aoh3.exe";
         file = new File("game.jar");
         if (file.exists()) return "game.jar";

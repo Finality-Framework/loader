@@ -83,7 +83,14 @@ public class FileProcessor {
         File config = new File("./generated.vdf");
         VDFNode node2 = parser.parse(Objects.requireNonNull(FileUtil.readString_UTF8(config)));
         try {
-            String string = node2.getSubNode("UserLocalConfigStore").getSubNode("Software").getSubNode("Valve").getSubNode("Steam").getSubNodeIgnoreCase("Apps").getSubNode("2772750").getString("LaunchOptions");
+            String string = node2.
+                    getSubNodeIgnoreCase("UserLocalConfigStore").
+                    getSubNodeIgnoreCase("Software").
+                    getSubNodeIgnoreCase("Valve").
+                    getSubNodeIgnoreCase("Steam").
+                    getSubNodeIgnoreCase("Apps").
+                    getSubNodeIgnoreCase("2772750").
+                    getString("LaunchOptions");
         }catch (Exception e){
             ErrorCode.showInternalError("Aria - 04");
             FinalityLogger.error("Failed to validate generated vdf file,to keep your steam client safe,installer will exit!", e);
