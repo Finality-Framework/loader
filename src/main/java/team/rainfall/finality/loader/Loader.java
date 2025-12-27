@@ -3,6 +3,8 @@ package team.rainfall.finality.loader;
 import com.formdev.flatlaf.FlatIntelliJLaf;
 import team.rainfall.finality.FinalityLogger;
 import team.rainfall.finality.installer.Installer;
+import team.rainfall.finality.loader.game.Product;
+import team.rainfall.finality.loader.game.ProductDetector;
 import team.rainfall.finality.loader.game.VersionDetector;
 import team.rainfall.finality.loader.gui.ErrorCode;
 import team.rainfall.finality.loader.gui.FinalityGUI;
@@ -36,13 +38,26 @@ public class Loader {
     static ParamParser paramParser = new ParamParser();
     static FinalityClassLoader classLoader;
     static String[] args;
-
+    static Product product = Product.AoH3;
     @SuppressWarnings("deprecated")
     public static void loaderMain(String[] args) {
         FinalityLogger.init();
         FinalityLogger.info("Finality Framework Loader " + VERSION);
-        paramParser.gameFilePath = FileManager.INSTANCE.findGameFile();
+
         paramParser.parse(args);
+        if(paramParser.gameFilePath == null){
+            paramParser.gameFilePath = FileManager.INSTANCE.findGameFile();
+        }
+        try {
+            JarFile jarFile = new JarFile(paramParser.gameFilePath);
+            product = ProductDetector.detect(jarFile);
+            jarFile.close();
+        } catch (IOException e) {
+            //throw new RuntimeException(e);
+        }
+        if(product == Product.AoH2){
+            FinalityLogger.warn(Localization.bundle.getString("experimental_aoh2_support"));
+        }
         sendDeviceInfo();
         FileUtil.createPrivateDir();
         FlatIntelliJLaf.setup();
@@ -79,7 +94,7 @@ public class Loader {
                 PluginManager.INSTANCE.findPlugins(file);
             }
 
-            if (!paramParser.disableSteamAPI) {
+            if (!paramParser.disableSteamAPI && product != Product.AoH2) {
                 for (File file : Objects.requireNonNull(FileManager.INSTANCE.getSteamWSFolder().listFiles())) {
                     boolean shouldBreak = false;
                     for (String s : FileManager.INSTANCE.getModsOffFile()) {
@@ -95,6 +110,10 @@ public class Loader {
                         PluginManager.INSTANCE.findPlugins(file);
                     }
                 }
+            }
+            if(PluginManager.INSTANCE.search("team.rainfall.finality.api") == null){
+                FinalityLogger.localizeError("finality_api_not_found");
+                FinalityLogger.localizeError("subscribe_finality_api");
             }
             //Luminosity2
             LuminosityEnvironment environment = new LuminosityEnvironment(PluginManager.INSTANCE.pluginDataList, new File(paramParser.gameFilePath));
@@ -186,7 +205,7 @@ public class Loader {
     @SuppressWarnings("unchecked")
     private static void hijackSteamManager(){
         try {
-            if (paramParser.disableSteamAPI) {
+            if (paramParser.disableSteamAPI && product != Product.AoH2) {
                 for (String str : FileManager.INSTANCE.localMods) {
                     Field foldersAllListField = classLoader.loadClass(STEAM_MANAGER_CLASS).getField("modsFoldersAll");
                     List<String> foldersAllList = (List<String>) foldersAllListField.get(null);

@@ -20,6 +20,14 @@ public class PluginManager {
     public ArrayList<PluginData> pluginDataList = new ArrayList<>();
     public PluginManager() {
     }
+    public PluginData search(String id){
+        for (PluginData pluginData : pluginDataList) {
+            if(pluginData.manifest.id.equals(id)){
+                return pluginData;
+            }
+        }
+        return null;
+    }
     public void findPlugins(File folder) {
         if (folder.isDirectory()) {
             File folder2 = new File(folder, "plugins");
@@ -34,7 +42,7 @@ public class PluginManager {
                             Iterator<PluginData> pluginDataIterator = pluginDataList.iterator();
                             while (pluginDataIterator.hasNext()){
                                 PluginData pluginData = pluginDataIterator.next();
-                                if(pluginData.manifest.id.equals(data.manifest.id) && Semver.parse(data.manifest.version).isGreaterThan(pluginData.manifest.version)){
+                                if(pluginData.manifest.id.equals(data.manifest.id) && Objects.requireNonNull(Semver.parse(data.manifest.version)).isGreaterThan(pluginData.manifest.version)){
                                     FinalityLogger.info(String.format(Localization.bundle.getString("duplicate_plugin"), pluginData.manifest.id,data.manifest.version));
                                     pluginDataIterator.remove();
                                     break;

@@ -10,7 +10,6 @@ public class ParamParser {
     public String gameFilePath = null;
     public boolean disableSteamAPI = false;
     public void parse(String[] args) {
-
         for (int i = 0; i < args.length; i++) {
             if(args[i].equals("-forceNoVDF")){
                 forceNoVDF = true;
@@ -30,6 +29,7 @@ public class ParamParser {
             if (args[i].equals("-gamePath")) {
                 if(args.length <= i + 1){
                     FinalityLogger.warn("Invalid game path");
+                    this.gameFilePath = FileManager.INSTANCE.findGameFile();
                     break;
                 }
                 gameFilePath = args[i+1];
@@ -59,5 +59,6 @@ public class ParamParser {
                 }
             }
         }
+
     }
 }
