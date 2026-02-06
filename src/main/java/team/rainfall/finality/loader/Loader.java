@@ -58,13 +58,14 @@ public class Loader {
         if(product == Product.AoH2){
             FinalityLogger.warn(Localization.bundle.getString("experimental_aoh2_support"));
         }
-        sendDeviceInfo();
+        printDeviceInfo();
         FileUtil.createPrivateDir();
         FlatIntelliJLaf.setup();
         SplashScreen.create();
         checkUpdate();
         if(paramParser.mode == LaunchMode.INSTALL){
             Installer.install();
+            return;
         }
 
         if(!paramParser.isReboot) {
@@ -124,10 +125,10 @@ public class Loader {
             if (paramParser.mode == LaunchMode.ONLY_GEN || paramParser.mode == LaunchMode.LAUNCH_AND_GEN) {
                 File l2File = new File("./.finality/luminosity2.jar");
                 ArrayList<File> files = new ArrayList<>();
-                files.add(l2File);
                 for (PluginData pluginData : PluginManager.INSTANCE.pluginDataList) {
                     files.add(pluginData.file);
                 }
+                files.add(l2File);
                 File file2 = new File("./.finality/generated.jar");
                 if (file2.exists()) {
                     boolean ignored = file2.delete();
@@ -243,7 +244,7 @@ public class Loader {
         classLoader.addUrl2((new File(paramParser.gameFilePath)).toURI().toURL());
 
     }
-    private static void sendDeviceInfo(){
+    private static void printDeviceInfo(){
         FinalityLogger.info("OS Info: "+OSUtil.getSystem());
         FinalityLogger.info("Java Info: "+OSUtil.getJavaInfo());
         FinalityLogger.info("CPU ID: "+OSUtil.getProcessorIdentifier());

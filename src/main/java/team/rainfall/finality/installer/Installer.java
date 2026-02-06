@@ -66,11 +66,14 @@ public class Installer {
                         }
                         ignored = ignored.getSubNodeIgnoreCase("Steam");
                         ignored = ignored.getSubNodeIgnoreCase("Apps");
-                        ignored.getSubNodeIgnoreCase("2772750");
+                        if(ignored.getSubNodeIgnoreCase("2772750") == null){
+                            FinalityLogger.error("2772750(AoH3) IS NOT FOUND in Steam config file,pls use lite-weight launch instead!");
+                            return;
+                        }
                     }catch (Exception e){
                         ErrorCode.showInternalError("Aria - 01");
                         FinalityLogger.error("Bad VDF", e);
-                        System.exit(1);
+                        return;
                     }
                     try {
                         shouldRestartSteam = detectSteam();
@@ -79,7 +82,7 @@ public class Installer {
                     } catch (IOException e) {
                         ErrorCode.showInternalError("Aria - 02");
                         FinalityLogger.error("Failed to write out", e);
-                        System.exit(1);
+                        return;
                     }
                 }
             }
@@ -94,7 +97,6 @@ public class Installer {
             }
         } else {
             FinalityLogger.error(String.format(Localization.bundle.getString("bad_vdf"), "loginusers.vdf"));
-            System.exit(1);
         }
 
     }
