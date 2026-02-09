@@ -22,8 +22,6 @@ public class PluginManifest {
     public String version;
     public String id;
     public String name;
-    public Boolean hasTweaker;
-    public String tweaker;
     public Boolean useLuminosity = false;
     public ArrayList<String> tweakClasses = new ArrayList<>();
     public ArrayList<String> requirements = new ArrayList<>();
