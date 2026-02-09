@@ -1,8 +1,3 @@
-//
-// Source code recreated from a .class file by IntelliJ IDEA
-// (powered by FernFlower decompiler)
-//
-
 package team.rainfall.finality.loader;
 
 import team.rainfall.finality.FinalityLogger;
