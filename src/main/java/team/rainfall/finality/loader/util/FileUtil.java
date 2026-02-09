@@ -27,33 +27,17 @@ public class FileUtil {
     public static void deleteFileIfThreeDaysPast(File file) {
         try {
             if (file.exists()) {
-                // 获取文件的基本属性
                 BasicFileAttributes attrs = Files.readAttributes(file.toPath(), BasicFileAttributes.class);
-                // 获取文件的创建时间
                 Instant creationTime = attrs.creationTime().toInstant();
-                // 获取当前时间
                 Instant now = Instant.now();
-                // 计算创建时间与当前时间的差异
                 long daysBetween = ChronoUnit.DAYS.between(creationTime, now);
-
-                // 如果差异大于或等于1天，删除文件
-                if (daysBetween >= 1) {
+                if (daysBetween >= 2) {
                     boolean ignored = file.delete();
                 }
             }
         } catch (Exception ignored) {
         }
     }
-
-    public static String readString(File file) {
-        try {
-            return new String(Files.readAllBytes(file.toPath()));
-        } catch (IOException e) {
-            FinalityLogger.error("Failed while readString(File)", e);
-            return null;
-        }
-    }
-
     public static String readString_UTF8(File file) {
         try {
             return new String(Files.readAllBytes(file.toPath()), StandardCharsets.UTF_8);
@@ -63,19 +47,13 @@ public class FileUtil {
         }
     }
 
-    public static void clearAndWriteFile(File file, String content) throws IOException {
-        try (OutputStreamWriter writer = new OutputStreamWriter(new FileOutputStream(file, false), StandardCharsets.UTF_8)) {
-            writer.write(content);
-        }
-    }
-
     public static byte[] calculateSHA256(File file) throws IOException, NoSuchAlgorithmException {
         MessageDigest digest = MessageDigest.getInstance("SHA-256");
         try (FileInputStream fis = new FileInputStream(file);
              DigestInputStream dis = new DigestInputStream(fis, digest)) {
             byte[] buffer = new byte[8192]; // 8 KB buffer
             while (dis.read(buffer) != -1) {
-                // just white for read
+                // just wait for read
             }
             return digest.digest();
         }
