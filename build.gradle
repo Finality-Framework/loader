@@ -30,6 +30,7 @@ dependencies {
     implementation group:'org.ow2.asm',name:'asm-tree',version:'9.7'
     implementation group:'org.ow2.asm',name:'asm-analysis',version:'9.7'
     implementation 'net.java.dev.jna:jna-platform:5.13.0'
+    implementation 'commons-cli:commons-cli:1.9.0'
 }
 
 shadowJar {

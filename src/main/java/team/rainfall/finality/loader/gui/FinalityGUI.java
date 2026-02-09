@@ -95,4 +95,10 @@ public class FinalityGUI {
         logArea.append(message + "\n");
         logArea.setCaretPosition(logArea.getDocument().getLength());
     }
+    public static void destroy(){
+        if(INSTANCE != null) {
+            INSTANCE.dispose();
+            INSTANCE = null;
+        }
+    }
 }

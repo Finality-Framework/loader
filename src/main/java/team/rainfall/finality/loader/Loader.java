@@ -65,7 +65,7 @@ public class Loader {
         checkUpdate();
         if(paramParser.mode == LaunchMode.INSTALL){
             Installer.install();
-            return;
+            safeExit();
         }
 
         if(!paramParser.isReboot) {
@@ -265,6 +265,11 @@ public class Loader {
         }else {
             FinalityLogger.warn(Localization.bundle.getString("unknown_version"));
         }
+    }
+    public static void safeExit(){
+        SplashScreen.destroy();
+        FinalityGUI.destroy();
+        System.exit(0);
     }
 
 }
