@@ -97,7 +97,7 @@ public class FinalityGUI {
     }
     public static void destroy(){
         if(INSTANCE != null) {
-            INSTANCE.dispose();
+            INSTANCE.frame.dispose();
             INSTANCE = null;
         }
     }

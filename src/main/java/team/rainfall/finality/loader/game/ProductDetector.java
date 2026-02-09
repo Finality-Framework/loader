@@ -18,7 +18,8 @@ public class ProductDetector {
             return null;
         }
         try (DataInputStream dis = new DataInputStream(Files.newInputStream(file.toPath()))){
-            String appIDStr = dis.readUTF().trim();
+            String appIDStr = dis.readLine().trim();
+            appIDStr = appIDStr.replaceAll("\n","");
             FinalityLogger.info("Detected Steam APP ID:"+appIDStr);
             switch (appIDStr){
                 case "2772750":
@@ -34,6 +35,7 @@ public class ProductDetector {
 
 
         } catch (IOException e) {
+            FinalityLogger.error("Error while detecting by Steam App ID",e);
             return null;
         }
     }

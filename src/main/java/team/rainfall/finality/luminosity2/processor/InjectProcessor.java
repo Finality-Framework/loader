@@ -6,6 +6,7 @@ import team.rainfall.finality.FinalityLogger;
 import team.rainfall.finality.luminosity2.Processor;
 import team.rainfall.finality.luminosity2.utils.AnnotationUtil;
 import team.rainfall.finality.luminosity2.utils.InjectPosition;
+import team.rainfall.finality.luminosity2.utils.MethodUtil;
 import team.rainfall.finality.luminosity2.utils.NumberUtil;
 
 import java.util.ArrayList;
@@ -23,23 +24,48 @@ public class InjectProcessor implements Processor {
 
     @Override
     public void process() {
+        if (classNode == null) {
+            FinalityLogger.warn("InjectProcessor: classNode is null");
+            return;
+        }
+        if (classNode.methods == null) {
+            return;
+        }
+
         for (MethodNode method : classNode.methods) {
+            if (method == null) continue;
+
             if (AnnotationUtil.annotationExists("Lteam/rainfall/finality/luminosity2/annotations/Inject;", method)) {
-                FinalityLogger.debug("INJECT FROM "+classNode.name+" "+method.name);
+                FinalityLogger.debug("INJECT FROM " + classNode.name + " " + method.name);
                 AnnotationNode injectAnnotation = AnnotationUtil.getAnnotation("Lteam/rainfall/finality/luminosity2/annotations/Inject;", method);
                 if (injectAnnotation != null) {
                     String targetMethodName = (String) AnnotationUtil.getAnnotationValue("methodName", injectAnnotation);
-                    InjectPosition position = (InjectPosition) AnnotationUtil.getAnnotationValue("position", injectAnnotation);
+                    String[] positionRaw = (String[])AnnotationUtil.getAnnotationValue("position", injectAnnotation);
+                    InjectPosition position = InjectPosition.HEAD;
+                    if (positionRaw != null && positionRaw.length > 1) {
+                        position = InjectPosition.valueOf(positionRaw[1]);
+                    }
                     String locator = (String) AnnotationUtil.getAnnotationValue("locator", injectAnnotation);
-                    boolean returnWithValue = true;//(Boolean) AnnotationUtil.getAnnotationValue("returnWithValue", injectAnnotation);
+                    Boolean returnWithValue = (Boolean) AnnotationUtil.getAnnotationValue("returnWithValue", injectAnnotation);
 
-                    if (position == null) {
-                        position = InjectPosition.HEAD; // 默认值
+                    if (targetMethodName == null || targetMethodName.isEmpty()) {
+                        FinalityLogger.warn("InjectProcessor: targetMethodName is empty for method " + method.name);
+                        continue;
                     }
 
+                    if (position == null) {
+                        position = InjectPosition.HEAD;
+                    }
+
+                    if (returnWithValue == null) {
+                        returnWithValue = false;
+                    }
+
+                    boolean targetFound = false;
                     for (MethodNode targetMethod : classNode.methods) {
-                        if (targetMethod.name.equals(targetMethodName)) {
-                            FinalityLogger.debug("L2 Find Inject "+targetMethodName+" at position "+position);
+                        if (targetMethod != null && targetMethod.name.equals(targetMethodName)) {
+                            targetFound = true;
+                            FinalityLogger.debug("L2 Find Inject " + targetMethodName + " at position " + position);
 
                             switch (position) {
                                 case HEAD:
@@ -54,8 +80,15 @@ public class InjectProcessor implements Processor {
                                 case AFTER_INVOKE:
                                     injectAfterInvoke(method, targetMethod, locator, returnWithValue);
                                     break;
+                                default:
+                                    FinalityLogger.warn("InjectProcessor: unknown position " + position + " for method " + method.name);
+                                    break;
                             }
                         }
+                    }
+
+                    if (!targetFound) {
+                        FinalityLogger.warn("InjectProcessor: target method " + targetMethodName + " not found for injection in class " + classNode.name);
                     }
                 }
             }
@@ -63,74 +96,88 @@ public class InjectProcessor implements Processor {
     }
 
     void injectHead(MethodNode sourceNode, MethodNode targetNode, boolean returnWithValue) {
-        InsnList insnList = new InsnList();
-        insnList.add(new TypeInsnNode(NEW, "team/rainfall/finality/luminosity2/CallbackInfo"));
-        insnList.add(new InsnNode(DUP));
-        insnList.add(new MethodInsnNode(INVOKESPECIAL, "team/rainfall/finality/luminosity2/CallbackInfo", "<init>", "()V", false));
-        insnList.add(new VarInsnNode(ASTORE, targetNode.maxLocals + 1));
-        if (!NumberUtil.isBitSet(sourceNode.access, 3)) {
-            insnList.add(new VarInsnNode(ALOAD, 0));
-        }
-        insnList.add(getLocalVarIndexOfParams(targetNode));
-        insnList.add(new VarInsnNode(ALOAD, targetNode.maxLocals + 1));
-        if (NumberUtil.isBitSet(sourceNode.access, 3)) {
-            insnList.add(new MethodInsnNode(INVOKESTATIC, classNode.name, sourceNode.name, sourceNode.desc, false));
-        }else {
-            insnList.add(new MethodInsnNode(INVOKEVIRTUAL, classNode.name, sourceNode.name, sourceNode.desc, false));
+        if (targetNode.instructions == null) {
+            FinalityLogger.warn("InjectProcessor: target method " + targetNode.name + " has no instructions");
+            return;
         }
 
-        targetNode.instructions.insert(insnList);
+        InsnList callback = createCallbackInsnList(sourceNode, targetNode, returnWithValue);
+        targetNode.instructions.insert(callback);
     }
 
     void injectReturn(MethodNode sourceNode, MethodNode targetNode, boolean returnWithValue) {
-        // 遍历目标方法的所有指令，找到所有返回指令
+        if (targetNode.instructions == null) {
+            FinalityLogger.warn("InjectProcessor: target method " + targetNode.name + " has no instructions");
+            return;
+        }
+
+        boolean returnFound = false;
         for (AbstractInsnNode insn : targetNode.instructions) {
-            // 检查是否是返回指令
             if (isReturnInstruction(insn)) {
-                // 在返回指令前插入回调
+                returnFound = true;
                 InsnList callback = createCallbackInsnList(sourceNode, targetNode, returnWithValue);
                 targetNode.instructions.insertBefore(insn, callback);
             }
         }
+
+        if (!returnFound) {
+            FinalityLogger.warn("InjectProcessor: no return instruction found in method " + targetNode.name);
+        }
     }
 
     void injectBeforeInvoke(MethodNode sourceNode, MethodNode targetNode, String locator, boolean returnWithValue) {
+        if (targetNode.instructions == null) {
+            FinalityLogger.warn("InjectProcessor: target method " + targetNode.name + " has no instructions");
+            return;
+        }
+
         if (locator == null || locator.isEmpty()) {
             FinalityLogger.warn("Locator is empty for BEFORE_INVOKE injection in method " + sourceNode.name);
             return;
         }
 
-        // 遍历目标方法的所有指令，找到指定的方法调用
+        boolean invokeFound = false;
         for (AbstractInsnNode insn : targetNode.instructions) {
             if (insn instanceof MethodInsnNode) {
                 MethodInsnNode methodInsn = (MethodInsnNode) insn;
-                // 检查方法名是否匹配locator
                 if (methodInsn.name.equals(locator)) {
-                    // 在方法调用前插入回调
+                    invokeFound = true;
                     InsnList callback = createCallbackInsnList(sourceNode, targetNode, returnWithValue);
                     targetNode.instructions.insertBefore(insn, callback);
                 }
             }
         }
+
+        if (!invokeFound) {
+            FinalityLogger.warn("InjectProcessor: no invoke instruction with locator '" + locator + "' found in method " + targetNode.name);
+        }
     }
 
     void injectAfterInvoke(MethodNode sourceNode, MethodNode targetNode, String locator, boolean returnWithValue) {
+        if (targetNode.instructions == null) {
+            FinalityLogger.warn("InjectProcessor: target method " + targetNode.name + " has no instructions");
+            return;
+        }
+
         if (locator == null || locator.isEmpty()) {
             FinalityLogger.warn("Locator is empty for AFTER_INVOKE injection in method " + sourceNode.name);
             return;
         }
 
-        // 遍历目标方法的所有指令，找到指定的方法调用
+        boolean invokeFound = false;
         for (AbstractInsnNode insn : targetNode.instructions) {
             if (insn instanceof MethodInsnNode) {
                 MethodInsnNode methodInsn = (MethodInsnNode) insn;
-                // 检查方法名是否匹配locator
                 if (methodInsn.name.equals(locator)) {
-                    // 在方法调用后插入回调
+                    invokeFound = true;
                     InsnList callback = createCallbackInsnList(sourceNode, targetNode, returnWithValue);
                     targetNode.instructions.insert(insn, callback);
                 }
             }
+        }
+
+        if (!invokeFound) {
+            FinalityLogger.warn("InjectProcessor: no invoke instruction with locator '" + locator + "' found in method " + targetNode.name);
         }
     }
 
@@ -141,20 +188,29 @@ public class InjectProcessor implements Processor {
         insnList.add(new MethodInsnNode(INVOKESPECIAL, "team/rainfall/finality/luminosity2/CallbackInfo", "<init>", "()V", false));
         insnList.add(new VarInsnNode(ASTORE, targetNode.maxLocals + 1));
 
-        if (!NumberUtil.isBitSet(sourceNode.access, 3)) {
+        if (!MethodUtil.isStatic(sourceNode)) {
             insnList.add(new VarInsnNode(ALOAD, 0));
         }
 
         insnList.add(getLocalVarIndexOfParams(targetNode));
         insnList.add(new VarInsnNode(ALOAD, targetNode.maxLocals + 1));
 
-        if (NumberUtil.isBitSet(sourceNode.access, 3)) {
+        if (MethodUtil.isStatic(sourceNode)) {
             insnList.add(new MethodInsnNode(INVOKESTATIC, classNode.name, sourceNode.name, sourceNode.desc, false));
         } else {
             insnList.add(new MethodInsnNode(INVOKEVIRTUAL, classNode.name, sourceNode.name, sourceNode.desc, false));
         }
 
         if (returnWithValue) {
+            // 检查 isCancelled 标志，只有当 isCancelled 为 true 时才劫持返回
+            insnList.add(new VarInsnNode(ALOAD, targetNode.maxLocals + 1));
+            insnList.add(new FieldInsnNode(GETFIELD, "team/rainfall/finality/luminosity2/CallbackInfo", "isCancelled", "Z"));
+            
+            // 创建标签用于条件跳转
+            LabelNode continueLabel = new LabelNode();
+            insnList.add(new JumpInsnNode(IFEQ, continueLabel)); // if isCancelled == false, jump to continue
+            
+            // isCancelled == true, 执行返回逻辑
             insnList.add(new VarInsnNode(ALOAD, targetNode.maxLocals + 1));
             insnList.add(new FieldInsnNode(GETFIELD, "team/rainfall/finality/luminosity2/CallbackInfo", "returnValue", "Ljava/lang/Object;"));
 
@@ -194,12 +250,16 @@ public class InjectProcessor implements Processor {
                     insnList.add(new InsnNode(ARETURN));
                     break;
             }
+            
+            // isCancelled == false, 继续执行原方法
+            insnList.add(continueLabel);
         }
 
         return insnList;
     }
 
     private boolean isReturnInstruction(AbstractInsnNode insn) {
+        if (insn == null) return false;
         int opcode = insn.getOpcode();
         return opcode >= IRETURN && opcode <= RETURN;
     }
@@ -212,37 +272,34 @@ public class InjectProcessor implements Processor {
         ArrayList<Integer> indexes = new ArrayList<>();
         InsnList insnList = new InsnList();
         Type[] types = Type.getMethodType(node.desc).getArgumentTypes();
-        //System.out.println(types.length);
         for (int i = 0; i < types.length; i++) {
-            //System.out.println(types[i].getDescriptor());
             indexes.add(i);
         }
         for (Integer integer : indexes) {
             switch (types[integer].getDescriptor()) {
                 case "I":
                 case "Z":
-                    insnList.add(new VarInsnNode(ILOAD, integer+flag));
+                    insnList.add(new VarInsnNode(ILOAD, integer + flag));
                     break;
                 case "J":
-                    insnList.add(new VarInsnNode(LLOAD, integer+flag));
+                    insnList.add(new VarInsnNode(LLOAD, integer + flag));
                     break;
                 case "F":
-                    insnList.add(new VarInsnNode(FLOAD, integer+flag));
+                    insnList.add(new VarInsnNode(FLOAD, integer + flag));
                     break;
                 case "D":
-                    insnList.add(new VarInsnNode(DLOAD, integer+flag));
+                    insnList.add(new VarInsnNode(DLOAD, integer + flag));
                     break;
                 case "L":
                 default:
-                    insnList.add(new VarInsnNode(ALOAD, integer+flag));
+                    insnList.add(new VarInsnNode(ALOAD, integer + flag));
                     break;
-
             }
         }
         return insnList;
     }
 
-    public InjectProcessor(ClassNode classNode){
+    public InjectProcessor(ClassNode classNode) {
         this.classNode = classNode;
     }
 }

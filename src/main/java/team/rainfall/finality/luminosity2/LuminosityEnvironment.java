@@ -77,7 +77,6 @@ public class LuminosityEnvironment {
                 classInfo.name = entry.getKey();
                 classInfo.node = targetNode;
                 classInfos.add(classInfo);
-                FinalityLogger.info("Added into classInfos "+classInfo.name);
             } catch (FileNotFoundException e) {
                 FinalityLogger.error("Failed to find target class " + entry.getKey(), e);
             }
