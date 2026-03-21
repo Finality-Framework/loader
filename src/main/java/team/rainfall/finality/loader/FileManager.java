@@ -15,6 +15,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
+import static team.rainfall.finality.loader.Loader.product;
+
 
 public class FileManager {
     //The folder of game core
@@ -25,7 +27,7 @@ public class FileManager {
     }
     public void loadLocalMods(){
         if (!FileManager.INSTANCE.getFile("mods").exists()) {
-            if(Loader.product != Product.AoH2) {
+            if(product != Product.AoH2) {
                 FinalityLogger.warn(Localization.bundle.getString("local_mods_are_missing"));
             }
             return;
@@ -116,8 +118,8 @@ public class FileManager {
     }
 
     public String findGameFile() {
-        File appID_File = new File("steam_appid.txt");
-        Product product = ProductDetector.detectBySteamAppID(appID_File);
+
+
         File file;
         if(product == Product.AoH2){
             file = new File("AoC2.exe");

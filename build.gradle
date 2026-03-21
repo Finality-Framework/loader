@@ -4,7 +4,7 @@ plugins {
 }
 
 group = 'team.rainfall.finality'
-version = '1.4.5'
+version = '1.5.1'
 
 repositories {
     maven {
@@ -53,7 +53,7 @@ java{
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
 }
-// 2. 创建一个任务，依赖于所有你想要生成的 JAR
+
 task release {
     description = 'Create a release set of Jars.'
     group = 'build'

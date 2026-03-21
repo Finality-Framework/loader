@@ -38,6 +38,7 @@ public class Loader {
     static ParamParser paramParser = new ParamParser();
     static FinalityClassLoader classLoader;
     static String[] args;
+    static ProductDetector productDetector = null;
     static Product product = Product.AoH3;
     @SuppressWarnings("deprecated")
     public static void loaderMain(String[] args) {
@@ -50,10 +51,15 @@ public class Loader {
         }
         try {
             JarFile jarFile = new JarFile(paramParser.gameFilePath);
-            product = ProductDetector.detect(jarFile);
+            File appID_File = new File("steam_appid.txt");
+            productDetector = new ProductDetector(jarFile,appID_File);
+            product = productDetector.detect();
             jarFile.close();
         } catch (IOException e) {
             //throw new RuntimeException(e);
+        }
+        if(paramParser.product != null){
+            product = paramParser.product;
         }
         if(product == Product.AoH2){
             FinalityLogger.warn(Localization.bundle.getString("experimental_aoh2_support"));

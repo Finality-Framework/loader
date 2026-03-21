@@ -2,6 +2,7 @@ package team.rainfall.finality.loader;
 
 import org.apache.commons.cli.*;
 import team.rainfall.finality.FinalityLogger;
+import team.rainfall.finality.loader.game.Product;
 import team.rainfall.finality.loader.util.Localization;
 
 public class ParamParser {
@@ -10,7 +11,7 @@ public class ParamParser {
     public LaunchMode mode = LaunchMode.ONLY_LAUNCH;
     public String gameFilePath = null;
     public boolean disableSteamAPI = false;
-
+    public Product product = null;
     private static final Options OPTIONS = new Options();
 
     static {
@@ -21,7 +22,7 @@ public class ParamParser {
         OPTIONS.addOption("debug", false, "Enable debug mode");
         OPTIONS.addOption("disableSteamAPI", false, "Disable Steam API");
         OPTIONS.addOption("gamePath", true, "Specify game file path");
-        
+        OPTIONS.addOption("product", true, "Specify product type. Valid values: aoh2, aoh3");
         Option launchModeOption = Option.builder()
                 .longOpt("launchMode")
                 .hasArg(true)
@@ -67,6 +68,25 @@ public class ParamParser {
                 if (gameFilePath == null || gameFilePath.trim().isEmpty()) {
                     FinalityLogger.warn("Invalid game path");
                     this.gameFilePath = FileManager.INSTANCE.findGameFile();
+                }
+            }
+            if (cmd.hasOption("product")) {
+                String productValue = cmd.getOptionValue("product");
+                if (productValue == null) {
+                    FinalityLogger.warn(Localization.bundle.getString("invalid_product"));
+                } else {
+                    productValue = productValue.toLowerCase();
+                    switch (productValue) {
+                        case "aoh2":
+                            product = Product.AoH2;
+                            break;
+                        case "aoh3":
+                            product = Product.AoH3;
+                            break;
+                        default:
+                            FinalityLogger.warn(Localization.bundle.getString("invalid_product"));
+                            break;
+                    }
                 }
             }
             
