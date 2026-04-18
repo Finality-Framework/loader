@@ -9,8 +9,8 @@ import java.util.jar.JarFile;
 
 public class ProductDetector {
     private final Score score = new Score();
-    private JarFile jarFile;
-    private File steamID;
+    private final JarFile jarFile;
+    private final File steamID;
     public ProductDetector(JarFile jarFile,File steamID){
         this.jarFile = jarFile;
         this.steamID = steamID;
@@ -22,10 +22,15 @@ public class ProductDetector {
         if(jarFile.getEntry("aoc") != null){
            score.AoH3++;
         }
-
+        if(score.AoH2 == 1 && score.AoH3 == 1){
+            score.AoH2DE++;
+        }
         try {
             String value = jarFile.getManifest().getMainAttributes().getValue(Attributes.Name.MAIN_CLASS);
-            if(value.startsWith("aoc")) score.AoH3++;
+            if(value.startsWith("aoc")) {
+                score.AoH3++;
+                score.AoH2DE++;
+            }
             if(value.startsWith("age")) score.AoH2++;
         } catch (IOException ignored) {
 
@@ -44,6 +49,7 @@ public class ProductDetector {
             default:
                 break;
         }
+        if(score.AoH2DE > score.AoH3 && score.AoH2DE > score.AoH2) return Product.AoH2DE;
         if(score.AoH2 > score.AoH3) return Product.AoH2;
         if(score.AoH3 > score.AoH2) return Product.AoH3;
         return null;
@@ -62,7 +68,6 @@ public class ProductDetector {
                 case "603850":
                     return Product.AoH2;
                 case "3381680":
-                    FinalityLogger.error("AoH2DE support is not implemented yet!");
                     return Product.AoH2DE;
                 default:
                     return null;

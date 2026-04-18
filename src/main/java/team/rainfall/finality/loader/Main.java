@@ -14,7 +14,7 @@ import javax.swing.plaf.PanelUI;
 public class Main {
     public static final int TARGET_GAME_VERSION = 2013;
     public static final String CODENAME = "RAIDEN";
-    public static final String VERSION = "1.5.1";
+    public static final String VERSION = "1.5.2";
     public static final VersionType VERSION_TYPE = VersionType.RELEASE;
     public static final String STEAM_MANAGER_CLASS = "aoc.kingdoms.lukasz.jakowski.Steam.SteamManager";
     public static String LAUNCHER_CLASS = "aoc.kingdoms.lukasz.jakowski.desktop.DesktopLauncher";

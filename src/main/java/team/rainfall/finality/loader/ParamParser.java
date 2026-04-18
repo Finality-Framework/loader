@@ -22,7 +22,7 @@ public class ParamParser {
         OPTIONS.addOption("debug", false, "Enable debug mode");
         OPTIONS.addOption("disableSteamAPI", false, "Disable Steam API");
         OPTIONS.addOption("gamePath", true, "Specify game file path");
-        OPTIONS.addOption("product", true, "Specify product type. Valid values: aoh2, aoh3");
+        OPTIONS.addOption("product", true, "Specify product type. Valid values: aoh2, aoh3, aoh2de");
         Option launchModeOption = Option.builder()
                 .longOpt("launchMode")
                 .hasArg(true)
@@ -83,6 +83,8 @@ public class ParamParser {
                         case "aoh3":
                             product = Product.AoH3;
                             break;
+                        case "aoh2de":
+                            product = Product.AoH2DE;
                         default:
                             FinalityLogger.warn(Localization.bundle.getString("invalid_product"));
                             break;

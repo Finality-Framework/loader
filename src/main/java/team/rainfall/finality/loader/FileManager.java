@@ -58,7 +58,7 @@ public class FileManager {
         file = file.getParentFile().getParentFile().getParentFile();
         file = new File(file, "workshop");
         file = new File(file, "content");
-        file = new File(file, "2772750");
+        file = new File(file, product.getAppID());
         if (file.exists()) {
             return file;
         }
@@ -68,7 +68,7 @@ public class FileManager {
     public File getSteamWSFolderGlobal() {
         try {
             for (String libraryPath : VdfManager.getINSTANCE().getLibraryPaths()) {
-                File workshopPath = new File(libraryPath, "steamapps/workshop/content/2772750");
+                File workshopPath = new File(libraryPath, "steamapps/workshop/content/"+product.getAppID());
                 if (workshopPath.exists() && workshopPath.isDirectory()) {
                     return workshopPath;
                 }
@@ -103,7 +103,6 @@ public class FileManager {
      * @author RedreamR
      */
     public void findGameFileByVDF() {
-
         FinalityLogger.info(Localization.bundle.getString("find_game_core_by_vdf"));
         for (String libraryPath : VdfManager.getINSTANCE().getLibraryPaths()) {
             File gameFolder = new File(libraryPath, "steamapps/common/Age of History 3");

@@ -15,10 +15,7 @@ import team.rainfall.finality.loader.util.*;
 import team.rainfall.finality.luminosity2.LuminosityEnvironment;
 
 import javax.swing.*;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.lang.reflect.Field;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -63,6 +60,9 @@ public class Loader {
         }
         if(product == Product.AoH2){
             FinalityLogger.warn(Localization.bundle.getString("experimental_aoh2_support"));
+        }
+        if(product == Product.AoH2DE){
+            FinalityLogger.warn(Localization.bundle.getString("experimental_aoh2de_support"));
         }
         printDeviceInfo();
         FileUtil.createPrivateDir();
