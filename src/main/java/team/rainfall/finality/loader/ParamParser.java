@@ -11,6 +11,7 @@ public class ParamParser {
     public LaunchMode mode = LaunchMode.ONLY_LAUNCH;
     public String gameFilePath = null;
     public boolean disableSteamAPI = false;
+    public boolean testCrash = false;
     public Product product = null;
     private static final Options OPTIONS = new Options();
 
@@ -21,6 +22,7 @@ public class ParamParser {
         OPTIONS.addOption("reboot", false, "Reboot mode");
         OPTIONS.addOption("debug", false, "Enable debug mode");
         OPTIONS.addOption("disableSteamAPI", false, "Disable Steam API");
+        OPTIONS.addOption("testCrash", false, "Trigger a test crash (Error Code: Etude - 99)");
         OPTIONS.addOption("gamePath", true, "Specify game file path");
         OPTIONS.addOption("product", true, "Specify product type. Valid values: aoh2, aoh3, aoh2de");
         Option launchModeOption = Option.builder()
@@ -61,6 +63,10 @@ public class ParamParser {
             
             if (cmd.hasOption("disableSteamAPI")) {
                 disableSteamAPI = true;
+            }
+
+            if (cmd.hasOption("testCrash")) {
+                testCrash = true;
             }
             
             if (cmd.hasOption("gamePath")) {

@@ -43,6 +43,12 @@ public class Loader {
         FinalityLogger.info("Finality Framework Loader " + VERSION);
 
         paramParser.parse(args);
+        if (paramParser.testCrash) {
+            FinalityLogger.error("Test crash caused by the CLI parameter --testCrash");
+            ErrorCode.showInternalError("Etude - 99");
+            safeExit();
+            return;
+        }
         if(paramParser.gameFilePath == null){
             paramParser.gameFilePath = FileManager.INSTANCE.findGameFile();
         }
@@ -151,7 +157,7 @@ public class Loader {
                     classLoader.loadClass(LAUNCHER_CLASS).getMethod("main", String[].class).invoke(null, (Object) new String[0]);
                 } catch (Exception e) {
                     FinalityLogger.error("Game err", e);
-                    JOptionPane.showMessageDialog(null, Localization.bundle.getString("game_crashed"), Localization.bundle.getString("error"), JOptionPane.ERROR_MESSAGE);
+                    ErrorCode.showError(Localization.bundle.getString("game_crashed"));
                 }
             }
         } catch (Exception var18) {

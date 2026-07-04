@@ -8,6 +8,8 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 public class FinalityLogger {
@@ -16,6 +18,8 @@ public class FinalityLogger {
     public static OutputStreamWriter logStream = null;
     public static boolean outputToGUI = false;
     public static boolean isDebug = false;
+    private static final int LOG_BUFFER_MAX = 500;
+    private static final List<String> logBuffer = new ArrayList<>();
     public static final String RED_COLOR = "\033[31m";
     public static final String RED_BACKGROUND = "\033[41m";
     public static final String WHITE_BACKGROUND = "\033[47m";
@@ -121,6 +125,12 @@ public class FinalityLogger {
     }
 
     public static void output(String message){
+        synchronized (logBuffer) {
+            logBuffer.add(message);
+            if (logBuffer.size() > LOG_BUFFER_MAX) {
+                logBuffer.remove(0);
+            }
+        }
         try{
             if(outputToGUI){
                 FinalityGUI.INSTANCE.logMessage(message);
@@ -129,6 +139,15 @@ public class FinalityLogger {
             logStream.flush();
         }catch (IOException ignored){
 
+        }
+    }
+
+    public static List<String> getRecentLogs(int count) {
+        synchronized (logBuffer) {
+            if (logBuffer.size() <= count) {
+                return new ArrayList<>(logBuffer);
+            }
+            return new ArrayList<>(logBuffer.subList(logBuffer.size() - count, logBuffer.size()));
         }
     }
 
