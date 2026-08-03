@@ -7,6 +7,8 @@ import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.MethodNode;
 import team.rainfall.finality.FinalityLogger;
 import team.rainfall.finality.luminosity2.Processor;
+import team.rainfall.finality.luminosity2.annotations.Overwrite;
+import team.rainfall.finality.luminosity2.annotations.Shadow;
 import team.rainfall.finality.luminosity2.utils.AnnotationUtil;
 import team.rainfall.finality.luminosity2.utils.MethodUtil;
 
@@ -31,8 +33,7 @@ public class MixinProcessor implements Processor {
         Iterator<MethodNode> nodeIterator = sourceNode.methods.iterator();
         while (nodeIterator.hasNext()){
             MethodNode methodNode = nodeIterator.next();
-            FinalityLogger.debug("DBG1 " + methodNode.name);
-            if (AnnotationUtil.annotationExists("Lteam/rainfall/finality/luminosity2/annotations/Shadow;", methodNode)) {
+            if (AnnotationUtil.annotationExists(Shadow.class, methodNode)) {
                 FinalityLogger.debug("ShadowMethod " + methodNode.name);
                 nodeIterator.remove();
             }
@@ -47,8 +48,8 @@ public class MixinProcessor implements Processor {
     public void mixinMethods(){
         for(MethodNode methodNode:sourceNode.methods){
             //Skip init method
-            if(methodNode.name.equals("<init>") && !AnnotationUtil.annotationExists("Lteam/rainfall/finality/luminosity2/annotations/Overwrite;", methodNode)) continue;
-            if(methodNode.name.equals("<clinit>") && !AnnotationUtil.annotationExists("Lteam/rainfall/finality/luminosity2/annotations/Overwrite;", methodNode)) continue;
+            if(methodNode.name.equals("<init>") && !AnnotationUtil.annotationExists(Overwrite.class, methodNode)) continue;
+            if(methodNode.name.equals("<clinit>") && !AnnotationUtil.annotationExists(Overwrite.class, methodNode)) continue;
             if(methodNameList.contains(methodNode.name+methodNode.desc)){
                 targetNode.methods.remove(MethodUtil.findMethodByName(targetNode,methodNode.name+methodNode.desc));
                 methodNameList.remove(methodNode.name+methodNode.desc);

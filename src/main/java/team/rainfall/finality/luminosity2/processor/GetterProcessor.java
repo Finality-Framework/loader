@@ -4,7 +4,9 @@ import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.*;
 import team.rainfall.finality.FinalityLogger;
+import team.rainfall.finality.loader.util.Localization;
 import team.rainfall.finality.luminosity2.Processor;
+import team.rainfall.finality.luminosity2.annotations.Getter;
 import team.rainfall.finality.luminosity2.utils.AnnotationUtil;
 import team.rainfall.finality.luminosity2.utils.MethodUtil;
 
@@ -19,16 +21,51 @@ public class GetterProcessor implements Processor {
     @Override
     public void process() {
         for (MethodNode method : sourceNode.methods) {
-            if (AnnotationUtil.annotationExists("Lteam/rainfall/finality/luminosity2/annotations/Getter;", method)) {
-                String fieldName = (String) AnnotationUtil.getAnnotationValue("fieldName", Objects.requireNonNull(AnnotationUtil.getAnnotation("Lteam/rainfall/finality/luminosity2/annotations/Getter;", method)));
-                if ((method.access & ACC_STATIC) != 0) {
-                    try {
-                        rewriteMethodToReturnField(method,targetNode,fieldName);
-                    } catch (NoSuchFieldException e) {
-                        FinalityLogger.warn("L2 Getter Method" + (sourceNode.name + "." + MethodUtil.getFullName(method)) + " inject failed:Field not found");
+            if (AnnotationUtil.annotationExists(Getter.class, method)) {
+                String fieldName = (String) AnnotationUtil.getAnnotationValue("fieldName", Objects.requireNonNull(AnnotationUtil.getAnnotation(Getter.class, method)));
+                if ((method.access & ACC_STATIC) == 0) {
+                    FinalityLogger.warn(String.format(Localization.bundle.getString("luminosity2_error"), "Getter Method " + (sourceNode.name + "." + MethodUtil.getFullName(method)) + " is not static."));
+                    continue;
+                }
+
+                FieldNode field = targetNode.fields.stream()
+                        .filter(f -> f.name.equals(fieldName))
+                        .findFirst()
+                        .orElse(null);
+                if (field == null) {
+                    FinalityLogger.warn(String.format(Localization.bundle.getString("luminosity2_error"), "Getter Method " + (sourceNode.name + "." + MethodUtil.getFullName(method)) + " inject failed: field '" + fieldName + "' not found"));
+                    continue;
+                }
+
+                Type[] argTypes = Type.getMethodType(method.desc).getArgumentTypes();
+                Type returnType = Type.getReturnType(method.desc);
+                boolean isFieldStatic = (field.access & Opcodes.ACC_STATIC) != 0;
+
+                if (isFieldStatic) {
+                    if (argTypes.length != 0) {
+                        FinalityLogger.warn(String.format(Localization.bundle.getString("luminosity2_error"), "Getter Method " + (sourceNode.name + "." + MethodUtil.getFullName(method)) + " for static field '" + fieldName + "' should have 0 parameters, got " + argTypes.length));
+                        continue;
                     }
                 } else {
-                    FinalityLogger.warn("L2 Getter Method " + (sourceNode.name + "." + MethodUtil.getFullName(method)) + "is a virtual method.");
+                    if (argTypes.length != 1) {
+                        FinalityLogger.warn(String.format(Localization.bundle.getString("luminosity2_error"), "Getter Method " + (sourceNode.name + "." + MethodUtil.getFullName(method)) + " for instance field '" + fieldName + "' should have 1 parameter (target instance), got " + argTypes.length));
+                        continue;
+                    }
+                    if (!argTypes[0].getInternalName().equals(targetNode.name)) {
+                        FinalityLogger.warn(String.format(Localization.bundle.getString("luminosity2_error"), "Getter Method " + (sourceNode.name + "." + MethodUtil.getFullName(method)) + " first parameter type '" + argTypes[0].getInternalName() + "' does not match target class '" + targetNode.name + "'"));
+                        continue;
+                    }
+                }
+
+                if (!returnType.getDescriptor().equals(field.desc)) {
+                    FinalityLogger.warn(String.format(Localization.bundle.getString("luminosity2_error"), "Getter Method " + (sourceNode.name + "." + MethodUtil.getFullName(method)) + " return type '" + returnType.getDescriptor() + "' does not match field type '" + field.desc + "'"));
+                    continue;
+                }
+
+                try {
+                    rewriteMethodToReturnField(method, targetNode, fieldName);
+                } catch (NoSuchFieldException e) {
+                    FinalityLogger.warn(String.format(Localization.bundle.getString("luminosity2_error"), "Getter Method " + (sourceNode.name + "." + MethodUtil.getFullName(method)) + " inject failed: field not found"));
                 }
             }
         }

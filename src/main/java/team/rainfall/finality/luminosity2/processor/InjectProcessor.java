@@ -4,6 +4,7 @@ import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.*;
 import team.rainfall.finality.FinalityLogger;
 import team.rainfall.finality.luminosity2.Processor;
+import team.rainfall.finality.luminosity2.annotations.Inject;
 import team.rainfall.finality.luminosity2.utils.AnnotationUtil;
 import team.rainfall.finality.luminosity2.utils.InjectPosition;
 import team.rainfall.finality.luminosity2.utils.MethodUtil;
@@ -35,9 +36,9 @@ public class InjectProcessor implements Processor {
         for (MethodNode method : classNode.methods) {
             if (method == null) continue;
 
-            if (AnnotationUtil.annotationExists("Lteam/rainfall/finality/luminosity2/annotations/Inject;", method)) {
+            if (AnnotationUtil.annotationExists(Inject.class, method)) {
                 FinalityLogger.debug("INJECT FROM " + classNode.name + " " + method.name);
-                AnnotationNode injectAnnotation = AnnotationUtil.getAnnotation("Lteam/rainfall/finality/luminosity2/annotations/Inject;", method);
+                AnnotationNode injectAnnotation = AnnotationUtil.getAnnotation(Inject.class, method);
                 if (injectAnnotation != null) {
                     String targetMethodName = (String) AnnotationUtil.getAnnotationValue("methodName", injectAnnotation);
                     String[] positionRaw = (String[])AnnotationUtil.getAnnotationValue("position", injectAnnotation);

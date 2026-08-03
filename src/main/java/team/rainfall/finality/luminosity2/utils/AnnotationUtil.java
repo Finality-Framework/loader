@@ -76,6 +76,26 @@ public class AnnotationUtil {
         return null;
     }
 
+    public static boolean annotationExists(Class<?> clazz, MethodNode node) {
+        return annotationExists(desc(clazz), node);
+    }
+
+    public static boolean annotationExists(Class<?> clazz, ClassNode node) {
+        return annotationExists(desc(clazz), node);
+    }
+
+    public static AnnotationNode getAnnotation(Class<?> clazz, MethodNode node) {
+        return getAnnotation(desc(clazz), node);
+    }
+
+    public static AnnotationNode getAnnotation(Class<?> clazz, ClassNode node) {
+        return getAnnotation(desc(clazz), node);
+    }
+
+    private static String desc(Class<?> clazz) {
+        return "L" + clazz.getName().replace('.', '/') + ";";
+    }
+
     public static Object getAnnotationValue(String key, AnnotationNode node) {
         boolean foundTarget = false;
         boolean isKey = true;

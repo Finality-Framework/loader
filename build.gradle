@@ -49,10 +49,44 @@ compileTestJava {
     options.encoding = 'UTF-8'
 }
 
+ext.buildVersionType = 'DEV'
+
+gradle.taskGraph.whenReady { graph ->
+    if (graph.hasTask(tasks.release)) {
+        ext.buildVersionType = 'RELEASE'
+    } else if (graph.hasTask(tasks.beta)) {
+        ext.buildVersionType = 'BETA'
+    }
+}
+
+task generateBuildConfig {
+    outputs.upToDateWhen { false }
+    outputs.file file('src/main/java/team/rainfall/finality/loader/BuildConfig.java')
+    doLast {
+        def srcFile = file('src/main/java/team/rainfall/finality/loader/BuildConfig.java')
+        srcFile.text = """package team.rainfall.finality.loader;
+
+public class BuildConfig {
+    public static final VersionType VERSION_TYPE = VersionType.${project.ext.buildVersionType};
+}
+"""
+    }
+}
+
+compileJava.dependsOn generateBuildConfig
+
 java{
     withSourcesJar()
     sourceCompatibility = JavaVersion.VERSION_1_8
     targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+sourcesJar.dependsOn generateBuildConfig
+
+task beta {
+    description = 'Create a beta set of Jars.'
+    group = 'build'
+    dependsOn clean, shadowJar, sourcesJar
 }
 
 task release {

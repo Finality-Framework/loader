@@ -1,9 +1,12 @@
 package team.rainfall.finality.luminosity2.processor;
 
 import org.objectweb.asm.Opcodes;
+import org.objectweb.asm.Type;
 import org.objectweb.asm.tree.*;
 import team.rainfall.finality.FinalityLogger;
+import team.rainfall.finality.loader.util.Localization;
 import team.rainfall.finality.luminosity2.Processor;
+import team.rainfall.finality.luminosity2.annotations.Setter;
 import team.rainfall.finality.luminosity2.utils.AnnotationUtil;
 import team.rainfall.finality.luminosity2.utils.MethodUtil;
 
@@ -18,18 +21,61 @@ public class SetterProcessor implements Processor {
     @Override
     public void process() {
         for (MethodNode method : sourceNode.methods) {
-            if (AnnotationUtil.annotationExists("Lteam/rainfall/finality/luminosity2/annotations/Setter;", method)) {
-                String fieldName = (String) AnnotationUtil.getAnnotationValue("fieldName", Objects.requireNonNull(AnnotationUtil.getAnnotation("Lteam/rainfall/finality/luminosity2/annotations/Setter;", method)));
-                if ((method.access & ACC_STATIC) != 0) {
-                    try {
-                        rewriteMethodToSetField(method, targetNode, fieldName);
-                    } catch (NoSuchFieldException e) {
-                        FinalityLogger.warn("L2 Setter Method " + (sourceNode.name + "." + MethodUtil.getFullName(method)) + " inject failed: Field not found");
-                    } catch (IllegalArgumentException e) {
-                        FinalityLogger.warn("L2 Setter Method " + (sourceNode.name + "." + MethodUtil.getFullName(method)) + " inject failed: " + e.getMessage());
+            if (AnnotationUtil.annotationExists(Setter.class, method)) {
+                String fieldName = (String) AnnotationUtil.getAnnotationValue("fieldName", Objects.requireNonNull(AnnotationUtil.getAnnotation(Setter.class, method)));
+                if ((method.access & ACC_STATIC) == 0) {
+                    FinalityLogger.warn(String.format(Localization.bundle.getString("luminosity2_error"), "Setter Method " + (sourceNode.name + "." + MethodUtil.getFullName(method)) + " is not static."));
+                    continue;
+                }
+
+                FieldNode field = targetNode.fields.stream()
+                        .filter(f -> f.name.equals(fieldName))
+                        .findFirst()
+                        .orElse(null);
+                if (field == null) {
+                    FinalityLogger.warn(String.format(Localization.bundle.getString("luminosity2_error"), "Setter Method " + (sourceNode.name + "." + MethodUtil.getFullName(method)) + " inject failed: field '" + fieldName + "' not found"));
+                    continue;
+                }
+
+                Type[] argTypes = Type.getMethodType(method.desc).getArgumentTypes();
+                Type returnType = Type.getReturnType(method.desc);
+                boolean isFieldStatic = (field.access & Opcodes.ACC_STATIC) != 0;
+
+                if (isFieldStatic) {
+                    if (argTypes.length != 1) {
+                        FinalityLogger.warn(String.format(Localization.bundle.getString("luminosity2_error"), "Setter Method " + (sourceNode.name + "." + MethodUtil.getFullName(method)) + " for static field '" + fieldName + "' should have 1 parameter (value), got " + argTypes.length));
+                        continue;
+                    }
+                    if (!argTypes[0].getDescriptor().equals(field.desc)) {
+                        FinalityLogger.warn(String.format(Localization.bundle.getString("luminosity2_error"), "Setter Method " + (sourceNode.name + "." + MethodUtil.getFullName(method)) + " parameter type '" + argTypes[0].getDescriptor() + "' does not match field type '" + field.desc + "'"));
+                        continue;
                     }
                 } else {
-                    FinalityLogger.warn("L2 Setter Method " + (sourceNode.name + "." + MethodUtil.getFullName(method)) + " is a virtual method.");
+                    if (argTypes.length != 2) {
+                        FinalityLogger.warn(String.format(Localization.bundle.getString("luminosity2_error"), "Setter Method " + (sourceNode.name + "." + MethodUtil.getFullName(method)) + " for instance field '" + fieldName + "' should have 2 parameters (target instance, value), got " + argTypes.length));
+                        continue;
+                    }
+                    if (!argTypes[0].getInternalName().equals(targetNode.name)) {
+                        FinalityLogger.warn(String.format(Localization.bundle.getString("luminosity2_error"), "Setter Method " + (sourceNode.name + "." + MethodUtil.getFullName(method)) + " first parameter type '" + argTypes[0].getInternalName() + "' does not match target class '" + targetNode.name + "'"));
+                        continue;
+                    }
+                    if (!argTypes[1].getDescriptor().equals(field.desc)) {
+                        FinalityLogger.warn(String.format(Localization.bundle.getString("luminosity2_error"), "Setter Method " + (sourceNode.name + "." + MethodUtil.getFullName(method)) + " second parameter type '" + argTypes[1].getDescriptor() + "' does not match field type '" + field.desc + "'"));
+                        continue;
+                    }
+                }
+
+                if (!returnType.getDescriptor().equals("V")) {
+                    FinalityLogger.warn(String.format(Localization.bundle.getString("luminosity2_error"), "Setter Method " + (sourceNode.name + "." + MethodUtil.getFullName(method)) + " should return void, got " + returnType.getDescriptor()));
+                    continue;
+                }
+
+                try {
+                    rewriteMethodToSetField(method, targetNode, fieldName);
+                } catch (NoSuchFieldException e) {
+                    FinalityLogger.warn(String.format(Localization.bundle.getString("luminosity2_error"), "Setter Method " + (sourceNode.name + "." + MethodUtil.getFullName(method)) + " inject failed: Field not found"));
+                } catch (IllegalArgumentException e) {
+                    FinalityLogger.warn(String.format(Localization.bundle.getString("luminosity2_error"), "Setter Method " + (sourceNode.name + "." + MethodUtil.getFullName(method)) + " inject failed: " + e.getMessage()));
                 }
             }
         }

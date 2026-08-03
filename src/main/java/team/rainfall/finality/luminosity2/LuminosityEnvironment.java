@@ -9,6 +9,7 @@ import team.rainfall.finality.loader.FileManager;
 import team.rainfall.finality.loader.plugin.PluginData;
 import team.rainfall.finality.loader.gui.ErrorCode;
 import team.rainfall.finality.loader.util.FinalityClassLoader;
+import team.rainfall.finality.luminosity2.annotations.Mixin;
 import team.rainfall.finality.luminosity2.processor.*;
 import team.rainfall.finality.luminosity2.utils.AnnotationUtil;
 import team.rainfall.finality.luminosity2.utils.ClassInfo;
@@ -113,7 +114,7 @@ public class LuminosityEnvironment {
                 for (String tweakClassName : pluginData.manifest.tweakClasses) {
                     try {
                         ClassNode node = JarUtil.getClassFromJar(pluginData.jarFile, tweakClassName);
-                        AnnotationNode annotationNode = AnnotationUtil.getAnnotation("Lteam/rainfall/finality/luminosity2/annotations/Mixin;", node);
+                        AnnotationNode annotationNode = AnnotationUtil.getAnnotation(Mixin.class, node);
                         if (annotationNode != null) {
                             String targetClassName = (String) AnnotationUtil.getAnnotationValue("mixinClass", annotationNode);
                             List<ClassInfo> boundClasses = classNodeMap.get(targetClassName);
