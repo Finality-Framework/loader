@@ -4,5 +4,7 @@ public enum LaunchMode {
     INSTALL,
     ONLY_LAUNCH,
     ONLY_GEN,
-    LAUNCH_AND_GEN
+    LAUNCH_AND_GEN,
+    COMPOSE,
+    PATCH
 }

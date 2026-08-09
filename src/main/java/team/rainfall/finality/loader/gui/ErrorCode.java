@@ -1,6 +1,7 @@
 package team.rainfall.finality.loader.gui;
 
 import team.rainfall.finality.FinalityLogger;
+import team.rainfall.finality.loader.Loader;
 import team.rainfall.finality.loader.util.Localization;
 
 import javax.swing.*;
@@ -14,6 +15,10 @@ public class ErrorCode {
     public static void showInternalError(String code){
         if(!showed) {
             showed = true;
+            if(Loader.isNoGui()){
+                FinalityLogger.error("Internal error: " + code);
+                return;
+            }
             String rawFormat = Localization.bundle.getString("internal_error");
             String htmlMsg = "<html><body style='width:450px'>"
                     + rawFormat.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\n", "<br>")
@@ -26,6 +31,10 @@ public class ErrorCode {
     public static void showError(String message){
         if(!showed) {
             showed = true;
+            if(Loader.isNoGui()){
+                FinalityLogger.error(message);
+                return;
+            }
             String htmlMsg = "<html><body style='width:450px'>"
                     + message.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\n", "<br>")
                     + "</body></html>";

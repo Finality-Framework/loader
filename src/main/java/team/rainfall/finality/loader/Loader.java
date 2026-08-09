@@ -33,6 +33,7 @@ import static team.rainfall.finality.loader.Main.*;
 public class Loader {
 
     static ParamParser paramParser = new ParamParser();
+    static Composer.ComposeConfig composeConfig = null;
     static FinalityClassLoader classLoader;
     static String[] args;
     static ProductDetector productDetector = null;
@@ -44,10 +45,33 @@ public class Loader {
 
         paramParser.parse(args);
         if (paramParser.testCrash) {
-            FinalityLogger.error("Test crash caused by the CLI parameter --testCrash");
+            FinalityLogger.error("Test crash caused by the CLI parameter --test-crash");
             ErrorCode.showInternalError("Etude - 99");
             safeExit();
             return;
+        }
+        if(paramParser.mode == LaunchMode.PATCH){
+            Patcher.patch(paramParser.patchConfigPath);
+            safeExit();
+            return;
+        }
+        if(paramParser.mode == LaunchMode.COMPOSE){
+            if(paramParser.composeConfigPath == null){
+                FinalityLogger.error(Localization.bundle.getString("compose_missing_config"));
+                System.exit(1);
+            }
+            if(paramParser.composeTarget == null){
+                FinalityLogger.error(Localization.bundle.getString("compose_missing_target"));
+                System.exit(1);
+            }
+            composeConfig = Composer.loadConfig(paramParser.composeConfigPath);
+            if(composeConfig == null){
+                System.exit(1);
+            }
+            if(composeConfig.gamePath != null && !composeConfig.gamePath.isEmpty()){
+                paramParser.gameFilePath = composeConfig.gamePath;
+            }
+            Composer.loadExtraPlugins(composeConfig);
         }
         if(paramParser.gameFilePath == null){
             paramParser.gameFilePath = FileManager.INSTANCE.findGameFile();
@@ -72,8 +96,10 @@ public class Loader {
         }
         printDeviceInfo();
         FileUtil.createPrivateDir();
-        FlatIntelliJLaf.setup();
-        SplashScreen.create();
+        if(!paramParser.headless){
+            FlatIntelliJLaf.setup();
+            SplashScreen.create();
+        }
         checkUpdate();
         if(paramParser.mode == LaunchMode.INSTALL){
             Installer.install();
@@ -84,7 +110,11 @@ public class Loader {
             unstableWarn();
         }
 
-        if(FileManager.parentFile != null){
+        if(FileManager.parentFile != null && paramParser.mode != LaunchMode.COMPOSE){
+            if(paramParser.headless){
+                FinalityLogger.error(Localization.bundle.getString("headless_outside_game_folder"));
+                System.exit(1);
+            }
             Loader.args = args;
             SplashScreen.destroy();
             FinalityGUI.main(args);
@@ -128,9 +158,23 @@ public class Loader {
                 FinalityLogger.localizeError("finality_api_not_found");
                 FinalityLogger.localizeError("subscribe_finality_api");
             }
+            if (paramParser.mode == LaunchMode.COMPOSE) {
+                PluginManager.INSTANCE.filterForPlatform(paramParser.composeTarget == ComposeTarget.ANDROID ? "android" : "desktop");
+            } else if (paramParser.mode == LaunchMode.ONLY_GEN || paramParser.mode == LaunchMode.LAUNCH_AND_GEN) {
+                PluginManager.INSTANCE.filterForPlatform("android");
+            } else {
+                PluginManager.INSTANCE.filterForPlatform("desktop");
+            }
             //Luminosity2
             LuminosityEnvironment environment = new LuminosityEnvironment(PluginManager.INSTANCE.pluginDataList, new File(paramParser.gameFilePath));
             tweak(environment);
+
+            if(paramParser.mode == LaunchMode.COMPOSE){
+                Composer.compose(paramParser.composeTarget, composeConfig);
+                SplashScreen.destroy();
+                safeExit();
+                return;
+            }
 
             hijackSteamManager();
 
@@ -191,7 +235,7 @@ public class Loader {
         try {
             currentJarPath = URLDecoder.decode(currentJarPath, "UTF-8");
             copyFile(new File(currentJarPath), new File(gamePath,"Finality_Loader.jar"));
-            String[] param = {"java", "-jar", gamePath.getAbsolutePath()+"/"+"Finality_Loader.jar","-reboot"};
+            String[] param = {"java", "-jar", gamePath.getAbsolutePath()+"/"+"Finality_Loader.jar","--reboot"};
             param = ArrayUtil.mergeArrays(param,args);
             ProcessBuilder processBuilder = new ProcessBuilder(param);
             processBuilder.directory(gamePath);
@@ -235,7 +279,14 @@ public class Loader {
         }
     }
     private static void checkUpdate(){
+        if(paramParser.noUpdateCheck){
+            return;
+        }
         if(GithubUtil.checkUpdate()){
+            if(paramParser.headless){
+                FinalityLogger.warn(String.format(Localization.bundle.getString("new_version"), GithubUtil.latestVersion));
+                return;
+            }
             String [] options = {Localization.bundle.getString("update_now"),Localization.bundle.getString("later")};
             int i = JOptionPane.showOptionDialog(null, String.format(Localization.bundle.getString("new_version"), GithubUtil.latestVersion),Localization.bundle.getString("update"),JOptionPane.YES_NO_OPTION,JOptionPane.QUESTION_MESSAGE,null,options,options[0]);
             if(i == 0){
@@ -247,7 +298,7 @@ public class Loader {
     private static void tweak(LuminosityEnvironment environment) throws MalformedURLException {
         environment.run();
         //Luminosity should run earlier than other classloader load
-        if (paramParser.mode != LaunchMode.ONLY_GEN) {
+        if (paramParser.mode != LaunchMode.ONLY_GEN && paramParser.mode != LaunchMode.COMPOSE) {
             environment.load(classLoader);
         }
         for (PluginData data : PluginManager.INSTANCE.pluginDataList) {
@@ -282,6 +333,10 @@ public class Loader {
         SplashScreen.destroy();
         FinalityGUI.destroy();
         System.exit(0);
+    }
+
+    public static boolean isNoGui(){
+        return paramParser.headless;
     }
 
 }

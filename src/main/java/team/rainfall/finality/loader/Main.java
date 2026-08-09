@@ -20,13 +20,24 @@ public class Main {
     public static String LAUNCHER_CLASS = "aoc.kingdoms.lukasz.jakowski.desktop.DesktopLauncher";
     public static void main(String[] args) {
         try {
-            FlatIntelliJLaf.setup();
+            if (!hasHeadlessFlag(args)) {
+                FlatIntelliJLaf.setup();
+            }
             Loader.loaderMain(args);
         }catch (Throwable e){
             FinalityLogger.error("Unknown err",e);
             ErrorCode.showInternalError("Etude - 02");
             System.exit(1);
         }
+    }
+
+    private static boolean hasHeadlessFlag(String[] args) {
+        for (String arg : args) {
+            if ("--headless".equals(arg)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public static boolean deleteDir(File dir) {

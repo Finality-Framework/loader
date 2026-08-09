@@ -28,6 +28,16 @@ public class PluginManager {
         }
         return null;
     }
+    public void filterForPlatform(String platform){
+        Iterator<PluginData> iterator = pluginDataList.iterator();
+        while (iterator.hasNext()) {
+            PluginData data = iterator.next();
+            if (!data.manifest.supportsPlatform(platform)) {
+                FinalityLogger.info(String.format(Localization.bundle.getString("plugin_platform_unsupported"), data.manifest.name, platform));
+                iterator.remove();
+            }
+        }
+    }
     public void findPlugins(File folder) {
         if (folder.isDirectory()) {
             File folder2 = new File(folder, "plugins");

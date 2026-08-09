@@ -63,21 +63,21 @@ public class FinalityLogger {
     public static void info(String message) {
         alternativeOutputStream.bypassing = true;
 
-        System.out.println(WHITE_BACKGROUND + BLACK_COLOR + "[Info] " + message + RESET);
+        System.out.println(WHITE_BACKGROUND + BLACK_COLOR + "[I] " + message + RESET);
         output("[Info] " + message);
         alternativeOutputStream.bypassing = false;
     }
 
     public static void error(String message) {
         alternativeOutputStream.bypassing = true;
-        System.err.println(RED_BACKGROUND + "[Error] " + message + RESET);
+        System.err.println(RED_BACKGROUND + "[E] " + message + RESET);
         output("[Error] " + message);
         alternativeOutputStream.bypassing = false;
     }
 
     public static void error(String message, Throwable throwable) {
         alternativeOutputStream.bypassing = true;
-        System.err.println(RED_BACKGROUND+"[Error] " + message + RESET);
+        System.err.println(RED_BACKGROUND+"[E] " + message + RESET);
         System.err.println(RED_COLOR+getStackTraceAsString(throwable,true)+RESET);
         output("[Error] " + message);
         output(getStackTraceAsString(throwable,false));
@@ -111,7 +111,7 @@ public class FinalityLogger {
     public static void debug(String message) {
         alternativeOutputStream.bypassing = true;
         if (isDebug) {
-            System.out.println(GRAY_BACKGROUND + "[Debug] " + message + RESET);
+            System.out.println(GRAY_BACKGROUND + "[D] " + message + RESET);
             output("[Debug] " + message);
         }
         alternativeOutputStream.bypassing = false;
@@ -119,7 +119,7 @@ public class FinalityLogger {
 
     public static void warn(String message) {
         alternativeOutputStream.bypassing = true;
-        System.out.println(YELLOW_BACKGROUND + BLACK_COLOR + "[Warning] " + message + RESET);
+        System.out.println(YELLOW_BACKGROUND + BLACK_COLOR + "[W] " + message + RESET);
         output("[Warning] "+message);
         alternativeOutputStream.bypassing = false;
     }

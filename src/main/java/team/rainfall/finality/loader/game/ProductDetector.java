@@ -36,18 +36,21 @@ public class ProductDetector {
 
         }
 
-        switch (detectBySteamAppID(steamID)) {
-            case AoH2:
-                score.AoH2++;
-                break;
-            case AoH3:
-                score.AoH3++;
-                break;
-            case AoH2DE:
-                score.AoH2DE++;
-                break;
-            default:
-                break;
+        Product detected = detectBySteamAppID(steamID);
+        if (detected != null) {
+            switch (detected) {
+                case AoH2:
+                    score.AoH2++;
+                    break;
+                case AoH3:
+                    score.AoH3++;
+                    break;
+                case AoH2DE:
+                    score.AoH2DE++;
+                    break;
+                default:
+                    break;
+            }
         }
         if(score.AoH2DE > score.AoH3 && score.AoH2DE > score.AoH2) return Product.AoH2DE;
         if(score.AoH2 > score.AoH3) return Product.AoH2;

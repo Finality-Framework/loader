@@ -47,7 +47,7 @@ public class Installer {
             for (Map.Entry<String, Object[]> stringEntry : node.entrySet()) {
                 int temp1 = node.getSubNode(stringEntry.getKey()).getInt("MostRecent");
                 if (temp1 == 1) {
-                    String launchOption = "java -jar \"" + FileManager.parentFile.getAbsolutePath() + "\\Finality_Loader.jar\" -forceNoVDF -ignore %command%";
+                    String launchOption = "java -jar \"" + FileManager.parentFile.getAbsolutePath() + "\\Finality_Loader.jar\" --force-no-vdf --ignore %command%";
                     launchOption = StringUtil.escapeString(launchOption);
 
                     FinalityLogger.localizeInfo("installing");

@@ -15,6 +15,7 @@ import team.rainfall.finality.luminosity2.utils.AnnotationUtil;
 import team.rainfall.finality.luminosity2.utils.ClassInfo;
 import team.rainfall.finality.luminosity2.utils.JarUtil;
 import team.rainfall.finality.luminosity2.utils.Luminosity_ClassWriter;
+import team.rainfall.finality.luminosity2.utils.PluginsCollectionBuilder;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -59,7 +60,15 @@ public class LuminosityEnvironment {
         bind();
         runMixin();
         runFieldOp();
+        generatePluginsCollection();
         writeBytes();
+    }
+
+    private void generatePluginsCollection() {
+        ClassInfo classInfo = new ClassInfo();
+        classInfo.name = PluginsCollectionBuilder.CLASS_NAME;
+        classInfo.node = PluginsCollectionBuilder.build(pluginData);
+        classInfos.add(classInfo);
     }
 
     public void runMixin() {

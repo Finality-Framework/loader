@@ -22,9 +22,12 @@ public class PluginManifest {
     public String version;
     public String id;
     public String name;
+    //Main class of the Plugin,fully qualified name
+    public String mainClass;
     public Boolean useLuminosity = false;
     public ArrayList<String> tweakClasses = new ArrayList<>();
     public ArrayList<String> requirements = new ArrayList<>();
+    public ArrayList<String> supportedPlatform = new ArrayList<>();
     public PluginManifest(InputStream is){
         JSONObject jsonObject = JSON.parseObject(is, Charset.defaultCharset());
         useLuminosity = jsonObject.getBoolean("useLuminosity");
@@ -32,7 +35,11 @@ public class PluginManifest {
         if(requirement != null) {
             requirement.forEach(item -> requirements.add((String) item));
         }
-        if(useLuminosity) {
+        JSONArray platform = jsonObject.getJSONArray("supportedPlatform");
+        if(platform != null) {
+            platform.forEach(item -> supportedPlatform.add((String) item));
+        }
+        if(Boolean.TRUE.equals(useLuminosity)) {
             jsonObject.getJSONArray("tweakClasses").forEach(item -> tweakClasses.add((String) item));
         }
         sdkVersion = jsonObject.getString("sdkVersion");
@@ -49,10 +56,15 @@ public class PluginManifest {
             version = "0.0.0";
         }
         id = jsonObject.getString("id");
+        mainClass = jsonObject.getString("mainClass");
 
         if(useLuminosity == null){
             useLuminosity = false;
         }
     }
     public PluginManifest(){}
+
+    public boolean supportsPlatform(String platform){
+        return supportedPlatform.isEmpty() || supportedPlatform.contains(platform);
+    }
 }

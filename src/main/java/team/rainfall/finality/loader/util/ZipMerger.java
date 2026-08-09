@@ -8,6 +8,11 @@ import java.util.zip.*;
 
 public class ZipMerger {
     public static void mergeZipFiles(File[] sourceZipFiles, File destinationZipFile) throws IOException {
+        mergeZipFiles(sourceZipFiles, destinationZipFile, new String[0]);
+    }
+
+    public static void mergeZipFiles(File[] sourceZipFiles, File destinationZipFile, String[] excludedPrefixes) throws IOException {
+        String[] normalizedPrefixes = normalizePrefixes(excludedPrefixes);
         Set<String> entries = new HashSet<>();
         try (ZipOutputStream zos = new ZipOutputStream(Files.newOutputStream(destinationZipFile.toPath()))) {
             byte[] buffer = new byte[4096];
@@ -40,6 +45,9 @@ public class ZipMerger {
                         if (entryName.equals("exclude.txt") || excludeEntries.contains(entryName)) {
                             continue;
                         }
+                        if (isExcluded(entryName, normalizedPrefixes)) {
+                            continue;
+                        }
                         if (entries.contains(entryName)) {
                             continue;
                         }
@@ -56,5 +64,37 @@ public class ZipMerger {
                 }
             }
         }
+    }
+
+    private static String[] normalizePrefixes(String[] prefixes) {
+        if (prefixes == null) {
+            return new String[0];
+        }
+        String[] normalized = new String[prefixes.length];
+        for (int i = 0; i < prefixes.length; i++) {
+            String prefix = prefixes[i];
+            if (prefix == null) {
+                continue;
+            }
+            prefix = prefix.trim();
+            if (prefix.isEmpty()) {
+                continue;
+            }
+            prefix = prefix.replace('.', '/');
+            if (!prefix.endsWith("/")) {
+                prefix = prefix + "/";
+            }
+            normalized[i] = prefix;
+        }
+        return normalized;
+    }
+
+    private static boolean isExcluded(String entryName, String[] prefixes) {
+        for (String prefix : prefixes) {
+            if (prefix != null && entryName.startsWith(prefix)) {
+                return true;
+            }
+        }
+        return false;
     }
 }
